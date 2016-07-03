@@ -14,6 +14,7 @@ pub use emulator::Emulator;
 pub use operand::Operand;
 pub use instruction::Instruction;
 pub use state::SharedState;
+pub use config::Config;
 
 #[cfg(test)]
 mod tests {

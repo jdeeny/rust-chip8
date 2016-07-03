@@ -1,8 +1,9 @@
 use rand::{thread_rng, Rng};
 
-use config::Config;
+// use config::Config;
 
 
+pub use config::Config;
 
 pub use instruction::{Instruction, InstructionDef, Word, InstructionTable};
 pub use operand::{Operand, OperandKind};
