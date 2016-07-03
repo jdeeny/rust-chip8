@@ -33,7 +33,6 @@ pub fn op_subn(inst: &Instruction, core: &mut Emulator) {
     core.store(inst.dest(), total);
 }
 
-
 pub fn op_or(inst: &Instruction, core: &mut Emulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
@@ -72,8 +71,6 @@ pub fn op_shl(inst: &Instruction, core: &mut Emulator) {
     core.store(inst.dest(), result);
     core.vf_store(carry);
 }
-
-
 
 pub fn op_load(inst: &Instruction, core: &mut Emulator) {
     let data = core.load(inst.src());
@@ -132,7 +129,7 @@ pub fn op_skipneq(inst: &Instruction, core: &mut Emulator) {
 
 pub fn op_skipkey(inst: &Instruction, core: &mut Emulator) {
     let key = core.load(inst.dest()) as usize;
-    let mut key_state = false;
+    let key_state: bool;
     {
         let keys = core.state.keys.read().unwrap();
         key_state = keys.is_down(key);
@@ -144,7 +141,7 @@ pub fn op_skipkey(inst: &Instruction, core: &mut Emulator) {
 
 pub fn op_skipnkey(inst: &Instruction, core: &mut Emulator) {
     let key = core.load(inst.dest()) as usize;
-    let mut key_state = false;
+    let key_state: bool;
     {
         let keys = core.state.keys.read().unwrap();
         key_state = keys.is_down(key);
@@ -159,7 +156,6 @@ pub fn op_waitkey(inst: &Instruction, core: &mut Emulator) {
     panic!("WaitKey Unimplemented")
 }
 
-
 /// Jump to address
 pub fn op_jump(inst: &Instruction, core: &mut Emulator) {
     let addr = core.load(inst.dest()) as usize;
@@ -172,7 +168,6 @@ pub fn op_jumpv0(inst: &Instruction, core: &mut Emulator) {
     addr += core.reg(0) as usize;
     core.jump_pc(addr);
 }
-
 
 pub fn op_call(inst: &Instruction, core: &mut Emulator) {
     let addr = core.load(inst.dest()) as usize;
