@@ -188,6 +188,7 @@ impl Simulator {
             print!("{:X} ", r);
         }
         print!(" i:{:X}", self.i);
+        print!(" DT: {:X} ST: {:X}", self.delay_timer, self.sound_timer);
         println!("");
         // println!("i:{:X} pc:{:X} stack{}", self.i, self.pc, self.stack.len());
     }
