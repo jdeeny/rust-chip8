@@ -28,7 +28,7 @@ pub struct Vram {
 }
 impl Vram {
     pub fn new() -> Vram {
-        Vram { pixels: [[0; 32]; 64], }
+        Vram { pixels: [[0; 32]; 64] }
     }
 }
 
@@ -38,9 +38,7 @@ pub struct Keyboard {
 }
 impl Keyboard {
     pub fn new() -> Keyboard {
-        Keyboard {
-            state: [false; 16],
-        }
+        Keyboard { state: [false; 16] }
     }
     pub fn is_down(&self, key: usize) -> bool {
         assert!(key <= 16);

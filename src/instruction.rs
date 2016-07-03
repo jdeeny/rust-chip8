@@ -1,4 +1,4 @@
-use chip8::{ Operand, OperandKind };
+use operand::{Operand, OperandKind};
 use operations::*;
 
 
@@ -24,7 +24,7 @@ pub struct InstructionTable {
 }
 impl InstructionTable {
     pub fn new() -> InstructionTable {
-        use chip8::OperandKind::*;
+        use operand::OperandKind::*;
         use self::Coding::*;
 
         let itable: Vec<InstructionDef> = vec!(
@@ -79,11 +79,11 @@ impl InstructionTable {
     }
 }
 
-///Defines a specific kind of instructions
+/// Defines a specific kind of instructions
 ///
-///It has a unique signature: the kind of operation and the kinds of the locations dest, src, aux
+/// It has a unique signature: the kind of operation and the kinds of the locations dest, src, aux
 ///
-///pattern defines how the instruction is decoded:
+/// pattern defines how the instruction is decoded:
 ///     C(n) is a constant nibble. The codeword must match for this instruction to be valid.
 ///     D, S, and A are value markers that indicate which nibbles represent which operand's value.
 ///     If more than one nibble is used for the same operand, the leftmost nibble is most significant
@@ -91,17 +91,23 @@ impl InstructionTable {
 ///     D indicates dest, S src, and A aux.
 
 pub struct InstructionDef {
-  pub operation: Operation,
-  dest_kind: OperandKind,
-  src_kind: OperandKind,
-  aux_kind: OperandKind,
-  pattern: Pattern,
-  mnemonic: String,
-  code: Word,
-  mask: Word,
+    pub operation: Operation,
+    dest_kind: OperandKind,
+    src_kind: OperandKind,
+    aux_kind: OperandKind,
+    pattern: Pattern,
+    mnemonic: String,
+    code: Word,
+    mask: Word,
 }
 impl InstructionDef {
-    pub fn new(operation: Operation, dest: OperandKind, src: OperandKind, aux:OperandKind, pattern: Pattern, mnemonic: &str) -> InstructionDef {
+    pub fn new(operation: Operation,
+               dest: OperandKind,
+               src: OperandKind,
+               aux: OperandKind,
+               pattern: Pattern,
+               mnemonic: &str)
+               -> InstructionDef {
         let mut code: Word = 0;
         let mut mask: Word = 0;
         for coding in pattern.iter() {
@@ -109,9 +115,9 @@ impl InstructionDef {
             mask <<= 4;
             match *coding {
                 Coding::C(n) => {
-                                    code |= n as Word;
-                                    mask |= 0xF;
-                                },
+                    code |= n as Word;
+                    mask |= 0xF;
+                }
                 _ => {}
             };
         }
@@ -145,11 +151,11 @@ impl InstructionDef {
 }
 
 pub struct Instruction {
-  pub def: InstructionDef,
-  codeword: Word,
-  dest: Operand,
-  src: Operand,
-  aux: Operand,
+    pub def: InstructionDef,
+    codeword: Word,
+    dest: Operand,
+    src: Operand,
+    aux: Operand,
 }
 
 impl Instruction {
@@ -162,26 +168,32 @@ impl Instruction {
         for coding in def.pattern.iter() {
             let nibble = (word & 0xF000) >> 12;
             word <<= 4;
-            //println!("nibble: {:?}", nibble);
+            // println!("nibble: {:?}", nibble);
             match *coding {
-                self::Coding::C(_) => {},
-                self::Coding::D => { dest_data = (dest_data << 4) | nibble; },
-                self::Coding::S => { src_data = (src_data << 4) | nibble; },
-                self::Coding::A => { aux_data = (aux_data << 4) | nibble; },
+                self::Coding::C(_) => {}
+                self::Coding::D => {
+                    dest_data = (dest_data << 4) | nibble;
+                }
+                self::Coding::S => {
+                    src_data = (src_data << 4) | nibble;
+                }
+                self::Coding::A => {
+                    aux_data = (aux_data << 4) | nibble;
+                }
             }
         }
 
 
-        let mut dest: Operand;
-        let mut src: Operand;
-        let mut aux: Operand;
+        let dest: Operand;
+        let src: Operand;
+        let aux: Operand;
         {
             dest = Self::specify_operand(&def.dest_kind, dest_data);
             src = Self::specify_operand(&def.src_kind, src_data);
             aux = Self::specify_operand(&def.aux_kind, aux_data);
         }
 
-        //println!("{:?} {:?} {:?} / {:?} {:?} {:?} ", dest.to_string(), src.to_string(), aux.to_string(), dest_data, src_data, aux_data);
+        // println!("{:?} {:?} {:?} / {:?} {:?} {:?} ", dest.to_string(), src.to_string(), aux.to_string(), dest_data, src_data, aux_data);
 
         Instruction {
             def: def,
