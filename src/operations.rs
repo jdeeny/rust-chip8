@@ -1,11 +1,11 @@
-use emulator::Emulator;
+use simulator::Simulator;
 use operand::Operand;
 use instruction::Instruction;
 
 
-pub type Operation = fn(&Instruction, &mut Emulator);
+pub type Operation = fn(&Instruction, &mut Simulator);
 
-pub fn op_add(inst: &Instruction, core: &mut Emulator) {
+pub fn op_add(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let total = lhs + rhs;
@@ -14,7 +14,7 @@ pub fn op_add(inst: &Instruction, core: &mut Emulator) {
 }
 
 /// Subtract src from dest, store in dest. Set flag if NOT borrow
-pub fn op_sub(inst: &Instruction, core: &mut Emulator) {
+pub fn op_sub(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest()) as i32;
     let rhs = core.load(inst.src()) as i32;
     let total = ((lhs - rhs) as u32) & 0xFF;
@@ -24,7 +24,7 @@ pub fn op_sub(inst: &Instruction, core: &mut Emulator) {
 }
 
 /// Subtract dest from src, store in dest. Set flag if NOT borrow
-pub fn op_subn(inst: &Instruction, core: &mut Emulator) {
+pub fn op_subn(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.src()) as i32;
     let rhs = core.load(inst.dest()) as i32;
     let total = ((lhs - rhs) as u32) & 0xFF;
@@ -33,21 +33,21 @@ pub fn op_subn(inst: &Instruction, core: &mut Emulator) {
     core.store(inst.dest(), total);
 }
 
-pub fn op_or(inst: &Instruction, core: &mut Emulator) {
+pub fn op_or(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs | rhs;
     core.store(inst.dest(), result);
 }
 
-pub fn op_and(inst: &Instruction, core: &mut Emulator) {
+pub fn op_and(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs & rhs;
     core.store(inst.dest(), result);
 }
 
-pub fn op_xor(inst: &Instruction, core: &mut Emulator) {
+pub fn op_xor(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs ^ rhs;
@@ -55,7 +55,7 @@ pub fn op_xor(inst: &Instruction, core: &mut Emulator) {
 }
 
 /// Shifts the source right 1 bit, and stores in dest. vF set to old LSB
-pub fn op_shr(inst: &Instruction, core: &mut Emulator) {
+pub fn op_shr(inst: &Instruction, core: &mut Simulator) {
     let val = core.load(inst.src());
     let carry = (val & 1) == 1;
     let result = val >> 1;
@@ -64,7 +64,7 @@ pub fn op_shr(inst: &Instruction, core: &mut Emulator) {
 }
 
 /// Shifts the source left 1 bit, and stores in dest. vF set to old MSB
-pub fn op_shl(inst: &Instruction, core: &mut Emulator) {
+pub fn op_shl(inst: &Instruction, core: &mut Simulator) {
     let val = core.load(inst.src());
     let carry = (val & 0x80) == 0x80;
     let result = (val << 1) & 0xFF;
@@ -72,17 +72,17 @@ pub fn op_shl(inst: &Instruction, core: &mut Emulator) {
     core.vf_store(carry);
 }
 
-pub fn op_load(inst: &Instruction, core: &mut Emulator) {
+pub fn op_load(inst: &Instruction, core: &mut Simulator) {
     let data = core.load(inst.src());
     core.store(inst.dest(), data);
 }
 
-pub fn op_font(inst: &Instruction, core: &mut Emulator) {
+pub fn op_font(inst: &Instruction, core: &mut Simulator) {
     let addr = core.config.font_addr as u32 + core.load(inst.src()) * 5;
     core.store(inst.dest(), addr);
 }
 
-pub fn op_bcd(inst: &Instruction, core: &mut Emulator) {
+pub fn op_bcd(inst: &Instruction, core: &mut Simulator) {
     let val = core.load(inst.src());
     let hundreds = val / 100;
     let val = val - hundreds * 100;
@@ -103,7 +103,7 @@ pub fn op_bcd(inst: &Instruction, core: &mut Emulator) {
 }
 
 
-pub fn op_rand(inst: &Instruction, core: &mut Emulator) {
+pub fn op_rand(inst: &Instruction, core: &mut Simulator) {
     let mask = core.load(inst.src());
     let data = core.rng.next_u32() & mask;
     core.store(inst.dest(), data);
@@ -111,7 +111,7 @@ pub fn op_rand(inst: &Instruction, core: &mut Emulator) {
 
 
 
-pub fn op_skipeq(inst: &Instruction, core: &mut Emulator) {
+pub fn op_skipeq(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     if lhs == rhs {
@@ -119,7 +119,7 @@ pub fn op_skipeq(inst: &Instruction, core: &mut Emulator) {
     }
 }
 
-pub fn op_skipneq(inst: &Instruction, core: &mut Emulator) {
+pub fn op_skipneq(inst: &Instruction, core: &mut Simulator) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     if lhs != rhs {
@@ -127,7 +127,7 @@ pub fn op_skipneq(inst: &Instruction, core: &mut Emulator) {
     }
 }
 
-pub fn op_skipkey(inst: &Instruction, core: &mut Emulator) {
+pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
     let key = core.load(inst.dest()) as usize;
     let key_state: bool;
     {
@@ -139,7 +139,7 @@ pub fn op_skipkey(inst: &Instruction, core: &mut Emulator) {
     }
 }
 
-pub fn op_skipnkey(inst: &Instruction, core: &mut Emulator) {
+pub fn op_skipnkey(inst: &Instruction, core: &mut Simulator) {
     let key = core.load(inst.dest()) as usize;
     let key_state: bool;
     {
@@ -152,24 +152,24 @@ pub fn op_skipnkey(inst: &Instruction, core: &mut Emulator) {
 }
 
 #[allow(unused_variables)]
-pub fn op_waitkey(inst: &Instruction, core: &mut Emulator) {
+pub fn op_waitkey(inst: &Instruction, core: &mut Simulator) {
     panic!("WaitKey Unimplemented")
 }
 
 /// Jump to address
-pub fn op_jump(inst: &Instruction, core: &mut Emulator) {
+pub fn op_jump(inst: &Instruction, core: &mut Simulator) {
     let addr = core.load(inst.dest()) as usize;
     core.jump_pc(addr);
 }
 
 /// Jump to address + V0
-pub fn op_jumpv0(inst: &Instruction, core: &mut Emulator) {
+pub fn op_jumpv0(inst: &Instruction, core: &mut Simulator) {
     let mut addr = core.load(inst.dest()) as usize;
     addr += core.reg(0) as usize;
     core.jump_pc(addr);
 }
 
-pub fn op_call(inst: &Instruction, core: &mut Emulator) {
+pub fn op_call(inst: &Instruction, core: &mut Simulator) {
     let addr = core.load(inst.dest()) as usize;
     let pc = core.pc();
     core.stack.push(pc);
@@ -177,20 +177,20 @@ pub fn op_call(inst: &Instruction, core: &mut Emulator) {
 }
 
 #[allow(unused_variables)]
-pub fn op_ret(inst: &Instruction, core: &mut Emulator) {
+pub fn op_ret(inst: &Instruction, core: &mut Simulator) {
     let addr = core.stack.pop().unwrap();
     core.jump_pc(addr);
 }
 
 
 #[allow(unused_variables)]
-pub fn op_cls(inst: &Instruction, core: &mut Emulator) {
+pub fn op_cls(inst: &Instruction, core: &mut Simulator) {
     let mut vram = core.state.vram.write().unwrap();
 
     vram.pixels = [[0; 32]; 64];
 }
 
-pub fn op_sprite(inst: &Instruction, core: &mut Emulator) {
+pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
 
     let x = core.load(inst.dest());
     let mut y = core.load(inst.src());
@@ -226,7 +226,7 @@ pub fn op_sprite(inst: &Instruction, core: &mut Emulator) {
 
 }
 
-pub fn op_stash(inst: &Instruction, core: &mut Emulator) {
+pub fn op_stash(inst: &Instruction, core: &mut Simulator) {
     let last = match inst.src() {
         Operand::Register(r) => r,
         _ => {
@@ -241,7 +241,7 @@ pub fn op_stash(inst: &Instruction, core: &mut Emulator) {
     core.set_i(i + last + 1);
 }
 
-pub fn op_fetch(inst: &Instruction, core: &mut Emulator) {
+pub fn op_fetch(inst: &Instruction, core: &mut Simulator) {
     let last = match inst.dest() {
         Operand::Register(r) => r,
         _ => {

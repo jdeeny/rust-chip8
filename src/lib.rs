@@ -2,7 +2,7 @@
 extern crate rand;
 extern crate strfmt;
 
-mod emulator;
+mod simulator;
 mod config;
 mod instruction;
 mod operand;
@@ -10,7 +10,7 @@ mod operations;
 mod font;
 mod state;
 
-pub use emulator::Emulator;
+pub use simulator::Simulator;
 pub use operand::Operand;
 pub use instruction::Instruction;
 pub use state::SharedState;

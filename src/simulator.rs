@@ -13,7 +13,7 @@ use state::SharedState;
 use operand::Operand::{Register, Address12, Literal12, Literal8, Literal4, IndirectI, I,
                        DelayTimer, SoundTimer};
 
-pub struct Emulator {
+pub struct Simulator {
     pub config: Config,
     pub state: SharedState,
     gp_reg: [u8; 16],
@@ -29,8 +29,8 @@ pub struct Emulator {
 
 
 
-impl Emulator {
-    pub fn new(config: Config, state: SharedState) -> Emulator {
+impl Simulator {
+    pub fn new(config: Config, state: SharedState) -> Simulator {
         let font = &FONT_CHIP8_4X5;
         let mut ram: Vec<u8> = vec![0; config.ram_size];
 
@@ -40,7 +40,7 @@ impl Emulator {
         println!("font addr {:X} - {:X}", font_start, font_end);
         ram[font_start..font_end].copy_from_slice(font);
 
-        Emulator {
+        Simulator {
             config: config,
             state: state,
             gp_reg: [0; 16],
