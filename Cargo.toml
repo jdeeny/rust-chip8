@@ -1,0 +1,12 @@
+[package]
+name = "chip8"
+version = "0.1.0"
+authors = ["jdeeny <jdeeny@dilapidated.org>"]
+publish = false
+
+[lib]
+name = "chip8"
+
+[dependencies]
+rand = "*"
+strfmt = "*"
