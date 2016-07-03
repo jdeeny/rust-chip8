@@ -55,7 +55,7 @@ impl Simulator {
         }
     }
 
-    pub fn load_bytes(&mut self, bytes: &Vec<u8>, addr: usize) {
+    pub fn load_bytes(&mut self, bytes: &[u8], addr: usize) {
         let mut i = addr;
         for b in bytes {
             self.ram[i] = *b;
@@ -145,9 +145,9 @@ impl Simulator {
             Address12(a) => self.ram[a] as u32,
             I => self.i as u32,
             IndirectI => self.ram[self.i] as u32,
-            Literal12(n) => n as u32,
-            Literal8(n) => n as u32,
-            Literal4(n) => n as u32,
+            Literal12(n12) => n12 as u32,
+            Literal8(n8) => n8 as u32,
+            Literal4(n4) => n4 as u32,
             SoundTimer => self.sound_timer as u32,
             DelayTimer => self.delay_timer as u32,
             _ => 0,
@@ -184,7 +184,7 @@ impl Simulator {
 
     pub fn dump_reg(&self) {
         print!("Reg: ");
-        for r in self.gp_reg.iter() {
+        for r in &self.gp_reg {
             print!("{:X} ", r);
         }
         print!(" i:{:X}", self.i);

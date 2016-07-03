@@ -71,7 +71,7 @@ impl InstructionTable {
 
 impl InstructionTable {
     pub fn decode(&self, codeword: Word) -> Instruction {
-        for def in self.table.iter() {
+        for def in &self.table {
             if def.is_match(codeword) {
                 return Instruction::new(def.clone(), codeword);
             }
@@ -111,15 +111,12 @@ impl InstructionDef {
                -> InstructionDef {
         let mut code: Word = 0;
         let mut mask: Word = 0;
-        for coding in pattern.iter() {
+        for coding in &pattern {
             code <<= 4;
             mask <<= 4;
-            match *coding {
-                Coding::C(n) => {
-                    code |= n as Word;
-                    mask |= 0xF;
-                }
-                _ => {}
+            if let Coding::C(n) = *coding {
+                code |= n as Word;
+                mask |= 0xF;
             };
         }
         InstructionDef {
@@ -136,14 +133,17 @@ impl InstructionDef {
     pub fn is_match(&self, codeword: Word) -> bool {
         (codeword & self.mask) == (self.code & self.mask)
     }
-    pub fn clone(&self) -> InstructionDef {
+}
+
+impl Clone for InstructionDef {
+    fn clone(&self) -> InstructionDef {
 
         InstructionDef {
             operation: self.operation,
             dest_kind: self.dest_kind,
             src_kind: self.src_kind,
             aux_kind: self.aux_kind,
-            pattern: self.pattern.clone(),
+            pattern: self.pattern,
             mnemonic: self.mnemonic.clone(),
             code: self.code,
             mask: self.mask,
@@ -167,7 +167,7 @@ impl Instruction {
         let mut aux_data: usize = 0;
 
         let mut word = codeword as usize;
-        for coding in def.pattern.iter() {
+        for coding in &def.pattern {
             let nibble = (word & 0xF000) >> 12;
             word <<= 4;
             // println!("nibble: {:?}", nibble);

@@ -8,6 +8,12 @@ pub struct Config {
 
 impl Config {
     pub fn new() -> Config {
+        Self::default()
+    }
+}
+
+impl Default for Config {
+    fn default() -> Self {
         Config {
             ram_size: 0x2000,
             font_addr: 0x0000,

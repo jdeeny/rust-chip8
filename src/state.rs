@@ -8,13 +8,22 @@ pub struct SharedState {
 
 impl SharedState {
     pub fn new() -> SharedState {
+        Self::default()
+    }
+}
+
+impl Default for SharedState {
+    fn default() -> SharedState {
         SharedState {
             vram: Arc::new(RwLock::new(Vram::new())),
             keys: Arc::new(RwLock::new(Keyboard::new())),
             audio: Arc::new(RwLock::new(Audio::new())),
         }
     }
-    pub fn clone(&self) -> SharedState {
+}
+
+impl Clone for SharedState {
+    fn clone(&self) -> SharedState {
         SharedState {
             vram: self.vram.clone(),
             keys: self.keys.clone(),
@@ -23,11 +32,17 @@ impl SharedState {
     }
 }
 
+
 pub struct Vram {
     pub pixels: [[u8; 32]; 64],
 }
 impl Vram {
     pub fn new() -> Vram {
+        Self::default()
+    }
+}
+impl Default for Vram {
+    fn default() -> Vram {
         Vram { pixels: [[0; 32]; 64] }
     }
 }
@@ -38,20 +53,29 @@ pub struct Keyboard {
 }
 impl Keyboard {
     pub fn new() -> Keyboard {
-        Keyboard { state: [false; 16] }
+        Self::default()
     }
     pub fn is_down(&self, key: usize) -> bool {
         assert!(key <= 16);
         self.state[key]
     }
 }
-
+impl Default for Keyboard {
+    fn default() -> Keyboard {
+        Keyboard { state: [false; 16] }
+    }
+}
 
 pub struct Audio {
 
 }
 impl Audio {
     pub fn new() -> Audio {
+        Self::default()
+    }
+}
+impl Default for Audio {
+    fn default() -> Audio {
         Audio {}
     }
 }

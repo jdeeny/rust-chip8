@@ -34,11 +34,11 @@ impl Operand {
             Operand::Literal12(n) => format!("0x{:03X}", n),
             Operand::Literal8(n) => format!("0x{:02X}", n),
             Operand::Literal4(n) => format!("0x{:01X}", n),
-            Operand::I => format!("I"),
-            Operand::IndirectI => format!("Indirect"),
-            Operand::SoundTimer => format!("ST"),
-            Operand::DelayTimer => format!("DT"),
-            Operand::Nowhere => format!("none"),
+            Operand::I => "I".to_string(),
+            Operand::IndirectI => "Indirect".to_string(),
+            Operand::SoundTimer => "ST".to_string(),
+            Operand::DelayTimer => "DT".to_string(),
+            Operand::Nowhere => "none".to_string(),
         }
 
     }
