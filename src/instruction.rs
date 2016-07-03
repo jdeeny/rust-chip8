@@ -1,8 +1,9 @@
 use operand::{Operand, OperandKind};
 use operations::*;
 
-
+#[allow(dead_code)]
 pub const CODEWORD_BITS: usize = 16;
+#[allow(dead_code)]
 pub const NUM_CODEWORDS: usize = (1 << CODEWORD_BITS) + 1;
 
 pub type Word = u16;
@@ -152,6 +153,7 @@ impl InstructionDef {
 
 pub struct Instruction {
     pub def: InstructionDef,
+    #[allow(dead_code)]
     codeword: Word,
     dest: Operand,
     src: Operand,
