@@ -8,5 +8,5 @@ publish = false
 name = "chip8"
 
 [dependencies]
-rand = "*"
-strfmt = "*"
+rand = "0.3.14"
+strfmt = "0.1.5"
