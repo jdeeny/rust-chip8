@@ -2,7 +2,6 @@ use simulator::Simulator;
 use operand::Operand;
 use instruction::Instruction;
 
-
 pub type Operation = fn(&Instruction, &mut Simulator);
 
 pub fn op_add(inst: &Instruction, core: &mut Simulator) {

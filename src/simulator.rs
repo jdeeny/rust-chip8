@@ -5,7 +5,7 @@ use config::Config;
 pub use instruction::{Instruction, InstructionDef, Word, InstructionTable};
 pub use operand::{Operand, OperandKind};
 use font::FONT_CHIP8_4X5;
-use state::SharedState;
+pub use state::SharedState;
 
 use operand::Operand::{Register, Address12, Literal12, Literal8, Literal4, IndirectI, I,
                        DelayTimer, SoundTimer};

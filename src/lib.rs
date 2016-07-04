@@ -13,7 +13,6 @@ mod state;
 pub use simulator::Simulator;
 pub use operand::Operand;
 pub use instruction::Instruction;
-pub use state::SharedState;
 pub use config::Config;
 
 #[cfg(test)]

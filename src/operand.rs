@@ -1,3 +1,7 @@
+/// A kind of operand
+///
+/// This is used to define a kind of operand. It is not specified, so the exact register,
+/// value, or address is not known.
 #[derive(Copy, Clone)]
 pub enum OperandKind {
     Register,
@@ -12,6 +16,9 @@ pub enum OperandKind {
     Unused,
 }
 
+/// An operand
+///
+/// This is a fully specified operand, including the particular register, address, or value.
 #[derive(Copy, Clone)]
 pub enum Operand {
     Register(usize),
