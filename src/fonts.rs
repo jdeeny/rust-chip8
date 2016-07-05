@@ -111,7 +111,11 @@ fn test_font4x5() {
 
     for (i, glyph) in FONT_CHIP8_4X5.iter().enumerate() {
         let ref_glyph = CHIP8_REFERENCE_FONT[i];
-        println!("Glyph {:X}.{}: {:08b} ?= {:08b}", i / 5, i % 5, glyph, ref_glyph);
+        println!("Glyph {:X}.{}: {:08b} ?= {:08b}",
+                 i / 5,
+                 i % 5,
+                 glyph,
+                 ref_glyph);
         assert_eq!(*glyph, ref_glyph);
     }
 }

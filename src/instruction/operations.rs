@@ -1,6 +1,5 @@
 use simulator::Simulator;
-use operand::Operand;
-use instruction::Instruction;
+use instruction::{Instruction, Operand};
 
 pub type Operation = fn(&Instruction, &mut Simulator);
 
@@ -82,9 +81,9 @@ pub fn op_font(inst: &Instruction, core: &mut Simulator) {
 }
 
 pub fn op_bcd(inst: &Instruction, core: &mut Simulator) {
-    let val = core.load(inst.src());
+    let mut val = core.load(inst.src());
     let hundreds = val / 100;
-    let val = val - hundreds * 100;
+    val -= hundreds * 100;
     let tens = val / 10;
     let ones = val - tens * 10;
 
@@ -104,7 +103,7 @@ pub fn op_bcd(inst: &Instruction, core: &mut Simulator) {
 
 pub fn op_rand(inst: &Instruction, core: &mut Simulator) {
     let mask = core.load(inst.src());
-    let data = core.rng.next_u32() & mask;
+    let data = core.load(inst.aux()) & mask;
     core.store(inst.dest(), data);
 }
 
@@ -226,26 +225,24 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
 }
 
 pub fn op_stash(inst: &Instruction, core: &mut Simulator) {
-    let last = match inst.src() {
-        Operand::Register(r) => r,
-        _ => {
-            panic!("Fetch only works with a register");
-        }
+    let last = if let Operand::Register(r) = inst.src() {
+        r
+    } else {
+        panic!("Fetch only works with a register");
     };
     let i = core.i();
     for r in 0...last {
-        let value = core.reg(r) as u8;
+        let value = core.reg(r);
         core.set_ram(i + r, value);
     }
     core.set_i(i + last + 1);
 }
 
 pub fn op_fetch(inst: &Instruction, core: &mut Simulator) {
-    let last = match inst.dest() {
-        Operand::Register(r) => r,
-        _ => {
-            panic!("Fetch only works with a register");
-        }
+    let last = if let Operand::Register(r) = inst.dest() {
+        r
+    } else {
+        panic!("Fetch only works with a register");
     };
     let i = core.i();
     for r in 0...last {

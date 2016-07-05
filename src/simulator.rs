@@ -1,33 +1,38 @@
-use rand::{thread_rng, Rng};
+//! Simulates a chip8 cpu.
+
+use std::fmt;
+use std::sync::{Arc, RwLock};
+use rand::{Rng, thread_rng};
 
 use config::Config;
 
-pub use instruction::{Instruction, InstructionDef, Word, InstructionTable};
-pub use operand::{Operand, OperandKind};
-use font::FONT_CHIP8_4X5;
-pub use state::SharedState;
+use instruction;
+use instruction::{Instruction, Operand, Word};
+use instruction::Operand::*;
 
-use operand::Operand::{Register, Address12, Literal12, Literal8, Literal4, IndirectI, I,
-                       DelayTimer, SoundTimer};
+use fonts::FONT_CHIP8_4X5;
 
+/// Manages the state of a chip8 cpu.
 pub struct Simulator {
+    /// The chip8 machine configuration.
     pub config: Config,
-    pub state: SharedState,
+    /// The state that is shared with the UI.
+    pub state: UiState,
     gp_reg: [u8; 16],
     i: usize,
     pc: usize,
-    pub delay_timer: u8,
+    delay_timer: u8,
     sound_timer: u8,
     ram: Vec<u8>,
+    /// The call stack.
     pub stack: Vec<usize>,
-    pub rng: Box<Rng>,
-    itable: InstructionTable,
+    rng: Box<Rng>,
+    itable: instruction::Table,
 }
 
-
-
 impl Simulator {
-    pub fn new(config: Config, state: SharedState) -> Simulator {
+    /// Returns a new Simulator.
+    pub fn new(config: Config, state: UiState) -> Simulator {
         let font = &FONT_CHIP8_4X5;
         let mut ram: Vec<u8> = vec![0; config.ram_size];
 
@@ -48,10 +53,11 @@ impl Simulator {
             ram: ram,
             stack: vec![],
             rng: Box::new(thread_rng()),
-            itable: InstructionTable::new(),
+            itable: instruction::Table::new(),
         }
     }
 
+    /// Loads bytes into RAM starting at the given address.
     pub fn load_bytes(&mut self, bytes: &[u8], addr: usize) {
         let mut i = addr;
         for b in bytes {
@@ -60,11 +66,12 @@ impl Simulator {
         }
     }
 
-
+    /// Decodes an instruction. TODO: Move to ::instruction
     pub fn decode_instruction(&self, codeword: Word) -> Instruction {
         self.itable.decode(codeword)
     }
 
+    /// Decodes the instruction stored in RAM at the given address.
     pub fn decode_at_addr(&self, addr: usize) -> Instruction {
         let hi = self.ram[addr];
         let lo = self.ram[addr + 1];
@@ -73,25 +80,34 @@ impl Simulator {
         self.itable.decode(word)
     }
 
+    /// Get the 16-bit word stored at the location pointed to by the program counter.
     pub fn current_codeword(&self) -> Word {
         let hi = self.ram[self.pc] as Word;
         let lo = self.ram[self.pc + 1] as Word;
         (hi << 8) | lo
     }
 
+    /// Get the value of a register.
     pub fn reg(&mut self, reg: usize) -> u8 {
         self.gp_reg[reg]
     }
+
+    /// Set the value of a register.
     pub fn set_reg(&mut self, reg: usize, val: u8) {
         self.gp_reg[reg] = val;
     }
+
+    /// Clear vF to 0.
     pub fn vf_clear(&mut self) {
         self.gp_reg[0xF] = 0;
     }
+
+    /// Set vF to 1.
     pub fn vf_set(&mut self) {
         self.gp_reg[0xF] = 1;
     }
 
+    /// Store a flag in vF.
     pub fn vf_store(&mut self, flag: bool) {
         self.gp_reg[0xF] = if flag {
             1
@@ -100,33 +116,42 @@ impl Simulator {
         };
     }
 
+    /// Gets the value of the program counter.
     pub fn pc(&self) -> usize {
         self.pc
     }
+
+    /// Advances the program counter one instruction.
     pub fn advance_pc(&mut self) {
         self.pc += 2;
     }
 
+    /// Jumps the program counter to a given address.
     pub fn jump_pc(&mut self, addr: usize) {
         self.pc = addr;
     }
 
-    pub fn set_ram(&mut self, addr: usize, data: u8) {
-        self.ram[addr] = data;
-    }
-
+    /// Gets the value stored at an address in RAM.
     pub fn ram(&self, addr: usize) -> u8 {
         self.ram[addr]
     }
 
+    /// Sets the value stored at an address in RAM.
+    pub fn set_ram(&mut self, addr: usize, data: u8) {
+        self.ram[addr] = data;
+    }
+
+    /// Gets the I register.
     pub fn i(&self) -> usize {
         self.i
     }
 
+    /// Sets the I register.
     pub fn set_i(&mut self, val: usize) {
         self.i = val;
     }
 
+    /// Decrements the delay and sound timer.
     pub fn decrement_timers(&mut self) {
         if self.delay_timer > 0 {
             self.delay_timer -= 1;
@@ -136,6 +161,7 @@ impl Simulator {
         }
     }
 
+    /// Loads a value from the source Operand.
     pub fn load(&mut self, src: Operand) -> u32 {
         match src {
             Register(r) => self.reg(r) as u32,
@@ -147,11 +173,13 @@ impl Simulator {
             Literal4(n4) => n4 as u32,
             SoundTimer => self.sound_timer as u32,
             DelayTimer => self.delay_timer as u32,
+            Random => self.rng.next_u32(),
             _ => 0,
             // Operand::Nowhere   => panic!("Cannot load nothing"),
         }
     }
 
+    /// Stores a value into the destination Operand.
     pub fn store(&mut self, dest: Operand, val: u32) {
         match dest {
             Register(r) => {
@@ -172,14 +200,18 @@ impl Simulator {
             DelayTimer => {
                 self.delay_timer = val as u8;
             }
-            Literal12(_) | Literal8(_) | Literal4(_) | Operand::Nowhere => {
+            Literal12(_) | Literal8(_) | Literal4(_) | Random | Nowhere => {
                 panic!("Cannot store");
             }
         }
     }
 
+    /// Returns the current config.
+    pub fn config(&self) -> Config {
+        self.config
+    }
 
-    pub fn dump_reg(&self) {
+/*    pub fn dump_reg(&self) {
         print!("Reg: ");
         for r in &self.gp_reg {
             print!("{:X} ", r);
@@ -189,6 +221,7 @@ impl Simulator {
         println!("");
         // println!("i:{:X} pc:{:X} stack{}", self.i, self.pc, self.stack.len());
     }
+
     pub fn dump_pixels(&self) {
         let vram = self.state.vram.read().unwrap();
 
@@ -199,8 +232,126 @@ impl Simulator {
             println!("");
         }
     }
-
+*/
+    /// Executes an instruction.
     pub fn execute(&mut self, instruction: &Instruction) {
         (instruction.def.operation)(instruction, self);
+    }
+}
+
+impl fmt::Debug for Simulator {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Simulator {{}}")
+    }
+}
+
+
+/// Contains the data that is shared between the simulator and the UI.
+#[derive(Debug)]
+pub struct UiState {
+    /// The video ram state.
+    pub vram: Arc<RwLock<Vram>>,
+    /// The keyboard state.
+    pub keys: Arc<RwLock<Keyboard>>,
+    /// The audio state.
+    pub audio: Arc<RwLock<Audio>>,
+}
+
+impl UiState {
+    /// Returns a a new UiState.
+    pub fn new() -> UiState {
+        Self::default()
+    }
+}
+
+impl Default for UiState {
+    fn default() -> UiState {
+        UiState {
+            vram: Arc::new(RwLock::new(Vram::new())),
+            keys: Arc::new(RwLock::new(Keyboard::new())),
+            audio: Arc::new(RwLock::new(Audio::new())),
+        }
+    }
+}
+
+impl Clone for UiState {
+    fn clone(&self) -> UiState {
+        UiState {
+            vram: self.vram.clone(),
+            keys: self.keys.clone(),
+            audio: self.audio.clone(),
+        }
+    }
+}
+
+/// Holds the state of the video ram of the simulator.
+#[derive(Copy)]
+pub struct Vram {
+    ///Holds the state of the pixels.
+    pub pixels: [[u8; 32]; 64],
+}
+impl Vram {
+    /// Returns a new Vram.
+    pub fn new() -> Vram {
+        Self::default()
+    }
+}
+impl Default for Vram {
+    fn default() -> Vram {
+        Vram { pixels: [[0; 32]; 64] }
+    }
+}
+impl fmt::Debug for Vram {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Vram {{}}")
+    }
+}
+impl Clone for Vram {
+    fn clone(&self) -> Self {
+        let mut p: [[u8;32];64] = [[0;32];64];
+        for (i, row) in self.pixels.iter().enumerate() {
+            p[i] = *row;
+        }
+        Vram { pixels: p }
+    }
+}
+
+/// Holds the state of the keyboard of the simulator.
+#[derive(Copy,Clone,Debug)]
+pub struct Keyboard {
+    /// The state of the keyboard. True indicates that the key is pressed.
+    pub state: [bool; 16],
+}
+impl Keyboard {
+    /// Returns a new Keyboard.
+    pub fn new() -> Keyboard {
+        Self::default()
+    }
+    /// Returns true if the requested key is currently pressed.
+    pub fn is_down(&self, key: usize) -> bool {
+        assert!(key <= 16);
+        self.state[key]
+    }
+}
+impl Default for Keyboard {
+    fn default() -> Keyboard {
+        Keyboard { state: [false; 16] }
+    }
+}
+
+/// Holds the state of the audio output of the simulator.
+#[derive(Copy,Clone,Debug)]
+pub struct Audio {
+
+}
+impl Audio {
+    /// Returns a new Audio.
+    pub fn new() -> Audio {
+        Self::default()
+    }
+}
+impl Default for Audio {
+    fn default() -> Audio {
+        Audio {}
     }
 }

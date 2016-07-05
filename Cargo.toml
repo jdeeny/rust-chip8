@@ -1,7 +1,13 @@
 [package]
 name = "chip8"
-version = "0.1.0"
-authors = ["jdeeny"]
+version = "0.1.1"
+authors = ["John Deeny <jdeeny@gmail.com> "]
+repository = "https://github.com/jdeeny/rust-chip8.git"
+homepage = "https://github.com/jdeeny/rust-chip8"
+license = "MIT"
+readme = "README.md"
+#documentation = ""
+description = "Chip8 instruction coding/decoding and cpu simulator"
 publish = false
 
 [lib]
@@ -10,3 +16,8 @@ name = "chip8"
 [dependencies]
 rand = "^0.3.14"
 strfmt = "^0.1.5"
+clippy = {version = "0.0.78", optional = true}
+
+[features]
+default = []
+lints = ["clippy"]
