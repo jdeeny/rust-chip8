@@ -76,7 +76,7 @@ pub fn op_load(inst: &Instruction, core: &mut Simulator) {
 }
 
 pub fn op_font(inst: &Instruction, core: &mut Simulator) {
-    let addr = core.config.font_addr as u32 + core.load(inst.src()) * 5;
+    let addr = core.config.sys_font_addr as u32 + core.load(inst.src()) * 5;
     core.store(inst.dest(), addr);
 }
 

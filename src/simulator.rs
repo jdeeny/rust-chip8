@@ -34,10 +34,10 @@ impl Simulator {
     /// Returns a new Simulator.
     pub fn new(config: Config, state: UiState) -> Simulator {
         let font = &FONT_CHIP8_4X5;
-        let mut ram: Vec<u8> = vec![0; config.ram_size];
+        let mut ram: Vec<u8> = vec![0; config.sys_ram_bytes];
 
         // copy font to beginning of RAM, into the 0-0x200 area
-        let font_start = config.font_addr;
+        let font_start = config.sys_font_addr;
         let font_end = font_start + font.len();
         println!("font addr {:X} - {:X}", font_start, font_end);
         ram[font_start..font_end].copy_from_slice(font);
