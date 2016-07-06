@@ -1,3 +1,6 @@
+use InstructionSet;
+use Simulator;
+
 /// Defines the configuration of the chip8 system being used.
 ///
 /// These settings account for various historical implementation oddities and also allow for
@@ -19,6 +22,14 @@ impl Config {
     pub fn new() -> Config {
         Self::default()
     }
+    /// Returns an InstructionSet based on the current configuration.
+    pub fn instructionset(&self) -> InstructionSet {
+        InstructionSet::new(*self)
+    }
+    /// Returns a Simulator based on the current configuration.
+    pub fn simulator(&self) -> Simulator {
+        Simulator::new(*self)
+    }
 }
 
 impl Default for Config {
@@ -33,3 +44,9 @@ const DEFAULT_CONFIG: Config = Config {
     sys_stack_size: 12,
     quirk_shift: false,
 };
+
+/// A trait for structs that contain a Config.
+pub trait Configured {
+    /// Returns the configuration used by this instance.
+    fn config(&self) -> Config;
+}

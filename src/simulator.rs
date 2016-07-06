@@ -4,7 +4,7 @@ use std::fmt;
 use std::sync::{Arc, RwLock};
 use rand::{Rng, thread_rng};
 
-use config::Config;
+use config::{ Config, Configured };
 
 use instruction;
 use instruction::{Instruction, Operand, Word};
@@ -32,7 +32,7 @@ pub struct Simulator {
 
 impl Simulator {
     /// Returns a new Simulator.
-    pub fn new(config: Config, state: UiState) -> Simulator {
+    pub fn new(config: Config) -> Simulator {
         let font = &FONT_CHIP8_4X5;
         let mut ram: Vec<u8> = vec![0; config.sys_ram_bytes];
 
@@ -44,7 +44,7 @@ impl Simulator {
 
         Simulator {
             config: config,
-            state: state,
+            state: UiState::new(),
             gp_reg: [0; 16],
             i: 0,
             pc: 0,
@@ -214,6 +214,12 @@ impl Simulator {
     /// Executes an instruction.
     pub fn execute(&mut self, instruction: &Instruction) {
         instruction.operation()(instruction, self);
+    }
+}
+
+impl Configured for Simulator {
+    fn config(&self) -> Config {
+        self.config
     }
 }
 

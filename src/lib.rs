@@ -25,10 +25,11 @@ extern crate rand;
 extern crate strfmt;
 
 mod config;
-mod fonts;
-
+pub mod fonts;
 
 pub mod instruction;
 pub mod simulator;
 
+pub use instruction::InstructionSet;
 pub use config::Config;
+pub use simulator::Simulator;
