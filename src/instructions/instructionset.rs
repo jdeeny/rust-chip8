@@ -1,5 +1,5 @@
 use config::{ Config, Configured };
-use instruction::{Instruction, Table, Word};
+use instructions::{Instruction, Table, Word};
 use simulator::{Simulator,UiState};
 
 

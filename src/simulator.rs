@@ -6,9 +6,9 @@ use rand::{Rng, thread_rng};
 
 use config::{ Config, Configured };
 
-use instruction;
-use instruction::{Instruction, Operand, Word};
-use instruction::Operand::*;
+use instructions;
+use instructions::{Instruction, Operand, Word};
+use instructions::Operand::*;
 
 use fonts::FONT_CHIP8_4X5;
 
@@ -27,7 +27,7 @@ pub struct Simulator {
     /// The call stack.
     pub stack: Vec<usize>,
     rng: Box<Rng>,
-    itable: instruction::Table,
+    itable: instructions::Table,
 }
 
 impl Simulator {
@@ -53,7 +53,7 @@ impl Simulator {
             ram: ram,
             stack: vec![],
             rng: Box::new(thread_rng()),
-            itable: instruction::Table::new(config),
+            itable: instructions::Table::new(config),
         }
     }
 

@@ -27,9 +27,9 @@ extern crate strfmt;
 mod config;
 pub mod fonts;
 
-pub mod instruction;
+pub mod instructions;
 pub mod simulator;
 
-pub use instruction::InstructionSet;
+pub use instructions::InstructionSet;
 pub use config::Config;
 pub use simulator::Simulator;

@@ -1,5 +1,5 @@
 use simulator::Simulator;
-use instruction::{Instruction, Operand};
+use instructions::{Instruction, Operand};
 
 pub type Operation = fn(&Instruction, &mut Simulator);
 
