@@ -23,7 +23,7 @@ impl Chip8 {
 
     /// Decodes a 16-bit codeword into an Instruction.
     pub fn decode(&self, codeword: Word) -> Instruction {
-        panic!("")
+        self.table.decode(codeword: Word)
     }
 
 }

@@ -7,6 +7,7 @@ mod operations;
 
 pub use self::operand::{Operand, OperandKind};
 use self::operations::*;
+use config::Config;
 
 /// A 16-bit chip8 codeword.
 pub type Word = u16;
@@ -34,7 +35,7 @@ pub struct Table {
 }
 impl Table {
     /// Returns a new instruction table.
-    pub fn new() -> Table {
+    pub fn new(config: Config) -> Table {
         use self::operand::OperandKind::*;
         use self::Coding::*;
 
@@ -88,12 +89,6 @@ impl Table {
             }
         }
         panic!("Unknown Instruction")
-    }
-}
-
-impl Default for Table {
-    fn default() -> Self {
-        Self::new()
     }
 }
 
