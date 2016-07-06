@@ -2,7 +2,7 @@
 ///
 /// This is used to define a kind of operand. It is not specified, so the exact register,
 /// value, or address is not known.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum OperandKind {
     /// A register, v0-vF.
     Register,
@@ -55,7 +55,7 @@ impl OperandKind {
 /// An operand.
 ///
 /// This is a fully specified operand, including the particular register, address, or value.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Operand {
     /// A register, v0-vF.
     Register(usize),

@@ -130,6 +130,7 @@ pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
     let mut key_state = false;
     if let Ok(keys) = core.state.keys.read() {
         key_state = keys.is_down(key);
+        drop(keys)
     } else {
         // TODO: log this
     }
@@ -143,6 +144,7 @@ pub fn op_skipnkey(inst: &Instruction, core: &mut Simulator) {
     let mut key_state = false;
     if let Ok(keys) = core.state.keys.read() {
         key_state = keys.is_down(key);
+        drop(keys)
     } else {
         // TODO: log this
     }
@@ -190,6 +192,7 @@ pub fn op_ret(inst: &Instruction, core: &mut Simulator) {
 pub fn op_cls(inst: &Instruction, core: &mut Simulator) {
     if let Ok(mut vram) = core.state.vram.write() {
         vram.pixels = [[0; 32]; 64];
+        drop(vram);
     } else {
         // TODO: log this or?
     }
@@ -207,6 +210,7 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
 
     if let Ok(vram) = core.state.vram.read() {
         pixels = vram.pixels;
+        drop(vram);
     } else {
         pixels = [[0; 32]; 64];
         //TODO: log this
@@ -234,6 +238,7 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
 
     if let Ok(mut vram) = core.state.vram.write() {
         vram.pixels = pixels;
+        drop(vram);
     } else {
         //TODO: log this
     }

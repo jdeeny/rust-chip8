@@ -35,6 +35,7 @@ pub struct Table {
 }
 impl Table {
     /// Returns a new instruction table.
+    #[allow(unused_variables)]
     pub fn new(config: Config) -> Table {
         use self::operand::OperandKind::*;
         use self::Coding::*;
@@ -177,12 +178,13 @@ impl fmt::Debug for Definition {
 }
 
 /// A fully specified chip8 instruction.
-#[derive(Debug)]
+#[derive(Copy)]
 pub struct Instruction {
     /// The definition from the instruction table that matches this instruction.
-    pub def: Definition,
-    #[allow(dead_code)]
-    codeword: Word,
+    //pub def: Definition,
+    //#[allow(dead_code)]
+    //codeword: Word,
+    operation: Operation,
     dest: Operand,
     src: Operand,
     aux: Operand,
@@ -225,8 +227,9 @@ impl Instruction {
         }
 
         Instruction {
-            def: def,
-            codeword: codeword,
+            //def: def,
+            //codeword: codeword,
+            operation: def.operation,
             dest: dest,
             src: src,
             aux: aux,
@@ -248,19 +251,42 @@ impl Instruction {
         self.aux
     }
 
+    /// Returns the operation used by this instruction.
+    pub fn operation(&self) -> Operation {
+        self.operation
+    }
+
     /// Returns a string describing the instruction.
     pub fn to_string(&self) -> String {
-        use strfmt::strfmt;
+        //use strfmt::strfmt;
         use std::collections::HashMap;
         let mut vars = HashMap::new();
         vars.insert("d".to_string(), self.dest.to_string());
         vars.insert("s".to_string(), self.src.to_string());
         vars.insert("a".to_string(), self.aux.to_string());
-        if let Ok(s) = strfmt(&self.def.mnemonic, &vars) {
+        "".to_string()
+        /*if let Ok(s) = strfmt(&self.def.mnemonic, &vars) {
             s
         } else {
             "".to_string()
             //TODO: log this?
+        }*/
+    }
+}
+
+impl Clone for Instruction {
+    fn clone(&self) -> Instruction {
+        Instruction {
+            operation: self.operation,
+            dest: self.dest,
+            src: self.src,
+            aux: self.aux,
         }
+    }
+}
+
+impl fmt::Debug for Instruction {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Instruction")
     }
 }

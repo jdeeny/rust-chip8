@@ -53,7 +53,7 @@ impl Simulator {
             ram: ram,
             stack: vec![],
             rng: Box::new(thread_rng()),
-            itable: instruction::Table::new(),
+            itable: instruction::Table::new(config),
         }
     }
 
@@ -211,31 +211,9 @@ impl Simulator {
         self.config
     }
 
-/*    pub fn dump_reg(&self) {
-        print!("Reg: ");
-        for r in &self.gp_reg {
-            print!("{:X} ", r);
-        }
-        print!(" i:{:X}", self.i);
-        print!(" DT: {:X} ST: {:X}", self.delay_timer, self.sound_timer);
-        println!("");
-        // println!("i:{:X} pc:{:X} stack{}", self.i, self.pc, self.stack.len());
-    }
-
-    pub fn dump_pixels(&self) {
-        let vram = self.state.vram.read().unwrap();
-
-        for row in vram.pixels.iter() {
-            for dot in row.iter() {
-                print!("{:?}", dot);
-            }
-            println!("");
-        }
-    }
-*/
     /// Executes an instruction.
     pub fn execute(&mut self, instruction: &Instruction) {
-        (instruction.def.operation)(instruction, self);
+        instruction.operation()(instruction, self);
     }
 }
 
