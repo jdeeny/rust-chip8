@@ -1,16 +1,16 @@
-use config::{ Config, Configured };
+use config::Config;
 use instructions::{Instruction, Table, Word};
-use simulator::{Simulator,UiState};
 
 
-/// A InstructionSet instruction coder/decoder.
+/// A Chip8 instruction set based on a particular configuration. Translates between machine code
+/// and `Instruction`s.
 ///
-/// A InstructionSet object is created with a particular configuration, which governs the
+/// An `InstructionSet` is created with a particular configuration, which governs the
 /// instructions that are included in the ISA.
 ///
-/// A 16-bit codeword can be decoded into a generic Instruction, which can then be processed
-/// by application logic, e.g. a disassembler. An Instruction can be encoded into a 16-bit
-/// codeword. The Instruction is created by application logic, e.g. an assembler.
+/// A 16-bit codeword can be decoded into a generic `Instruction`, which can then be processed
+/// by application logic, e.g. a disassembler. An `Instruction` can be encoded into a 16-bit
+/// codeword. The `Instruction` is created by application logic, e.g. an assembler.
 #[derive(Debug)]
 pub struct InstructionSet {
     config: Config,
@@ -36,10 +36,10 @@ impl InstructionSet {
     pub fn decode(&self, codeword: Word) -> Instruction {
         self.table.decode(codeword)
     }
-}
 
-impl Configured for InstructionSet {
-    fn config(&self) -> Config {
+    /// Returns the configuration that was used to create this `InstructionSet`
+    pub fn config(&self) -> Config {
         self.config
     }
+
 }

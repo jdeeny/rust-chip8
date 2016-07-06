@@ -44,9 +44,3 @@ const DEFAULT_CONFIG: Config = Config {
     sys_stack_size: 12,
     quirk_shift: false,
 };
-
-/// A trait for structs that contain a Config.
-pub trait Configured {
-    /// Returns the configuration used by this instance.
-    fn config(&self) -> Config;
-}

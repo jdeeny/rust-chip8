@@ -1,5 +1,9 @@
+//! Chip8 fonts
+
+/// Each glyph is 5 bytes. The most significant 4 bits are used.
 pub type Font4x5 = [u8; 5 * 16];
 
+/// I believe this is the 'official' chip8 font.
 pub const FONT_CHIP8_4X5: Font4x5 = [// 0
                                      0b_1111_0000,
                                      0b_1001_0000,

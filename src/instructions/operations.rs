@@ -76,7 +76,7 @@ pub fn op_load(inst: &Instruction, core: &mut Simulator) {
 }
 
 pub fn op_font(inst: &Instruction, core: &mut Simulator) {
-    let addr = core.config.sys_font_addr as u32 + core.load(inst.src()) * 5;
+    let addr = core.config().sys_font_addr as u32 + core.load(inst.src()) * 5;
     core.store(inst.dest(), addr);
 }
 
@@ -128,7 +128,7 @@ pub fn op_skipneq(inst: &Instruction, core: &mut Simulator) {
 pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
     let key = core.load(inst.dest()) as usize;
     let mut key_state = false;
-    if let Ok(keys) = core.state.keys.read() {
+    if let Ok(keys) = core.state().keys.read() {
         key_state = keys.is_down(key);
         drop(keys)
     } else {
@@ -142,7 +142,7 @@ pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
 pub fn op_skipnkey(inst: &Instruction, core: &mut Simulator) {
     let key = core.load(inst.dest()) as usize;
     let mut key_state = false;
-    if let Ok(keys) = core.state.keys.read() {
+    if let Ok(keys) = core.state().keys.read() {
         key_state = keys.is_down(key);
         drop(keys)
     } else {
@@ -174,13 +174,13 @@ pub fn op_jumpv0(inst: &Instruction, core: &mut Simulator) {
 pub fn op_call(inst: &Instruction, core: &mut Simulator) {
     let addr = core.load(inst.dest()) as usize;
     let pc = core.pc();
-    core.stack.push(pc);
+    core.stack_push(pc);
     core.jump_pc(addr);
 }
 
 #[allow(unused_variables)]
 pub fn op_ret(inst: &Instruction, core: &mut Simulator) {
-    if let Some(addr) = core.stack.pop() {
+    if let Some(addr) = core.stack_pop() {
         core.jump_pc(addr);
     } else {
         //TODO: There should probably be some kind of log/output
@@ -190,7 +190,7 @@ pub fn op_ret(inst: &Instruction, core: &mut Simulator) {
 
 #[allow(unused_variables)]
 pub fn op_cls(inst: &Instruction, core: &mut Simulator) {
-    if let Ok(mut vram) = core.state.vram.write() {
+    if let Ok(mut vram) = core.state().vram.write() {
         vram.pixels = [[0; 32]; 64];
         drop(vram);
     } else {
@@ -208,7 +208,7 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
 
     let mut pixels: [[u8;32]; 64];
 
-    if let Ok(vram) = core.state.vram.read() {
+    if let Ok(vram) = core.state().vram.read() {
         pixels = vram.pixels;
         drop(vram);
     } else {
@@ -236,7 +236,7 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
         y += 1;
     }
 
-    if let Ok(mut vram) = core.state.vram.write() {
+    if let Ok(mut vram) = core.state().vram.write() {
         vram.pixels = pixels;
         drop(vram);
     } else {

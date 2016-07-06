@@ -4,7 +4,7 @@ use std::fmt;
 use std::sync::{Arc, RwLock};
 use rand::{Rng, thread_rng};
 
-use config::{ Config, Configured };
+use config::Config;
 
 use instructions;
 use instructions::{Instruction, Operand, Word};
@@ -15,9 +15,9 @@ use fonts::FONT_CHIP8_4X5;
 /// Manages the state of a chip8 cpu.
 pub struct Simulator {
     /// The chip8 machine configuration.
-    pub config: Config,
+    config: Config,
     /// The state that is shared with the UI.
-    pub state: UiState,
+    state: UiState,
     gp_reg: [u8; 16],
     i: usize,
     pc: usize,
@@ -25,7 +25,7 @@ pub struct Simulator {
     sound_timer: u8,
     ram: Vec<u8>,
     /// The call stack.
-    pub stack: Vec<usize>,
+    stack: Vec<usize>,
     rng: Box<Rng>,
     itable: instructions::Table,
 }
@@ -206,21 +206,31 @@ impl Simulator {
         }
     }
 
-    /// Returns the current config.
-    pub fn config(&self) -> Config {
-        self.config
-    }
-
     /// Executes an instruction.
     pub fn execute(&mut self, instruction: &Instruction) {
         instruction.operation()(instruction, self);
     }
-}
 
-impl Configured for Simulator {
-    fn config(&self) -> Config {
+    /// Returns the configuration that was used to create this `Simulator`.
+    pub fn config(&self) -> Config {
         self.config
     }
+
+    /// Returns the `UiState`.
+    pub fn state(&self) -> UiState {
+        self.state
+    }
+
+    /// Pops an item off the stack
+    pub fn stack_pop(&self) -> Option<usize> {
+        self.stack.pop()
+    }
+
+    /// Pops an item off the stack
+    pub fn stack_push(&self, address: usize) {
+        self.stack.push(address);
+    }
+
 }
 
 impl fmt::Debug for Simulator {

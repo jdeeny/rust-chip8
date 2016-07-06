@@ -25,8 +25,8 @@ extern crate rand;
 extern crate strfmt;
 
 mod config;
-pub mod fonts;
 
+pub mod fonts;
 pub mod instructions;
 pub mod simulator;
 
