@@ -224,12 +224,10 @@ impl Instruction {
         let src: Operand;
         let aux: Operand;
         {
-            dest = Self::specify_operand(&def.dest_kind, dest_data);
-            src = Self::specify_operand(&def.src_kind, src_data);
-            aux = Self::specify_operand(&def.aux_kind, aux_data);
+            dest = def.dest_kind.specify(dest_data);
+            src = def.src_kind.specify(src_data);
+            aux = def.aux_kind.specify(aux_data);
         }
-
-        // println!("{:?} {:?} {:?} / {:?} {:?} {:?} ", dest.to_string(), src.to_string(), aux.to_string(), dest_data, src_data, aux_data);
 
         Instruction {
             def: def,
@@ -237,21 +235,6 @@ impl Instruction {
             dest: dest,
             src: src,
             aux: aux,
-        }
-    }
-    fn specify_operand(kind: &OperandKind, data: usize) -> Operand {
-        match *kind {
-            OperandKind::Register => Operand::Register(data),
-            OperandKind::I => Operand::I,
-            OperandKind::Address12 => Operand::Address12(data),
-            OperandKind::IndirectI => Operand::IndirectI,
-            OperandKind::Literal12 => Operand::Literal12(data),
-            OperandKind::Literal8 => Operand::Literal8(data),
-            OperandKind::Literal4 => Operand::Literal4(data),
-            OperandKind::DelayTimer => Operand::DelayTimer,
-            OperandKind::SoundTimer => Operand::SoundTimer,
-            OperandKind::Random => Operand::Random,
-            OperandKind::Unused => Operand::Nowhere,
         }
     }
 
@@ -278,6 +261,11 @@ impl Instruction {
         vars.insert("d".to_string(), self.dest.to_string());
         vars.insert("s".to_string(), self.src.to_string());
         vars.insert("a".to_string(), self.aux.to_string());
-        strfmt(&self.def.mnemonic, &vars).unwrap()
+        if let Ok(s) = strfmt(&self.def.mnemonic, &vars) {
+            s
+        } else {
+            "".to_string()
+            //TODO: log this?
+        }
     }
 }

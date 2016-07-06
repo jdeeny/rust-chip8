@@ -1,4 +1,4 @@
-/// A kind of operand
+/// A kind of operand.
 ///
 /// This is used to define a kind of operand. It is not specified, so the exact register,
 /// value, or address is not known.
@@ -28,7 +28,31 @@ pub enum OperandKind {
     Unused,
 }
 
-/// An operand
+impl OperandKind {
+    /// Specify the operand with the supplied data.
+    ///
+    /// For example, a Register will change from an OperandKind::Register with no associated
+    /// data into an Operand::Register(n) where n is the specific register number. The given
+    /// data is also used for Addresses and Literals. Other kinds of operands cannot be further
+    /// specified.
+    pub fn specify(&self, data: usize) -> Operand {
+        match *self {
+            OperandKind::Register => Operand::Register(data),
+            OperandKind::I => Operand::I,
+            OperandKind::Address12 => Operand::Address12(data),
+            OperandKind::IndirectI => Operand::IndirectI,
+            OperandKind::Literal12 => Operand::Literal12(data),
+            OperandKind::Literal8 => Operand::Literal8(data),
+            OperandKind::Literal4 => Operand::Literal4(data),
+            OperandKind::DelayTimer => Operand::DelayTimer,
+            OperandKind::SoundTimer => Operand::SoundTimer,
+            OperandKind::Random => Operand::Random,
+            OperandKind::Unused => Operand::Nowhere,
+        }
+    }
+}
+
+/// An operand.
 ///
 /// This is a fully specified operand, including the particular register, address, or value.
 #[derive(Copy, Clone, Debug)]
