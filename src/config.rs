@@ -1,4 +1,4 @@
-use InstructionSet;
+use instructions::codec::InstructionCodec;
 use Simulator;
 
 /// Defines the configuration of the chip8 system being used.
@@ -23,8 +23,8 @@ impl Config {
         Self::default()
     }
     /// Returns an InstructionSet based on the current configuration.
-    pub fn instructionset(&self) -> InstructionSet {
-        InstructionSet::new(*self)
+    pub fn instruction_codec(&self) -> InstructionCodec {
+        InstructionCodec::new(*self)
     }
     /// Returns a Simulator based on the current configuration.
     pub fn simulator(&self) -> Simulator {

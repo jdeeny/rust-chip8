@@ -1,5 +1,6 @@
 use simulator::Simulator;
 use instructions::{Instruction, Operand};
+use simulator::Vram;
 
 pub type Operation = fn(&Instruction, &mut Simulator);
 
@@ -128,12 +129,12 @@ pub fn op_skipneq(inst: &Instruction, core: &mut Simulator) {
 pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
     let key = core.load(inst.dest()) as usize;
     let mut key_state = false;
-    if let Ok(keys) = core.state().keys.read() {
+    /*if let Ok(keys) = core.state().keys.read() {
         key_state = keys.is_down(key);
         drop(keys)
     } else {
         // TODO: log this
-    }
+    }*/
     if key_state {
         core.advance_pc();
     }
@@ -142,12 +143,12 @@ pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
 pub fn op_skipnkey(inst: &Instruction, core: &mut Simulator) {
     let key = core.load(inst.dest()) as usize;
     let mut key_state = false;
-    if let Ok(keys) = core.state().keys.read() {
+    /*if let Ok(keys) = core.state().keys.read() {
         key_state = keys.is_down(key);
         drop(keys)
     } else {
         // TODO: log this
-    }
+    }*/
     if !key_state {
         core.advance_pc();
     }
@@ -190,12 +191,12 @@ pub fn op_ret(inst: &Instruction, core: &mut Simulator) {
 
 #[allow(unused_variables)]
 pub fn op_cls(inst: &Instruction, core: &mut Simulator) {
-    if let Ok(mut vram) = core.state().vram.write() {
+    /*if let Ok(mut vram) = core.state().vram.write() {
         vram.pixels = [[0; 32]; 64];
         drop(vram);
     } else {
         // TODO: log this or?
-    }
+    }*/
 }
 
 pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
@@ -207,14 +208,15 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
     let mut i = core.i();
 
     let mut pixels: [[u8;32]; 64];
-
-    if let Ok(vram) = core.state().vram.read() {
-        pixels = vram.pixels;
+    pixels = [[0; 32]; 64];
+    /*if let Ok(vram) = core.state().vram.read() {
+        local_vram = vram.clone();//pixels = vram.pixels;
         drop(vram);
     } else {
-        pixels = [[0; 32]; 64];
+        local_vram = Vram::default();
+        //pixels = [[0; 32]; 64];
         //TODO: log this
-    }
+    }*/
 
     core.vf_clear();
     for _ in 0..n {
@@ -236,14 +238,15 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
         y += 1;
     }
 
+    /*let mut vram: Vram;
     if let Ok(mut vram) = core.state().vram.write() {
-        vram.pixels = pixels;
+        vram = local_vram;//.clone();
         drop(vram);
     } else {
         //TODO: log this
-    }
-
+    }*/
 }
+
 
 pub fn op_stash(inst: &Instruction, core: &mut Simulator) {
     let last = if let Operand::Register(r) = inst.src() {

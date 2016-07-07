@@ -4,9 +4,8 @@ use std::fmt;
 
 mod operand;
 mod operations;
-mod instructionset;
+pub mod codec;
 
-pub use self::instructionset::InstructionSet;
 pub use self::operand::{Operand, OperandKind};
 use self::operations::*;
 use config::Config;

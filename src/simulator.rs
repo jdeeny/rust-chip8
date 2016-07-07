@@ -218,16 +218,16 @@ impl Simulator {
 
     /// Returns the `UiState`.
     pub fn state(&self) -> UiState {
-        self.state
+        self.state.clone()
     }
 
     /// Pops an item off the stack
-    pub fn stack_pop(&self) -> Option<usize> {
+    pub fn stack_pop(&mut self) -> Option<usize> {
         self.stack.pop()
     }
 
     /// Pops an item off the stack
-    pub fn stack_push(&self, address: usize) {
+    pub fn stack_push(&mut self, address: usize) {
         self.stack.push(address);
     }
 
@@ -302,11 +302,12 @@ impl fmt::Debug for Vram {
 }
 impl Clone for Vram {
     fn clone(&self) -> Self {
-        let mut p: [[u8;32];64] = [[0;32];64];
+        *self
+/*        let mut p: [[u8;32];64] = [[0;32];64];
         for (i, row) in self.pixels.iter().enumerate() {
             p[i] = *row;
         }
-        Vram { pixels: p }
+        Vram { pixels: p }*/
     }
 }
 

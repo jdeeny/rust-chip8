@@ -30,6 +30,6 @@ pub mod fonts;
 pub mod instructions;
 pub mod simulator;
 
-pub use instructions::InstructionSet;
+pub use instructions::codec::InstructionCodec;
 pub use config::Config;
 pub use simulator::Simulator;
