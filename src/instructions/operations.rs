@@ -1,52 +1,60 @@
-use simulator::Simulator;
-use instructions::{Instruction, Operand};
-use simulator::Vram;
+//! Contains the functions that perform the operations of each type of instruction.
 
-pub type Operation = fn(&Instruction, &mut Simulator);
+use instructions::{Executor, Instruction, Operand};
+#[allow(unused_imports)]
+use config::Config;
+use types::*;
 
-pub fn op_add(inst: &Instruction, core: &mut Simulator) {
+/// Each operation is able to perform the action of a certain instruction or group of instructions.
+pub type Operation = fn(&Instruction, &mut Executor);
+
+/// Add src to dst and store in dst.
+pub fn op_add(inst: &Instruction, core: &mut Executor) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let total = lhs + rhs;
-    core.vf_store(total > 0xFF);  //set vF if result overflows
+    core.set_flag(total > 0xFF);  //set vF if result overflows
     core.store(inst.dest(), total);
 }
 
 /// Subtract src from dest, store in dest. Set flag if NOT borrow
-pub fn op_sub(inst: &Instruction, core: &mut Simulator) {
-    let lhs = core.load(inst.dest()) as i32;
-    let rhs = core.load(inst.src()) as i32;
-    let total = ((lhs - rhs) as u32) & 0xFF;
+pub fn op_sub(inst: &Instruction, core: &mut Executor) {
+    let lhs = core.load(inst.dest());
+    let rhs = core.load(inst.src());
+    let total = (lhs - rhs) & 0xFF;
 
-    core.vf_store(lhs > rhs);  //set vF if NOT borrow
+    core.set_flag(lhs > rhs);  //set vF if NOT borrow
     core.store(inst.dest(), total);
 }
 
 /// Subtract dest from src, store in dest. Set flag if NOT borrow
-pub fn op_subn(inst: &Instruction, core: &mut Simulator) {
-    let lhs = core.load(inst.src()) as i32;
-    let rhs = core.load(inst.dest()) as i32;
-    let total = ((lhs - rhs) as u32) & 0xFF;
+pub fn op_subn(inst: &Instruction, core: &mut Executor) {
+    let lhs = core.load(inst.src());
+    let rhs = core.load(inst.dest());
+    let total = (lhs - rhs) & 0xFF;
 
-    core.vf_store(lhs > rhs);  //set vF if NOT borrow
+    core.set_flag(lhs > rhs);  //set vF if NOT borrow
     core.store(inst.dest(), total);
 }
 
-pub fn op_or(inst: &Instruction, core: &mut Simulator) {
+/// Or src with dest and store in dest.
+pub fn op_or(inst: &Instruction, core: &mut Executor) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs | rhs;
     core.store(inst.dest(), result);
 }
 
-pub fn op_and(inst: &Instruction, core: &mut Simulator) {
+/// And src with dest and store in dest.
+pub fn op_and(inst: &Instruction, core: &mut Executor) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs & rhs;
     core.store(inst.dest(), result);
 }
 
-pub fn op_xor(inst: &Instruction, core: &mut Simulator) {
+/// Xor src with dest and store in dest.
+pub fn op_xor(inst: &Instruction, core: &mut Executor) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs ^ rhs;
@@ -54,34 +62,37 @@ pub fn op_xor(inst: &Instruction, core: &mut Simulator) {
 }
 
 /// Shifts the source right 1 bit, and stores in dest. vF set to old LSB
-pub fn op_shr(inst: &Instruction, core: &mut Simulator) {
+pub fn op_shr(inst: &Instruction, core: &mut Executor) {
     let val = core.load(inst.src());
     let carry = (val & 1) == 1;
     let result = val >> 1;
     core.store(inst.dest(), result);
-    core.vf_store(carry);
+    core.set_flag(carry);
 }
 
 /// Shifts the source left 1 bit, and stores in dest. vF set to old MSB
-pub fn op_shl(inst: &Instruction, core: &mut Simulator) {
+pub fn op_shl(inst: &Instruction, core: &mut Executor) {
     let val = core.load(inst.src());
     let carry = (val & 0x80) == 0x80;
     let result = (val << 1) & 0xFF;
     core.store(inst.dest(), result);
-    core.vf_store(carry);
+    core.set_flag(carry);
 }
 
-pub fn op_load(inst: &Instruction, core: &mut Simulator) {
+/// Copy src to dest.
+pub fn op_load(inst: &Instruction, core: &mut Executor) {
     let data = core.load(inst.src());
     core.store(inst.dest(), data);
 }
 
-pub fn op_font(inst: &Instruction, core: &mut Simulator) {
-    let addr = core.config().sys_font_addr as u32 + core.load(inst.src()) * 5;
+/// Set I to the first byte of the glyph specified in the system font.
+pub fn op_font(inst: &Instruction, core: &mut Executor) {
+    let addr = core.config().sys_font_addr + core.load(inst.src()) * 5;
     core.store(inst.dest(), addr);
 }
 
-pub fn op_bcd(inst: &Instruction, core: &mut Simulator) {
+/// Set I[0...2] to the BCD representation of src.
+pub fn op_bcd(inst: &Instruction, core: &mut Executor) {
     let mut val = core.load(inst.src());
     let hundreds = val / 100;
     val -= hundreds * 100;
@@ -92,25 +103,24 @@ pub fn op_bcd(inst: &Instruction, core: &mut Simulator) {
     assert!(tens < 10);
     assert!(ones < 10);
 
-    let inital_i = core.i();      //store I so it can be restored
+    let inital_i = core.load(Operand::I);      //store I so it can be restored
     core.store(inst.dest(), hundreds);
-    core.set_i(inital_i + 1);
+    core.store(Operand::I, inital_i + 1);
     core.store(inst.dest(), tens);
-    core.set_i(inital_i + 2);
+    core.store(Operand::I, inital_i + 2);
     core.store(inst.dest(), ones);
-    core.set_i(inital_i);
+    core.store(Operand::I, inital_i);
 }
 
-
-pub fn op_rand(inst: &Instruction, core: &mut Simulator) {
+/// Set dest to a src(a random number) masked with aux.
+pub fn op_rand(inst: &Instruction, core: &mut Executor) {
     let mask = core.load(inst.src());
     let data = core.load(inst.aux()) & mask;
     core.store(inst.dest(), data);
 }
 
-
-
-pub fn op_skipeq(inst: &Instruction, core: &mut Simulator) {
+/// Skips the next instruction if src == dest.
+pub fn op_skipeq(inst: &Instruction, core: &mut Executor) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     if lhs == rhs {
@@ -118,7 +128,8 @@ pub fn op_skipeq(inst: &Instruction, core: &mut Simulator) {
     }
 }
 
-pub fn op_skipneq(inst: &Instruction, core: &mut Simulator) {
+/// Skips the next instruction if src != dest.
+pub fn op_skipneq(inst: &Instruction, core: &mut Executor) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     if lhs != rhs {
@@ -126,71 +137,79 @@ pub fn op_skipneq(inst: &Instruction, core: &mut Simulator) {
     }
 }
 
-pub fn op_skipkey(inst: &Instruction, core: &mut Simulator) {
-    let key = core.load(inst.dest()) as usize;
+/// Skips the next instruction if the key in dest is currently pressed.
+#[allow(unused_variables)]
+pub fn op_skipkey(inst: &Instruction, core: &mut Executor) {
+    /*let key = core.load(inst.dest());
     let mut key_state = false;
-    /*if let Ok(keys) = core.state().keys.read() {
+    if let Ok(keys) = core.state().keys.read() {
         key_state = keys.is_down(key);
         drop(keys)
     } else {
         // TODO: log this
-    }*/
+    }
     if key_state {
         core.advance_pc();
     }
+    */
 }
 
-pub fn op_skipnkey(inst: &Instruction, core: &mut Simulator) {
-    let key = core.load(inst.dest()) as usize;
+#[allow(unused_variables)]
+/// Skips the next instruction if the key in dest is currently not pressed.
+pub fn op_skipnkey(inst: &Instruction, core: &mut Executor) {
+    /*let key = core.load(inst.dest()) ;
     let mut key_state = false;
-    /*if let Ok(keys) = core.state().keys.read() {
+    if let Ok(keys) = core.state().keys.read() {
         key_state = keys.is_down(key);
         drop(keys)
     } else {
         // TODO: log this
-    }*/
+    }
     if !key_state {
         core.advance_pc();
-    }
+    }*/
 }
 
+/// Halt execution until a key is pressed.
 #[allow(unused_variables)]
-pub fn op_waitkey(inst: &Instruction, core: &mut Simulator) {
+pub fn op_waitkey(inst: &Instruction, core: &mut Executor) {
     panic!("WaitKey Unimplemented")
 }
 
 /// Jump to address
-pub fn op_jump(inst: &Instruction, core: &mut Simulator) {
-    let addr = core.load(inst.dest()) as usize;
-    core.jump_pc(addr);
+pub fn op_jump(inst: &Instruction, core: &mut Executor) {
+    let addr = core.load(inst.dest()) as Address;
+    core.jump(addr);
 }
 
 /// Jump to address + V0
-pub fn op_jumpv0(inst: &Instruction, core: &mut Simulator) {
-    let mut addr = core.load(inst.dest()) as usize;
-    addr += core.reg(0) as usize;
-    core.jump_pc(addr);
+pub fn op_jumpv0(inst: &Instruction, core: &mut Executor) {
+    let mut addr = core.load(inst.dest()) as Address;
+    addr += core.load(Operand::Register(0)) as Address;
+    core.jump(addr);
 }
-
-pub fn op_call(inst: &Instruction, core: &mut Simulator) {
-    let addr = core.load(inst.dest()) as usize;
+/// Add current program counter to the stack and jump to address.
+pub fn op_call(inst: &Instruction, core: &mut Executor) {
+    let addr = core.load(inst.dest()) as Address;
     let pc = core.pc();
     core.stack_push(pc);
-    core.jump_pc(addr);
+    core.jump(addr);
 }
 
+/// Return
 #[allow(unused_variables)]
-pub fn op_ret(inst: &Instruction, core: &mut Simulator) {
+pub fn op_ret(inst: &Instruction, core: &mut Executor) {
     if let Some(addr) = core.stack_pop() {
-        core.jump_pc(addr);
+        core.jump(addr);
     } else {
         //TODO: There should probably be some kind of log/output
     }
 }
 
 
+/// Clear the screen.
 #[allow(unused_variables)]
-pub fn op_cls(inst: &Instruction, core: &mut Simulator) {
+pub fn op_cls(inst: &Instruction, core: &mut Executor) {
     /*if let Ok(mut vram) = core.state().vram.write() {
         vram.pixels = [[0; 32]; 64];
         drop(vram);
@@ -199,36 +218,38 @@ pub fn op_cls(inst: &Instruction, core: &mut Simulator) {
     }*/
 }
 
-pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
-
+#[allow(unused_variables)]
+/// Draw a sprite.
+pub fn op_sprite(inst: &Instruction, core: &mut Executor) {
+    /*
     let x = core.load(inst.dest());
     let mut y = core.load(inst.src());
     let n = core.load(inst.aux());
 
-    let mut i = core.i();
+    let mut i = core.load(Operand::I)();
 
     let mut pixels: [[u8;32]; 64];
     pixels = [[0; 32]; 64];
-    /*if let Ok(vram) = core.state().vram.read() {
+    if let Ok(vram) = core.state().vram.read() {
         local_vram = vram.clone();//pixels = vram.pixels;
         drop(vram);
     } else {
         local_vram = Vram::default();
         //pixels = [[0; 32]; 64];
         //TODO: log this
-    }*/
+    }
 
     core.vf_clear();
-    for _ in 0..n {
-        let byte = core.ram(i);
+    for byte in 0..n {
+        core.ram(i);
         for bit in 0..8 {
             let pixel = if byte & (0x80 >> bit) == 0 {
                 0
             } else {
                 1
             };
-            let x_loc = ((x + bit) & 63) as usize;
-            let y_loc = (y & 31) as usize;
+            let x_loc = ((x + bit) & 63) ;
+            let y_loc = (y & 31) ;
             pixels[x_loc][y_loc] ^= pixel;
             if pixels[x_loc][y_loc] == 0 && pixel == 1 {
                 core.vf_set();
@@ -238,40 +259,42 @@ pub fn op_sprite(inst: &Instruction, core: &mut Simulator) {
         y += 1;
     }
 
-    /*let mut vram: Vram;
+    let mut vram: Vram;
     if let Ok(mut vram) = core.state().vram.write() {
         vram = local_vram;//.clone();
         drop(vram);
     } else {
         //TODO: log this
-    }*/
+    }
+    */
 }
 
-
-pub fn op_stash(inst: &Instruction, core: &mut Simulator) {
+/// Stores registers v0.. to ram[I]
+pub fn op_stash(inst: &Instruction, core: &mut Executor) {
     let last = if let Operand::Register(r) = inst.src() {
         r
     } else {
         panic!("Fetch only works with a register");
     };
-    let i = core.i();
+    let i = core.load(Operand::I);
     for r in 0...last {
-        let value = core.reg(r);
-        core.set_ram(i + r, value);
+        let value = core.load(Operand::Register(r));
+        core.store(Operand::Address12(i + r), value);
     }
-    core.set_i(i + last + 1);
+    core.store(Operand::I, i + last + 1);
 }
 
-pub fn op_fetch(inst: &Instruction, core: &mut Simulator) {
+/// Fetches several bytes, pointed to by I, into v0..
+pub fn op_fetch(inst: &Instruction, core: &mut Executor) {
     let last = if let Operand::Register(r) = inst.dest() {
         r
     } else {
         panic!("Fetch only works with a register");
     };
-    let i = core.i();
+    let i = core.load(Operand::I);
     for r in 0...last {
-        let v = core.ram(i + r);
-        core.set_reg(r, v);
+        let v = core.load(Operand::Address12(i + r));
+        core.store(Operand::Register(r), v);
     }
-    core.set_i(i + last + 1);
+    core.store(Operand::I, i + last + 1);
 }

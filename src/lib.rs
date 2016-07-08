@@ -24,12 +24,19 @@
 extern crate rand;
 extern crate strfmt;
 
-mod config;
+mod chip8;
+mod types;
 
+pub mod config;
 pub mod fonts;
 pub mod instructions;
 pub mod simulator;
 
-pub use instructions::codec::InstructionCodec;
-pub use config::Config;
-pub use simulator::Simulator;
+pub use chip8::Chip8;
+
+#[test]
+fn test_iset() {
+    let iset = instructions::InstructionSet::new(Config::default());
+
+    assert_eq!(0xC234, iset.encode(iset.decode(0xC234)));
+}

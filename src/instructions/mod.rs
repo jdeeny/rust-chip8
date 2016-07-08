@@ -3,10 +3,13 @@
 use std::fmt;
 
 mod operand;
-mod operations;
-pub mod codec;
+mod set;
+pub mod operations;
 
+pub use self::set::InstructionSet;
 pub use self::operand::{Operand, OperandKind};
+
+use types::*;
 use self::operations::*;
 use config::Config;
 
@@ -91,6 +94,17 @@ impl Table {
             }
         }
         panic!("Unknown Instruction")
+    }
+
+    /// Encode an `Instruction` into a codeword.
+    #[allow(unused_variables)]
+    pub fn encode(&self, inst: Instruction) -> Word {
+        0
+        /*for def in &self.table {
+            if def.operation == inst.operation {
+
+            }
+        }*/
     }
 }
 
@@ -290,4 +304,29 @@ impl fmt::Debug for Instruction {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Instruction")
     }
+}
+
+/// Implementations of `Executor` can manipulate the machine state.
+///
+/// `Operations` make use of these functions to update the core as instructions are
+/// executed. Currently, there is only one implementation: `Simulator`.
+pub trait Executor {
+    /// Returns the Config being used by the Executor
+    fn config(&self) -> Config;
+    /// Loads a value from the source Operand.
+    fn store(&mut self, dest: Operand, data: usize);
+    /// Stores a value into the destination Operand.
+    fn load(&mut self, src: Operand) -> usize;
+    /// Pops an item off the stack
+    fn stack_pop(&mut self) -> Option<Address>;
+    /// Pops an item off the stack
+    fn stack_push(&mut self, address: Address);
+    /// Returns the current address pointed to by the program counter
+    fn pc(&self) -> Address;
+    /// Advances the program counter one instruction.
+    fn advance_pc(&mut self);
+    /// Jumps the program counter to a given address.
+    fn jump(&mut self, addr: Address);
+    /// Store a flag in vF.
+    fn set_flag(&mut self, state: bool);
 }
