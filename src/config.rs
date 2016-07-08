@@ -37,12 +37,12 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
-        CONFIG_DEFAULT
+        DEFAULT
     }
 }
 
 /// The default configuration.
-pub const CONFIG_DEFAULT: Config = Config {
+pub const DEFAULT: Config = Config {
     sys_ram_bytes: 0x2000,
     sys_stack_size: 12,
     sys_vram_bytes: 64*32,
@@ -51,7 +51,7 @@ pub const CONFIG_DEFAULT: Config = Config {
 };
 
 /// A sample configuration with large RAM.
-pub const CONFIG_BIG: Config = Config {
+pub const BIG: Config = Config {
     sys_ram_bytes: 0xFFFF,
     sys_vram_bytes: 64*32,
     sys_stack_size: 1000,

@@ -298,3 +298,32 @@ pub fn op_fetch(inst: &Instruction, core: &mut Executor) {
     }
     core.store(Operand::I, i + last + 1);
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use Chip8;
+    use config::DEFAULT;
+    use instructions::{Executor, Instruction, Operand};
+
+    #[test]
+    fn test_add_reg() {
+        let mut core = Chip8::new(DEFAULT);
+        let inst = Instruction { operation: op_add, dest: Operand::Register(0), src: Operand::Register(1), aux: Operand::Nowhere };
+
+        core.store(Operand::Register(0), 5);
+        core.store(Operand::Register(1), 10);
+        op_add(&inst, &mut core);
+        assert_eq!(core.load(Operand::Register(0)), 15);
+        assert_eq!(core.load(Operand::Register(1)), 10);
+        assert_eq!(core.load(Operand::Register(0xF)), 0);
+
+        //with overflow
+        core.store(Operand::Register(0), 0xFF);
+        op_add(&inst, &mut core);
+        assert_eq!(core.load(Operand::Register(0)), 9);
+        assert_eq!(core.load(Operand::Register(1)), 10);
+        assert_eq!(core.load(Operand::Register(0xF)), 1);
+
+    }
+}

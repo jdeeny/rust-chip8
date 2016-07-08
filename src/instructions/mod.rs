@@ -241,6 +241,8 @@ impl Instruction {
             aux = def.aux_kind.specify(aux_data);
         }
 
+        println!("{:?} {:?} {:?}", dest, src, aux);
+
         Instruction {
             //def: def,
             //codeword: codeword,

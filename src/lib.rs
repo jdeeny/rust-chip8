@@ -33,10 +33,3 @@ pub mod instructions;
 pub mod simulator;
 
 pub use chip8::Chip8;
-
-#[test]
-fn test_iset() {
-    let iset = instructions::InstructionSet::new(Config::default());
-
-    assert_eq!(0xC234, iset.encode(iset.decode(0xC234)));
-}

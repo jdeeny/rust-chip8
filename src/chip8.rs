@@ -1,11 +1,8 @@
 use std::iter::{FromIterator, repeat};
-use std::fmt;
-use std::fmt::Debug;
 use rand::{Rng, thread_rng};
 use types::*;
 use config::Config;
 use instructions::{Executor,Operand};
-use simulator::Simulator;
 
 
 /// A struct that contains a Chip8 `Config` and the machine state.
