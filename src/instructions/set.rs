@@ -12,12 +12,12 @@ use instructions::{Instruction, Table, Word};
 /// by application logic, e.g. a disassembler. An `Instruction` can be encoded into a 16-bit
 /// codeword. The `Instruction` is created by application logic, e.g. an assembler.
 #[derive(Debug)]
-pub struct  InstructionSet {
+pub struct InstructionSet {
     config: Config,
     table: Table
 }
 
-impl  InstructionSet {
+impl InstructionSet {
     /// Creates a new  InstructionSet using the given configuration.
     pub fn new(config: Config) ->  InstructionSet {
          InstructionSet {

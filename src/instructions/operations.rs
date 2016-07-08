@@ -87,7 +87,7 @@ pub fn op_load(inst: &Instruction, core: &mut Executor) {
 
 /// Set I to the first byte of the glyph specified in the system font.
 pub fn op_font(inst: &Instruction, core: &mut Executor) {
-    let addr = core.config().sys_font_addr + core.load(inst.src()) * 5;
+    let addr = core.config().font_addr + core.load(inst.src()) * 5;
     core.store(inst.dest(), addr);
 }
 

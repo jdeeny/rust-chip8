@@ -41,14 +41,14 @@ impl Chip8 {
     pub fn new(config: Config) -> Chip8 {
         Chip8 {
             config: config,
-            ram: Vec::from_iter(repeat(0u8).take(config.sys_ram_bytes)),
+            ram: Vec::from_iter(repeat(0u8).take(config.ram_bytes)),
             v: [0; 16],
             i: 0,
             st: 0,
             dt: 0,
             pc: 0,
-            stack: Vec::with_capacity(config.sys_stack_size),
-            vram: Vec::from_iter(repeat(Pixel::default()).take(config.sys_vram_bytes)),
+            stack: Vec::with_capacity(config.stack_size),
+            vram: Vec::from_iter(repeat(Pixel::default()).take(config.vram_bytes)),
             keys: [false;16],
             audio: false,
         }
@@ -68,7 +68,7 @@ impl Executor for Chip8 {
     }*/
 
     fn config(&self) -> Config {
-        self .config
+        self.config
     }
 
     fn load(&mut self, src: Operand) -> usize {

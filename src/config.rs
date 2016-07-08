@@ -1,21 +1,24 @@
 //! Configuration of the Chip8 machine.
+use std::fmt::{self, Debug};
+use fonts::*;
 use instructions::InstructionSet;
-use simulator::Simulator;
 
 /// Defines the configuration of the chip8 system being used.
 ///
 /// These settings account for various historical implementation oddities and also allow for
 /// modern instruction set enhancements.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone)]
 pub struct Config {
     /// Sets the size of ram in bytes.
-    pub sys_ram_bytes: usize,
+    pub ram_bytes: usize,
     /// Sets the number of addresses that can be placed on the stack.
-    pub sys_stack_size: usize,
+    pub stack_size: usize,
     /// Sets the number of pixels in vram.
-    pub sys_vram_bytes: usize,
+    pub vram_bytes: usize,
     /// Sets the base address where the system font will be loaded.
-    pub sys_font_addr: usize,
+    pub font_addr: usize,
+    /// Sets the small font.
+    pub font_small: &'static Font4x5,
     /// When true, shifts modify vx in place and ignore vy.
     pub quirk_shift: bool,
 }
@@ -29,32 +32,36 @@ impl Config {
     pub fn instruction_codec(&self) -> InstructionSet {
         InstructionSet::new(*self)
     }
-    /// Returns a Simulator based on the current configuration.
-    pub fn simulator(&self) -> Simulator {
-        Simulator::new(*self)
-    }
 }
 
 impl Default for Config {
-    fn default() -> Self {
+    fn default() -> Config {
         DEFAULT
+    }
+}
+
+impl Debug for Config {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Config {{}}")
     }
 }
 
 /// The default configuration.
 pub const DEFAULT: Config = Config {
-    sys_ram_bytes: 0x2000,
-    sys_stack_size: 12,
-    sys_vram_bytes: 64*32,
-    sys_font_addr: 0x0000,
+    ram_bytes: 0x2000,
+    stack_size: 12,
+    vram_bytes: 64*32,
+    font_addr: 0x0000,
+    font_small: &FONT_CHIP8_4X5,
     quirk_shift: false,
 };
 
 /// A sample configuration with large RAM.
 pub const BIG: Config = Config {
-    sys_ram_bytes: 0xFFFF,
-    sys_vram_bytes: 64*32,
-    sys_stack_size: 1000,
-    sys_font_addr: 0x000,
+    ram_bytes: 0xFFFF,
+    vram_bytes: 64*32,
+    stack_size: 1000,
+    font_addr: 0x000,
+    font_small: &FONT_CHIP8_4X5,
     quirk_shift: false,
 };
