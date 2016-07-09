@@ -1,15 +1,13 @@
 //! Contains the functions that perform the operations of each type of instruction.
 
-use instructions::{Executor, Instruction, Operand};
+use instructions::{Instruction, Operand};
+use execution::{Execute};
 #[allow(unused_imports)]
 use config::Config;
 use types::*;
 
-/// Each operation is able to perform the action of a certain instruction or group of instructions.
-pub type Operation = fn(&Instruction, &mut Executor);
-
 /// Add src to dst and store in dst.
-pub fn op_add(inst: &Instruction, core: &mut Executor) {
+pub fn op_add(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let total = lhs + rhs;
@@ -18,7 +16,7 @@ pub fn op_add(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Subtract src from dest, store in dest. Set flag if NOT borrow
-pub fn op_sub(inst: &Instruction, core: &mut Executor) {
+pub fn op_sub(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let total = (lhs - rhs) & 0xFF;
@@ -28,7 +26,7 @@ pub fn op_sub(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Subtract dest from src, store in dest. Set flag if NOT borrow
-pub fn op_subn(inst: &Instruction, core: &mut Executor) {
+pub fn op_subn(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.src());
     let rhs = core.load(inst.dest());
     let total = (lhs - rhs) & 0xFF;
@@ -38,7 +36,7 @@ pub fn op_subn(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Or src with dest and store in dest.
-pub fn op_or(inst: &Instruction, core: &mut Executor) {
+pub fn op_or(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs | rhs;
@@ -46,7 +44,7 @@ pub fn op_or(inst: &Instruction, core: &mut Executor) {
 }
 
 /// And src with dest and store in dest.
-pub fn op_and(inst: &Instruction, core: &mut Executor) {
+pub fn op_and(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs & rhs;
@@ -54,7 +52,7 @@ pub fn op_and(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Xor src with dest and store in dest.
-pub fn op_xor(inst: &Instruction, core: &mut Executor) {
+pub fn op_xor(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     let result = lhs ^ rhs;
@@ -62,7 +60,7 @@ pub fn op_xor(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Shifts the source right 1 bit, and stores in dest. vF set to old LSB
-pub fn op_shr(inst: &Instruction, core: &mut Executor) {
+pub fn op_shr(inst: &Instruction, core: &mut Execute) {
     let val = core.load(inst.src());
     let carry = (val & 1) == 1;
     let result = val >> 1;
@@ -71,7 +69,7 @@ pub fn op_shr(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Shifts the source left 1 bit, and stores in dest. vF set to old MSB
-pub fn op_shl(inst: &Instruction, core: &mut Executor) {
+pub fn op_shl(inst: &Instruction, core: &mut Execute) {
     let val = core.load(inst.src());
     let carry = (val & 0x80) == 0x80;
     let result = (val << 1) & 0xFF;
@@ -80,19 +78,19 @@ pub fn op_shl(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Copy src to dest.
-pub fn op_load(inst: &Instruction, core: &mut Executor) {
+pub fn op_load(inst: &Instruction, core: &mut Execute) {
     let data = core.load(inst.src());
     core.store(inst.dest(), data);
 }
 
 /// Set I to the first byte of the glyph specified in the system font.
-pub fn op_font(inst: &Instruction, core: &mut Executor) {
+pub fn op_font(inst: &Instruction, core: &mut Execute) {
     let addr = core.config().addr_font + core.load(inst.src()) * 5;
     core.store(inst.dest(), addr);
 }
 
 /// Set I[0...2] to the BCD representation of src.
-pub fn op_bcd(inst: &Instruction, core: &mut Executor) {
+pub fn op_bcd(inst: &Instruction, core: &mut Execute) {
     let mut val = core.load(inst.src());
     let hundreds = val / 100;
     val -= hundreds * 100;
@@ -113,14 +111,14 @@ pub fn op_bcd(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Set dest to a src(a random number) masked with aux.
-pub fn op_rand(inst: &Instruction, core: &mut Executor) {
+pub fn op_rand(inst: &Instruction, core: &mut Execute) {
     let mask = core.load(inst.src());
     let data = core.load(inst.aux()) & mask;
     core.store(inst.dest(), data);
 }
 
 /// Skips the next instruction if src == dest.
-pub fn op_skipeq(inst: &Instruction, core: &mut Executor) {
+pub fn op_skipeq(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     if lhs == rhs {
@@ -129,7 +127,7 @@ pub fn op_skipeq(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Skips the next instruction if src != dest.
-pub fn op_skipneq(inst: &Instruction, core: &mut Executor) {
+pub fn op_skipneq(inst: &Instruction, core: &mut Execute) {
     let lhs = core.load(inst.dest());
     let rhs = core.load(inst.src());
     if lhs != rhs {
@@ -139,7 +137,7 @@ pub fn op_skipneq(inst: &Instruction, core: &mut Executor) {
 
 /// Skips the next instruction if the key in dest is currently pressed.
 #[allow(unused_variables)]
-pub fn op_skipkey(inst: &Instruction, core: &mut Executor) {
+pub fn op_skipkey(inst: &Instruction, core: &mut Execute) {
     /*let key = core.load(inst.dest());
     let mut key_state = false;
     if let Ok(keys) = core.state().keys.read() {
@@ -156,7 +154,7 @@ pub fn op_skipkey(inst: &Instruction, core: &mut Executor) {
 
 #[allow(unused_variables)]
 /// Skips the next instruction if the key in dest is currently not pressed.
-pub fn op_skipnkey(inst: &Instruction, core: &mut Executor) {
+pub fn op_skipnkey(inst: &Instruction, core: &mut Execute) {
     /*let key = core.load(inst.dest()) ;
     let mut key_state = false;
     if let Ok(keys) = core.state().keys.read() {
@@ -172,24 +170,24 @@ pub fn op_skipnkey(inst: &Instruction, core: &mut Executor) {
 
 /// Halt execution until a key is pressed.
 #[allow(unused_variables)]
-pub fn op_waitkey(inst: &Instruction, core: &mut Executor) {
+pub fn op_waitkey(inst: &Instruction, core: &mut Execute) {
     panic!("WaitKey Unimplemented")
 }
 
 /// Jump to address
-pub fn op_jump(inst: &Instruction, core: &mut Executor) {
+pub fn op_jump(inst: &Instruction, core: &mut Execute) {
     let addr = core.load(inst.dest()) as Address;
     core.jump(addr);
 }
 
 /// Jump to address + V0
-pub fn op_jumpv0(inst: &Instruction, core: &mut Executor) {
+pub fn op_jumpv0(inst: &Instruction, core: &mut Execute) {
     let mut addr = core.load(inst.dest()) as Address;
     addr += core.load(Operand::Register(0)) as Address;
     core.jump(addr);
 }
 /// Add current program counter to the stack and jump to address.
-pub fn op_call(inst: &Instruction, core: &mut Executor) {
+pub fn op_call(inst: &Instruction, core: &mut Execute) {
     let addr = core.load(inst.dest()) as Address;
     let pc = core.pc();
     core.stack_push(pc);
@@ -198,7 +196,7 @@ pub fn op_call(inst: &Instruction, core: &mut Executor) {
 
 /// Return
 #[allow(unused_variables)]
-pub fn op_ret(inst: &Instruction, core: &mut Executor) {
+pub fn op_ret(inst: &Instruction, core: &mut Execute) {
     if let Some(addr) = core.stack_pop() {
         core.jump(addr);
     } else {
@@ -209,7 +207,7 @@ pub fn op_ret(inst: &Instruction, core: &mut Executor) {
 
 /// Clear the screen.
 #[allow(unused_variables)]
-pub fn op_cls(inst: &Instruction, core: &mut Executor) {
+pub fn op_cls(inst: &Instruction, core: &mut Execute) {
     /*if let Ok(mut vram) = core.state().vram.write() {
         vram.pixels = [[0; 32]; 64];
         drop(vram);
@@ -220,7 +218,7 @@ pub fn op_cls(inst: &Instruction, core: &mut Executor) {
 
 #[allow(unused_variables)]
 /// Draw a sprite.
-pub fn op_sprite(inst: &Instruction, core: &mut Executor) {
+pub fn op_sprite(inst: &Instruction, core: &mut Execute) {
     /*
     let x = core.load(inst.dest());
     let mut y = core.load(inst.src());
@@ -270,7 +268,7 @@ pub fn op_sprite(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Stores registers v0.. to ram[I]
-pub fn op_stash(inst: &Instruction, core: &mut Executor) {
+pub fn op_stash(inst: &Instruction, core: &mut Execute) {
     let last = if let Operand::Register(r) = inst.src() {
         r
     } else {
@@ -285,7 +283,7 @@ pub fn op_stash(inst: &Instruction, core: &mut Executor) {
 }
 
 /// Fetches several bytes, pointed to by I, into v0..
-pub fn op_fetch(inst: &Instruction, core: &mut Executor) {
+pub fn op_fetch(inst: &Instruction, core: &mut Execute) {
     let last = if let Operand::Register(r) = inst.dest() {
         r
     } else {
@@ -298,17 +296,18 @@ pub fn op_fetch(inst: &Instruction, core: &mut Executor) {
     }
     core.store(Operand::I, i + last + 1);
 }
-
+/*
 #[cfg(test)]
 mod tests {
     use super::*;
     use Chip8;
-    use config::DEFAULT;
-    use instructions::{Executor, Instruction, Operand};
+    use config::Config;
+    use instructions::{Instruction, Operand};
+    use execution::Execute;
 
     #[test]
     fn test_add_reg() {
-        let mut core = Chip8::new(DEFAULT);
+        let mut core = Chip8::new(Config::default());
         let inst = Instruction { operation: op_add, dest: Operand::Register(0), src: Operand::Register(1), aux: Operand::Nowhere };
 
         core.store(Operand::Register(0), 5);
@@ -327,3 +326,4 @@ mod tests {
 
     }
 }
+*/

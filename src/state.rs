@@ -1,19 +1,20 @@
-//! Defines the state of the Chip8 virtual machine.
+//! Defines the state of the State virtual machine.
 
 use std::iter::{FromIterator, repeat};
 use rand::{Rng, thread_rng};
 pub use types::*;
 use config::Config;
-use instructions::{Executor,Operand};
+use instructions::Operand;
+use execution::Execute;
 
 
-/// A struct that contains a Chip8 `Config` and the machine state.
+/// A struct that contains a State `Config` and the machine state.
 ///
 /// The machine state includes the RAM, registers, program counter, stack, timers, and the
 /// state of the IO subsystems.
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
-pub struct Chip8 {
+pub struct State {
     /// Sets the configuration of the machine.
     pub config: Config,
     /// The ram.
@@ -38,10 +39,10 @@ pub struct Chip8 {
     pub audio: Audio,
 }
 
-impl Chip8 {
-    /// Create a new Chip8 using the supplied Config.
-    pub fn new(config: Config) -> Chip8 {
-        Chip8 {
+impl State {
+    /// Create a new State using the supplied Config.
+    pub fn new(config: Config) -> State {
+        State {
             config: config,
             ram: Vec::from_iter(repeat(0u8).take(config.ram_bytes)),
             v: [0; 16],
@@ -57,7 +58,7 @@ impl Chip8 {
     }
 }
 
-impl Executor for Chip8 {
+impl Execute for State {
 
 /*    /// Gets the value stored at an address in RAM.
     fn ram(&self, addr: Address) -> MemoryCell {
@@ -146,12 +147,12 @@ impl Executor for Chip8 {
     }
 }
 
-impl Default for Chip8 {
+impl Default for State {
     fn default() -> Self {
         Self::new(Config::default())
     }
 }
-/*impl Debug for Chip8 {
+/*impl Debug for State {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Simulator {{}}")
     }

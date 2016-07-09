@@ -2,21 +2,32 @@
 
 use std::fmt;
 
-pub mod operations;
-
+mod codec;
 mod definition;
-mod operand;
-mod isa;
-mod set;
-mod execution;
+mod operands;
+pub mod sets;
+mod instruction;
 
-pub use self::definition::{Codeword, Coding, Definition, Instruction};
+pub use self::codec::{Decoder,Encoder};
+pub use self::definition::Definition;
+pub use self::instruction::Instruction;
+pub use self::operands::{Operand, OperandKind};
 
-pub use self::execution::Executor;
-pub use self::set::InstructionSet;
-pub use self::operand::{Operand, OperandKind};
-pub use self::isa::*;
+pub type Isa = Vec<Definition>;
+pub type Codeword = u16;
 
-use types::*;
-use self::operations::*;
-use config::Config;
+/// Type to hold instruction word pattern
+pub type Pattern = [Coding; 4];
+
+/// Used to define the coding of each instruction type
+#[derive(Clone,Copy,Debug)]
+pub enum Coding {
+    /// A constant nibble (literal)
+    C(u8),
+    /// Destination
+    D,
+    /// Source
+    S,
+    /// Auxillary
+    A,
+}

@@ -4,7 +4,7 @@ use std::fmt;
 use rand::{Rng, thread_rng};
 
 use config::Config;
-use types::*;
+//use types::*;
 
 use chip8::Chip8;
 use instructions;

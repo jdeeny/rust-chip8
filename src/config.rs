@@ -5,7 +5,7 @@
 //!
 use std::fmt::{self, Debug};
 use fonts::Font4x5;
-use instructions::InstructionSet;
+use instructions::Isa;
 use self::presets::*;
 
 /// Defines the configuration of the chip8 system being used.
@@ -35,10 +35,6 @@ impl Config {
     /// Returns a new Config.
     pub fn new() -> Config {
         Self::default()
-    }
-    /// Returns an InstructionSet based on the current configuration.
-    pub fn instruction_codec(&self) -> InstructionSet {
-        InstructionSet::new(*self)
     }
 }
 

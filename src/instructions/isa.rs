@@ -1,43 +1,148 @@
-use instructions::Definition;
-use instructions::OperandKind::*;
-use instructions::Coding::*;
-use instructions::operations::*;
+//! A set of instructions.
+//!
+//! # Examples
+//! ```
+//! let set = Isa::new(Config::default());
+//! let word: Codeword = 0x1234;
+//! let inst: = set.decode(word);
+//! assert_eq!( word, set.encode(inst) );
+//! ```
+
+use std::fmt;
+
+use config::Config;
+use instructions::{Definition, Instruction, Codeword, isa_chip8};
 
 
+/// A Chip8 instruction set based on a particular configuration. Translates between machine code
+/// and `Instruction`s.
+///
+/// An ` Isa` is created with a particular configuration, which governs the
+/// instructions that are included in the ISA.
+///
+/// A 16-bit codeword can be decoded into a generic `Instruction`, which can then be processed
+/// by application logic, e.g. a disassembler. An `Instruction` can be encoded into a 16-bit
+/// codeword. The `Instruction` is created by application logic, e.g. an assembler.
+//#[derive(Debug)]
+pub struct Isa {
+    table: Vec<InstructionMatcher>,
+}
 
-pub const isa_chip8: &'static [Definition] = &[
-/*    Definition::new(op_cls,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0x0)], "Cls"),
-    Definition::new(op_ret,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0xE)], "Ret"),
-    Definition::new(op_jump,     Literal12,  Unused,     Unused,     [C(0x1), D,      D,      D     ], "Jump {d}"),
-    Definition::new(op_call,     Literal12,  Unused,     Unused,     [C(0x2), D,      D,      D     ], "Call {d}"),
-    Definition::new(op_skipeq,   Register,   Literal8,   Unused,     [C(0x3), D,      S,      S     ], "SkipEq {d}, {s}"),
-    Definition::new(op_skipneq,  Register,   Literal8,   Unused,     [C(0x4), D,      S,      S     ], "SkipNeq {d}, {s}"),
-    Definition::new(op_skipeq,   Register,   Register,   Unused,     [C(0x5), D,      S,      C(0x0)], "SkipEq {d}, {s}"),
-    Definition::new(op_load,     Register,   Literal8,   Unused,     [C(0x6), D,      S,      S     ], "Load {d}, {s}"),
-    Definition::new(op_add,      Register,   Literal8,   Unused,     [C(0x7), D,      S,      S     ], "Add {d}, {s}"),
-    Definition::new(op_load,     Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x0)], "Load {d}, {s}"),
-    Definition::new(op_or,       Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x1)], "Or {d}, {s}"),
-    Definition::new(op_and,      Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x2)], "And {d}, {s}"),
-    Definition::new(op_xor,      Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x3)], "Xor {d}, {s}"),
-    Definition::new(op_add,      Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x4)], "Add {d}, {s}"),
-    Definition::new(op_sub,      Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x5)], "Sub {d}, {s}"),
-    Definition::new(op_shr,      Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x6)], "ShR {d}, {s}"),
-    Definition::new(op_subn,     Register,   Register,   Unused,     [C(0x8), D,      S,      C(0x7)], "SubN {d}, {s}"),
-    Definition::new(op_shl,      Register,   Register,   Unused,     [C(0x8), D,      S,      C(0xE)], "ShL {d}, {s}"),
-    Definition::new(op_skipneq,  Register,   Register,   Unused,     [C(0x9), D,      S,      C(0x0)], "SkipNeq {d}, {s}"),
-    Definition::new(op_load,     I,          Literal12,  Unused,     [C(0xA), S,      S,      S     ], "Load {d}, {s}"),
-    Definition::new(op_jumpv0,   Literal12,  Unused,     Unused,     [C(0xB), D,      D,      D     ], "JumpV0 {d}"),
-    Definition::new(op_rand,     Register,   Literal8,   Random,     [C(0xC), D,      S,      S     ], "Rand {d}, {s}"),
-    Definition::new(op_sprite,   Register,   Register,   Literal4,   [C(0xD), D,      S,      A     ], "Sprite {d}, {s}, {a}"),
-    Definition::new(op_skipkey,  Register,   Unused,     Unused,     [C(0xE), D,      C(0x9), C(0xE)], "SkipKey {d}"),
-    Definition::new(op_skipnkey, Register,   Unused,     Unused,     [C(0xE), D,      C(0xA), C(0x1)], "SkipNKey {d}"),
-    Definition::new(op_load,     Register,   DelayTimer, Unused,     [C(0xF), D,      C(0x0), C(0x7)], "Load {d}, {s}"),
-    Definition::new(op_waitkey,  Register,   Unused,     Unused,     [C(0xF), D,      C(0x0), C(0xA)], "WaitKey {d}"),
-    Definition::new(op_load,     DelayTimer, Register,   Unused,     [C(0xF), S,      C(0x1), C(0x5)], "Load {d}, {s}"),
-    Definition::new(op_load,     SoundTimer, Register,   Unused,     [C(0xF), S,      C(0x1), C(0x8)], "Load {d}, {s}"),
-    Definition::new(op_add,      I,          Register,   Unused,     [C(0xF), S,      C(0x1), C(0xE)], "Add {d}, {s}"),
-    Definition::new(op_font,     I,          Register,   Unused,     [C(0xF), S,      C(0x2), C(0x9)], "Font {d}, {s}"),
-    Definition::new(op_bcd,      IndirectI,  Register,   Unused,     [C(0xF), S,      C(0x3), C(0x3)], "BCD {d}, {s}"),
-    Definition::new(op_stash,    IndirectI,  Register,   Unused,     [C(0xF), S,      C(0x5), C(0x5)], "Stash {s}"),*/
-    //Definition::new(op_fetch,    Register,   IndirectI,  Unused,     [C(0xF), D,      C(0x6), C(0x5)], "Fetch {d}"),
-];
+impl Isa {
+    /// Creates a new  Isa using the given configuration.
+    pub fn new(config: Config) ->  Isa {
+         Isa {
+        //    config: config,
+            table: Vec::new(),
+        }
+    }
+
+    /// Encodes a given chip8 instruction into a 16-bit codeword.
+    #[allow(unused_variables)]
+    pub fn encode(&self, inst: Instruction) -> Codeword {
+        self.table.encode(inst)
+    }
+
+    /// Decodes a 16-bit codeword into an Instruction.
+    pub fn decode(&self, codeword: Codeword) -> Instruction {
+        for matcher in self.table {
+            if matcher.is_match(codeword) {
+                
+            }
+        }
+        self.table.decode(codeword)
+    }
+
+/*    /// Returns the configuration that was used to create this ` Isa`
+    pub fn config(&self) -> Config {
+        self.config
+    }*/
+
+}
+
+/// A table of all the chip8 instructions. TODO: Move to new file
+pub struct Table {
+    table: Vec<Definition>,
+}
+impl Table {
+    /// Returns a new instruction table.
+    #[allow(unused_variables)]
+    pub fn new(config: Config) -> Table {
+
+        let mut table: Vec<Definition> = Vec::new();
+        for d in isa_chip8 {
+            //table.push(*d);
+        }
+
+        Table { table: table }
+    }
+}
+
+impl Table {
+    /// Decode a codeword by finding a match in the table.
+    pub fn decode(&self, codeword: Codeword) -> Instruction {
+/*        for def in &self.table {
+            if def.is_match(codeword) {
+                return Instruction::new(def.clone(), codeword);
+            }
+        }*/
+        panic!("Unknown Instruction")
+    }
+
+    /// Encode an `Instruction` into a codeword.
+    #[allow(unused_variables)]
+    pub fn encode(&self, inst: Instruction) -> Codeword {
+        0
+        /*for def in &self.table {
+            if def.operation == inst.operation {
+
+            }
+        }*/
+    }
+}
+
+impl fmt::Debug for Table {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Table {{}}")
+    }
+}
+
+
+struct CodewordMatcher {
+    code: Codeword,
+    mask: Codeword,
+}
+
+impl CodewordMatcher {
+    fn new(pattern: Pattern) -> CodewordMatcher {
+        let mut code: Codeword = 0;
+        let mut mask: Codeword = 0;
+        for coding in &pattern {
+            code <<= 4;
+            mask <<= 4;
+            if let Coding::C(n) = *coding {
+                code |= n as Codeword;
+                mask |= 0xF;
+            };
+        }
+        CodewordMatcher {
+            code: code,
+            mask: mask,
+        }
+    }
+    /// Returns true if a given codeword matches this definition.
+    pub fn is_match(&self, codeword: Codeword) -> bool {
+        (codeword & self.mask) == (self.code & self.mask)
+    }
+
+}
+
+struct InstructionMatcher {
+        definition: Definition,
+        matcher: CodewordMatcher,
+}
+impl InstructionMatcher {
+    pub fn is_match(&self, codeword: Codeword) -> bool {
+        self.matcher.is_match(codeword)
+    }
+}

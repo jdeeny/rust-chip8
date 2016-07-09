@@ -2,12 +2,12 @@ use types::Address;
 use config::Config;
 use instructions::Operand;
 
-/// Implementations of `Executor` can manipulate the machine state.
+/// Implementations of `Execute` can manipulate the machine state.
 ///
-/// `Operations` make use of these functions to update the core as instructions are
+/// `Microprograms` make use of these functions to update the core as instructions are
 /// executed. Currently, there is only one implementation: `Simulator`.
-pub trait Executor {
-    /// Returns the Config being used by the Executor
+pub trait Execute {
+    /// Returns the Config being used by the Execute
     fn config(&self) -> Config;
     /// Loads a value from the source Operand.
     fn store(&mut self, dest: Operand, data: usize);
