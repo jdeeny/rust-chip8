@@ -1,6 +1,18 @@
 //! A chip8 cpu simulator and instruction coding/decoding library.
 //!
+//! This crate is able to define a configuration for a Chip8 virtual machine, allowing
+//! customization of parameters such as RAM size, system fonts, quirks, and supported instruction
+//! sets. Several predefined `Config`s are provided in the presets module.
 //!
+//! An `InstructionSet` can be created with a particular `Config`. It will contain a set of instruction
+//! definitions that will allow it to decode a codeword into an abstact `Instruction`. An `Instruction`
+//! can likewise be encoded into a `Codeword``.
+//!
+//! A `Chip8` can be created with a particular `Config`. It will contain the state of a Chip8
+//! virtual machine. It implements the `Executor` trait, which allows it to execute `Operation`s.
+//!
+//! A `Simulator` provides a thread-safe interface to a Chip8 simulator. It contains an
+//! `InstructionSet` and a `Chip8`. It is able to load programs and execute instructions.
 
 #![feature(inclusive_range_syntax)]
 #![feature(plugin)]
@@ -25,12 +37,13 @@
 extern crate rand;
 extern crate strfmt;
 
-mod chip8;
-mod types;
-
-pub mod config;
-pub mod fonts;
 pub mod instructions;
+pub mod fonts;
+pub mod chip8;
+mod config;
 //pub mod simulator;
 
+mod types;
+
 pub use chip8::Chip8;
+pub use config::{Config, presets};

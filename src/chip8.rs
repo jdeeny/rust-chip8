@@ -1,6 +1,8 @@
+//! Defines the state of the Chip8 virtual machine.
+
 use std::iter::{FromIterator, repeat};
 use rand::{Rng, thread_rng};
-use types::*;
+pub use types::*;
 use config::Config;
 use instructions::{Executor,Operand};
 
@@ -48,7 +50,7 @@ impl Chip8 {
             dt: 0,
             pc: 0,
             stack: Vec::with_capacity(config.stack_size),
-            vram: Vec::from_iter(repeat(Pixel::default()).take(config.vram_bytes)),
+            vram: Vec::from_iter(repeat(Pixel::default()).take(config.vram_size)),
             keys: [false;16],
             audio: false,
         }

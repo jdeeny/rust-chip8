@@ -1,7 +1,12 @@
 //! Configuration of the Chip8 machine.
+//!
+//! Possible future inclusions:
+//!  - Processor speed (ops/tick or /sec)
+//!
 use std::fmt::{self, Debug};
-use fonts::*;
+use fonts::Font4x5;
 use instructions::InstructionSet;
+use self::presets::*;
 
 /// Defines the configuration of the chip8 system being used.
 ///
@@ -14,7 +19,7 @@ pub struct Config {
     /// Sets the number of addresses that can be placed on the stack.
     pub stack_size: usize,
     /// Sets the number of pixels in vram.
-    pub vram_bytes: usize,
+    pub vram_size: usize,
     /// Sets the base address where the program will be loaded.
     pub addr_program: usize,
     /// Sets the base address where the system font will be loaded.
@@ -23,6 +28,7 @@ pub struct Config {
     pub font_small: &'static Font4x5,
     /// When true, shifts modify vx in place and ignore vy.
     pub quirk_shift: bool,
+    pub isa_xochip: bool,
 }
 
 impl Config {
@@ -48,24 +54,29 @@ impl Debug for Config {
     }
 }
 
-/// The default configuration.
-pub const DEFAULT: Config = Config {
-    ram_bytes: 0x2000,
-    stack_size: 12,
-    vram_bytes: 64*32,
-    addr_program: 0x0200,
-    addr_font: 0x0000,
-    font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
-    quirk_shift: false,
-};
+pub mod presets {
+    use config::Config;
+    use fonts::*;
+    /// The default configuration.
+    pub const DEFAULT: Config = COSMAC_VIP_STOCK;
 
-/// A sample configuration with large RAM.
-pub const BIG: Config = Config {
-    ram_bytes: 0xFFFF,
-    vram_bytes: 64*32,
-    stack_size: 1000,
-    addr_program: 0x0200,
-    addr_font: 0x000,
-    font_small: &FONT_4X5_CHIP8,
-    quirk_shift: false,
-};
+    /// Configuration of a stock COSMAC VIP
+    ///
+    /// Reference: https://en.wikipedia.org/wiki/COSMAC_VIP
+    pub const COSMAC_VIP_STOCK: Config = Config {
+        ram_bytes: 2048,
+        stack_size: 12,
+        vram_size: 64*32,
+        addr_program: 0x0200,
+        addr_font: 0x0000,
+        font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
+        quirk_shift: false,
+        isa_xochip: false,
+    };
+
+    pub const COSMAC_VIP_UPGRADED: Config = Config { ram_bytes: 4096, .. DEFAULT };
+    /// Configuration of a stock TELMAC 1800
+    ///
+    /// Reference: https://en.wikipedia.org/wiki/Telmac_1800
+    pub const _TELMAC_1800: Config = DEFAULT;
+}
