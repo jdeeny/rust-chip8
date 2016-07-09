@@ -31,6 +31,6 @@ mod types;
 pub mod config;
 pub mod fonts;
 pub mod instructions;
-//pub mod simulator;
+pub mod simulator;
 
 pub use chip8::Chip8;

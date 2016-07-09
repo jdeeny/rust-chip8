@@ -10,8 +10,6 @@ use chip8::Chip8;
 use instructions;
 use instructions::{Executor, Instruction, Operand, Word};
 
-use fonts::FONT_CHIP8_4X5;
-
 
 /// Manages the state of a chip8 cpu.
 pub struct Simulator {
@@ -22,19 +20,12 @@ pub struct Simulator {
 impl Simulator {
     /// Returns a new Simulator.
     pub fn new(config: Config) -> Simulator {
-        let font = &FONT_CHIP8_4X5;
-        let mut ram: Vec<u8> = vec![0; config.ram_bytes];
-
-        // copy font to beginning of RAM, into the 0-0x200 area
-        let font_start = config.font_addr;
-        let font_end = font_start + font.len();
-        println!("font addr {:X} - {:X}", font_start, font_end);
-        ram[font_start..font_end].copy_from_slice(font);
-
-        Simulator {
-            core: Chip8::new(config),
-            itable: instructions::Table::new(config),
-        }
+        let mut s = Simulator {
+                        core: Chip8::new(config),
+                        itable: instructions::Table::new(config),
+                    };
+        s.load_bytes(config.font_small, config.font_addr as Address);
+        s
     }
 
     /// Loads bytes into RAM starting at the given address.

@@ -52,7 +52,7 @@ pub const DEFAULT: Config = Config {
     stack_size: 12,
     vram_bytes: 64*32,
     font_addr: 0x0000,
-    font_small: &FONT_CHIP8_4X5,
+    font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
     quirk_shift: false,
 };
 
@@ -62,6 +62,6 @@ pub const BIG: Config = Config {
     vram_bytes: 64*32,
     stack_size: 1000,
     font_addr: 0x000,
-    font_small: &FONT_CHIP8_4X5,
+    font_small: &FONT_4X5_CHIP8,
     quirk_shift: false,
 };
