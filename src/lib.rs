@@ -3,6 +3,8 @@
 //!
 
 #![feature(inclusive_range_syntax)]
+#![feature(plugin)]
+#![plugin(drawbytes)]
 
 // enable errors for some additional lints
 #![deny(missing_debug_implementations, missing_copy_implementations,
@@ -10,7 +12,6 @@
         unused_qualifications)]
 
 #![cfg_attr(feature = "lints", warn(missing_docs))]
-#![cfg_attr(feature = "lints", feature(plugin))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
 #![cfg_attr(feature = "lints", deny(clippy))]
 #![cfg_attr(feature = "lints", deny(if_not_else, invalid_upcast_comparisons, items_after_statements,
@@ -30,6 +31,6 @@ mod types;
 pub mod config;
 pub mod fonts;
 pub mod instructions;
-pub mod simulator;
+//pub mod simulator;
 
 pub use chip8::Chip8;
