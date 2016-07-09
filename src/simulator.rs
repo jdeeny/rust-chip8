@@ -24,7 +24,7 @@ impl Simulator {
                         core: Chip8::new(config),
                         itable: instructions::Table::new(config),
                     };
-        s.load_bytes(config.font_small, config.font_addr as Address);
+        s.load_bytes(config.font_small, config.addr_font as Address);
         s
     }
 
@@ -98,6 +98,12 @@ impl Simulator {
         if self.core.st > 0 {
             self.core.st -= 1;
         }
+    }
+
+    fn step(&mut self) {
+        let i = self.decode_at_addr(self.pc());
+        self.advance_pc();
+        self.execute(&i);
     }
 
 
@@ -201,13 +207,34 @@ impl Executor for Simulator {
         self.core.pc = addr;
     }
 
-
-
 }
 
 
 impl fmt::Debug for Simulator {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "Simulator {{}}")
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use instructions::{Executor, Operand};
+    use config::Config;
+    use types::Address;
+    #[test]
+    fn test_sim_jump() {
+        let config = Config::default();
+        let mut s = Simulator::new(config);
+        let prog = [0x60, 0x55, 0x12, 0x00];    //LD V0, 0x55; Jump 0x200
+        s.load_bytes(&prog, config.addr_program as Address);
+        s.jump(config.addr_program as Address);
+        s.step();
+        assert_eq!(s.pc(), 0x202);
+        assert_eq!(s.load(Operand::Register(0)), 0x55);
+        s.step();
+        assert_eq!(s.pc(), 0x200);
+
     }
 }

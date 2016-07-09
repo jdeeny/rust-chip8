@@ -15,8 +15,10 @@ pub struct Config {
     pub stack_size: usize,
     /// Sets the number of pixels in vram.
     pub vram_bytes: usize,
+    /// Sets the base address where the program will be loaded.
+    pub addr_program: usize,
     /// Sets the base address where the system font will be loaded.
-    pub font_addr: usize,
+    pub addr_font: usize,
     /// Sets the small font.
     pub font_small: &'static Font4x5,
     /// When true, shifts modify vx in place and ignore vy.
@@ -51,7 +53,8 @@ pub const DEFAULT: Config = Config {
     ram_bytes: 0x2000,
     stack_size: 12,
     vram_bytes: 64*32,
-    font_addr: 0x0000,
+    addr_program: 0x0200,
+    addr_font: 0x0000,
     font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
     quirk_shift: false,
 };
@@ -61,7 +64,8 @@ pub const BIG: Config = Config {
     ram_bytes: 0xFFFF,
     vram_bytes: 64*32,
     stack_size: 1000,
-    font_addr: 0x000,
+    addr_program: 0x0200,
+    addr_font: 0x000,
     font_small: &FONT_4X5_CHIP8,
     quirk_shift: false,
 };
