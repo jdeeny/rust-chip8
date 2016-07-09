@@ -99,4 +99,21 @@ impl Operand {
         }
 
     }
+
+    pub fn kind(&self) -> OperandKind {
+        match *self {
+            Operand::Register(_) => OperandKind::Register,
+            Operand::I => OperandKind::I,
+            Operand::Address12(_) => OperandKind::Address12,
+            Operand::IndirectI => OperandKind::IndirectI,
+            Operand::Literal12(_) => OperandKind::Literal12,
+            Operand::Literal8(_) => OperandKind::Literal8,
+            Operand::Literal4(_) => OperandKind::Literal4,
+            Operand::DelayTimer => OperandKind::DelayTimer,
+            Operand::SoundTimer => OperandKind::SoundTimer,
+            Operand::Random => OperandKind::Random,
+            Operand::Nowhere => OperandKind::Unused,
+        }
+    }
+
 }

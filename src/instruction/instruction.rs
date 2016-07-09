@@ -20,7 +20,7 @@ pub struct Instruction {
 
 impl Instruction {
     /// Returns a new Instruction.
-    pub fn new(def: Definition, codeword: Codeword) -> Instruction {
+    pub fn new(def: &Definition, codeword: Codeword) -> Instruction {
         let mut dest_data: usize = 0;
         let mut src_data: usize = 0;
         let mut aux_data: usize = 0;

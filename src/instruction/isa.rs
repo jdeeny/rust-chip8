@@ -28,19 +28,33 @@ use instruction::sets;
 /// by application logic, e.g. a disassembler. An `Instruction` can be encoded into a 16-bit
 /// codeword. The `Instruction` is created by application logic, e.g. an assembler.
 //#[derive(Debug)]
-pub struct Set {
-    table: Vec<InstructionMatcher>,
+pub struct Set{
+    table: Vec<DefMatcher>,
 }
+
+struct DefMatcher {
+    pub definition: Definition,
+    pub code_matcher: CodewordMatcher,
+    pub inst_matcher: InstructionMatcher,
+}
+
+
 
 impl Set {
     /// Creates a new  Set using the given configuration.
     pub fn new(config: &Config) ->  Set {
+        let mut table = Vec::new();
 
-         Set {
-        //    config: config,
-            table: Vec::new(),
-            //table.push(sets::CHIP8.)
+        for definition in sets::CHIP8 {
+            table.push(
+                DefMatcher {
+                    definition: *definition,
+                    code_matcher: CodewordMatcher::new(definition.pattern),
+                    inst_matcher: InstructionMatcher::new(definition),
+                });
         }
+
+        Set{ table: table }
     }
 
     /// Encodes a given chip8 instruction into a 16-bit codeword.
@@ -52,6 +66,21 @@ impl Set {
     /// Decodes a 16-bit codeword into an Instruction.
     pub fn decode(&self, codeword: Codeword) -> Instruction {
         unimplemented!()
+    }
+
+    pub fn codeword_exists(&self, codeword: Codeword) -> bool {
+        let mut count = 0;
+        for dm in &self.table {
+            if dm.code_matcher.is_match(codeword) {
+                count += 1;
+            }
+        }
+        match count {
+            0 => false,
+            1 => true,
+            _ => panic!("should never match more than once")
+
+        }
     }
 
 /*    /// Returns the configuration that was used to create this ` Set`

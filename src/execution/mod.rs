@@ -18,7 +18,7 @@ pub fn execute_microcode(inst: &Instruction, executor: &mut Execute) {
     }
 }
 
-#[derive(Copy,Clone)]
+#[derive(Copy,Clone,Eq,PartialEq)]
 pub enum Operation {
     OpCls,
     OpRet,
