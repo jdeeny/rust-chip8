@@ -6,15 +6,15 @@ mod codec;
 mod definition;
 mod operands;
 pub mod sets;
+pub mod matching;
+mod isa;
 mod instruction;
 
 pub use self::codec::{Decoder,Encoder};
 pub use self::definition::Definition;
 pub use self::instruction::Instruction;
 pub use self::operands::{Operand, OperandKind};
-
-pub type Isa = Vec<Definition>;
-pub type Codeword = u16;
+pub use self::isa::Set;
 
 /// Type to hold instruction word pattern
 pub type Pattern = [Coding; 4];

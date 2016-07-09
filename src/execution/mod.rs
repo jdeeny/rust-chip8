@@ -3,7 +3,7 @@ pub mod implementations;
 
 pub use self::execute::Execute;
 
-use instructions::Instruction;
+use instruction::Instruction;
 use self::implementations::*;
 
 /// Each operation is able to perform the action of a certain instruction or group of instructions.

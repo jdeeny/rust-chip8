@@ -1,6 +1,6 @@
 use types::Address;
 use config::Config;
-use instructions::Operand;
+use instruction::Operand;
 
 /// Implementations of `Execute` can manipulate the machine state.
 ///

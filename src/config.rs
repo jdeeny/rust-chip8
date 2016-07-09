@@ -5,7 +5,7 @@
 //!
 use std::fmt::{self, Debug};
 use fonts::Font4x5;
-use instructions::Isa;
+use instruction::Set;
 use self::presets::*;
 
 /// Defines the configuration of the chip8 system being used.

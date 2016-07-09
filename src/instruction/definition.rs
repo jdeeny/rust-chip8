@@ -1,6 +1,6 @@
 use std::fmt;
 
-use instructions::{Operand, OperandKind, Pattern};
+use instruction::{Operand, OperandKind, Pattern};
 use execution::{ Operation };
 
 

@@ -1,6 +1,6 @@
 //! Contains the functions that perform the operations of each type of instruction.
 
-use instructions::{Instruction, Operand};
+use instruction::{Instruction, Operand};
 use execution::{Execute};
 #[allow(unused_imports)]
 use config::Config;
@@ -302,7 +302,7 @@ mod tests {
     use super::*;
     use Chip8;
     use config::Config;
-    use instructions::{Instruction, Operand};
+    use instruction::{Instruction, Operand};
     use execution::Execute;
 
     #[test]

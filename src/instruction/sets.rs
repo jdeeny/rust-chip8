@@ -1,6 +1,6 @@
-use instructions::Definition;
-use instructions::OperandKind::*;
-use instructions::Coding::*;
+use instruction::Definition;
+use instruction::OperandKind::*;
+use instruction::Coding::*;
 use execution::Operation::*;
 
 const EMPTY_DEF: Definition = Definition {

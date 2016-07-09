@@ -2,7 +2,7 @@ use std::fmt;
 use std::clone::Clone;
 
 use execution::{Operation};
-use instructions::{Definition,Operand};
+use instruction::{Definition,Operand};
 use types::*;
 
 /// A fully specified chip8 instruction.

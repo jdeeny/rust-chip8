@@ -4,7 +4,7 @@
 //! customization of parameters such as RAM size, system fonts, quirks, and supported instruction
 //! sets. Several predefined `Config`s are provided in the presets module.
 //!
-//! An `Isa` can be created with a particular `Config`. It will contain a set of instruction
+//! An `Set` can be created with a particular `Config`. It will contain a set of instruction
 //! definitions that will allow it to decode a codeword into an abstact `Instruction`. An `Instruction`
 //! can likewise be encoded into a `Codeword``.
 //!
@@ -12,15 +12,14 @@
 //! virtual machine. It implements the `Executor` trait, which allows it to execute `Microprogram`s.
 //!
 //! A `Simulator` provides a thread-safe interface to a Chip8 simulator. It contains an
-//! `Isa` and a `Chip8`. It is able to load programs and execute instructions.
+//! `Set` and a `Chip8`. It is able to load programs and execute instructions.
 
 #![feature(inclusive_range_syntax)]
 #![feature(plugin)]
 #![plugin(drawbytes)]
 
 // enable errors for some additional lints
-#![deny(missing_copy_implementations,
-        trivial_casts, trivial_numeric_casts, unsafe_code,
+#![deny(trivial_casts, trivial_numeric_casts, unsafe_code,
         unused_qualifications)]
 
 #![cfg_attr(feature = "lints", warn(missing_docs))]
@@ -32,7 +31,7 @@
                                     similar_names, single_match_else, string_add, string_add_assign,
                                     unicode_not_nfc, wrong_pub_self_convention ))]
 #![cfg_attr(feature = "lints", warn(option_unwrap_used, result_unwrap_used, missing_debug_implementations,
-                                    unused_import_braces))]
+                                    unused_import_braces,missing_copy_implementations))]
 //#![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
 
 #![allow(unused_imports, unused_variables, unused_mut)]
@@ -42,16 +41,15 @@ extern crate strfmt;
 
 pub mod config;
 pub mod fonts;
-pub mod instructions;
+pub mod instruction;
 pub mod execution;
 //pub mod simulator;
-pub mod state;
-mod system;
+mod state;
 mod types;
 
-pub use system::Chip8;
 pub use config::Config;
 pub use types::*;
+pub use state::Chip8;
 
 #[cfg(test)]
 mod tests {
@@ -59,8 +57,12 @@ mod tests {
 
     #[test]
     fn test_chip8_system() {
-        let c = config::presets::COSMAC_VIP_STOCK;
-        let system = Chip8::new(c);
+        let conf = config::presets::COSMAC_VIP_STOCK;
+        let chip8 = Chip8::new(&conf);
+        let mut isa = instruction::Set::new(&conf);
+        let d = instruction::Decoder::new(&conf, &isa);
+        let e = instruction::Encoder::new(&conf, &isa);
+
         assert!(true)
     }
 }

@@ -8,13 +8,13 @@ use config::Config;
 
 use chip8::Chip8;
 use instructions;
-use instructions::{Executor, Instruction, Operand, Codeword};
+use instruction::{Executor, Instruction, Operand, Codeword};
 
 
 /// Manages the state of a chip8 cpu.
 pub struct Simulator {
     core: Chip8,
-    itable: instructions::Table,
+    itable: instruction::Table,
 }
 
 impl Simulator {
@@ -22,7 +22,7 @@ impl Simulator {
     pub fn new(config: Config) -> Simulator {
         let mut s = Simulator {
                         core: Chip8::new(config),
-                        itable: instructions::Table::new(config),
+                        itable: instruction::Table::new(config),
                     };
         s.load_bytes(config.font_small, config.addr_font as Address);
         s
@@ -336,7 +336,7 @@ impl Default for Audio {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use instructions::{Executor, Operand};
+    use instruction::{Executor, Operand};
     use config::Config;
     use types::Address;
     #[test]
@@ -354,3 +354,24 @@ mod tests {
 
     }
 }
+
+/*use config::Config;
+use state::Chip8;
+use instruction::Set;
+
+pub struct Chip8 {
+    pub config: Config,
+    pub state: Chip8,
+    pub instruction_set: Set,
+}
+
+impl Chip8 {
+    pub fn new(config: Config) -> Chip8 {
+        Chip8 {
+            config: config,
+            state: Chip8::new(config),
+            instruction_set: Set::new(),
+        }
+    }
+}
+*/
