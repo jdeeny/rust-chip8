@@ -7,7 +7,7 @@
 #![plugin(drawbytes)]
 
 // enable errors for some additional lints
-#![deny(missing_debug_implementations, missing_copy_implementations,
+#![deny(missing_copy_implementations,
         trivial_casts, trivial_numeric_casts, unsafe_code, unused_import_braces,
         unused_qualifications)]
 
@@ -19,7 +19,7 @@
                                     nonminimal_bool, shadow_reuse, shadow_same, shadow_unrelated,
                                     similar_names, single_match_else, string_add, string_add_assign,
                                     unicode_not_nfc, wrong_pub_self_convention ))]
-#![cfg_attr(feature = "lints", warn(option_unwrap_used, result_unwrap_used))]
+#![cfg_attr(feature = "lints", warn(option_unwrap_used, result_unwrap_used, missing_debug_implementations))]
 //#![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
 
 extern crate rand;
@@ -31,6 +31,6 @@ mod types;
 pub mod config;
 pub mod fonts;
 pub mod instructions;
-pub mod simulator;
+//pub mod simulator;
 
 pub use chip8::Chip8;
