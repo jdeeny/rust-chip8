@@ -3,7 +3,7 @@ use std::clone::Clone;
 
 use types::*;
 use instruction::{Definition, Dest, Src};
-use instruction::execution::{Operation, execute_microcode, Execute};
+use instruction::execution::{Operation, Execute};
 
 /// A fully specified chip8 instruction.
 #[derive(Copy,Clone)]
@@ -93,7 +93,7 @@ impl Instruction {
     }
 
     pub fn execute(&self, cpu: &mut Execute) {
-        execute_microcode(self, cpu)
+        self.operation.execute(cpu);
     }
 
 }

@@ -31,6 +31,9 @@
                                     unicode_not_nfc, wrong_pub_self_convention ))]
 #![cfg_attr(feature = "lints", warn(option_unwrap_used, result_unwrap_used, missing_debug_implementations,
                                     unused_import_braces,missing_copy_implementations))]
+#![cfg_attr(feature = "lints", allow(doc_markdown))]
+
+
 //#![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
 
 #![allow(unused_imports, unused_variables, unused_mut)]
@@ -41,13 +44,14 @@ extern crate strfmt;
 pub mod config;
 pub mod fonts;
 pub mod instruction;
-//pub mod simulator;
+mod simulator;
 mod state;
 mod types;
 
 pub use config::Config;
 pub use types::*;
 pub use state::Chip8;
+pub use simulator::Simulator;
 
 #[cfg(test)]
 mod tests {

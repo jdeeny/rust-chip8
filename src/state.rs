@@ -85,8 +85,6 @@ impl Execute for Chip8 {
             Src::SoundTimer => self.st as usize,
             Src::DelayTimer => self.dt as usize,
             Src::Random => (thread_rng().next_u32() & 0xFF) as usize,
-            _ => 0,
-            // Src::Nowhere   => panic!("Cannot load nothing"),
         }
     }
 

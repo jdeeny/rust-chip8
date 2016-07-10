@@ -28,6 +28,11 @@ pub struct Config {
     pub font_small: &'static Font4x5,
     /// When true, shifts modify vx in place and ignore vy.
     pub quirk_shift: bool,
+
+    pub isa_chip8: bool,
+
+    pub isa_superchip: bool,
+
     pub isa_xochip: bool,
 }
 
@@ -67,6 +72,8 @@ pub mod presets {
         addr_font: 0x0000,
         font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
         quirk_shift: false,
+        isa_chip8: true,
+        isa_superchip: false,
         isa_xochip: false,
     };
 
