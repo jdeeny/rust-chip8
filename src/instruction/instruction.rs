@@ -89,8 +89,7 @@ impl Instruction {
     */
     /// Returns the operation used by this instruction.
     pub fn operation(&self) -> Operation {
-        let op: Operation = self.operation.clone();
-        op
+        self.operation.clone()
     }
 
     pub fn execute(&self, cpu: &mut Execute) {

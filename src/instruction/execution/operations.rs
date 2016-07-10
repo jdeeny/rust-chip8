@@ -3,7 +3,7 @@ use instruction::{Dest, DestKind, Src, SrcKind};
 #[derive(Copy,Clone,Eq,PartialEq)]
 pub enum OperationKind {
     NoOp,
-    Load(SrcKind),
+    Load(DestKind, SrcKind),
     Store(DestKind),
     Stash(SrcKind),
     Fetch(DestKind),
@@ -29,26 +29,17 @@ pub enum OperationKind {
     Rand(DestKind),
 
     Cls,
-    Sprite,
+    Sprite(SrcKind, SrcKind, SrcKind),
     Font,
     Bcd,
 }
 
-impl OperationKind {
-    pub fn specify(&self, data: usize) -> Operation {
-        match *self {
-            OperationKind::NoOp => Operation::NoOp,
-            OperationKind::Cls => Operation::Cls,
-            _ => panic!("cannot specify"),
-        }
-    }
-}
+
 
 #[derive(Copy,Clone,Eq,PartialEq)]
 pub enum Operation {
     NoOp,
-    Load(Src),
-    Store(Dest),
+    Load(Dest, Src),
     Stash(Src),
     Fetch(Dest),
 
@@ -73,7 +64,7 @@ pub enum Operation {
     Rand(DestKind),
 
     Cls,
-    Sprite,
+    Sprite(Src, Src, Dest),
     Font,
     Bcd,
 }

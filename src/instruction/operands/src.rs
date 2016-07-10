@@ -26,8 +26,8 @@ pub enum SrcKind {
     SoundTimer,
     /// A random value.
     Random,
-    /// No value.
-    Unused,
+    // /// No value.
+    //Unused,
 }
 
 impl SrcKind {
@@ -49,7 +49,7 @@ impl SrcKind {
             SrcKind::DelayTimer => Src::DelayTimer,
             SrcKind::SoundTimer => Src::SoundTimer,
             SrcKind::Random => Src::Random,
-            SrcKind::Unused => Src::Nowhere,
+//            SrcKind::Unused => Src::Nowhere,
         }
     }
 }
@@ -81,8 +81,8 @@ pub enum Src {
     SoundTimer,
     /// A random value.
     Random,
-    /// No value.
-    Nowhere,
+//    /// No value.
+//    Nowhere,
 }
 
 impl Src {
@@ -98,7 +98,7 @@ impl Src {
             Src::DelayTimer => SrcKind::DelayTimer,
             Src::SoundTimer => SrcKind::SoundTimer,
             Src::Random => SrcKind::Random,
-            Src::Nowhere => SrcKind::Unused,
+//            Src::Nowhere => SrcKind::Unused,
         }
     }
 

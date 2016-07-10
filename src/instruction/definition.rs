@@ -1,5 +1,6 @@
 use std::fmt;
 
+use types::*;
 use instruction::{ Operation, OperationKind, DestKind, SrcKind };
 
 /// Type to hold instruction word pattern
@@ -8,12 +9,9 @@ pub type Pattern = [Coding; 4];
 /// Used to define the coding of each instruction type
 #[derive(Clone,Copy,Debug)]
 pub enum Coding {
-    A,
-    B,
-    C,
-    D,
+    A(usize),
     /// A literal value
-    L(u8),
+    C(u8),
     /// Don't care
     X,
 }
@@ -43,5 +41,28 @@ impl Definition {
             pattern: pattern,
     //        mnemonic: mnemonic,
         }
+    }
+
+    pub fn specify(&self, codeword: Codeword) -> Operation {
+        let mut data = [0usize; 4];
+        let mut w = codeword;
+
+        for (i, coding) in self.pattern.iter().enumerate() {
+            let nibble = (w as usize & 0xF000) >> 12;
+            match *coding {
+                Coding::A(i) => { data[i] = (data[i] << 4) | nibble; },
+                Coding::C(n) => {},
+                Coding::X => {},
+            }
+
+        }
+
+        match self.op {
+            OperationKind::NoOp => Operation::NoOp,
+            OperationKind::Cls => Operation::Cls,
+            OperationKind::Load(D, S) => Operation::Load(D.specify(data[0]), S.specify(data[1])),
+            _ => panic!("cannot specify"),
+        }
+
     }
 }

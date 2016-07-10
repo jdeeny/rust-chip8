@@ -14,9 +14,8 @@ use std::fmt;
 
 use types::*;
 use config::Config;
-use instruction::{Definition, Instruction };
+use instruction::{Definition, Instruction, instruction_sets };
 use instruction::matching::{InstructionMatcher, CodewordMatcher};
-use instruction::sets;
 
 /// A Chip8 instruction set based on a particular configuration. Translates between machine code
 /// and `Instruction`s.
@@ -43,19 +42,29 @@ struct DefMatcher {
 impl Set {
     /// Creates a new  Set using the given configuration.
     pub fn new(config: &Config) ->  Set {
-        let mut table = Vec::new();
+        let mut set = Set { table: Vec::new() };
 
-        for definition in sets::CHIP8 {
-            table.push(
-                DefMatcher {
-                    definition: *definition,
-                    code_matcher: CodewordMatcher::new(definition.pattern),
-                    inst_matcher: InstructionMatcher::new(definition),
-                });
-        }
+        if config.isa_chip8 {set.append(instruction_sets::CHIP8); }
+        if config.isa_superchip { set.append(instruction_sets::SUPERCHIP); }
+        if config.isa_xochip { set.append(instruction_sets::XOCHIP); }
 
-        Set{ table: table }
+        set
     }
+
+    pub fn append(&mut self, set: &[Definition]) {
+        for d in set.iter() {
+            self.push(&d);
+        }
+    }
+
+    pub fn push(&mut self, definition: &Definition) {
+        self.table.push(DefMatcher {
+            definition: *definition,
+            code_matcher: CodewordMatcher::new(definition.pattern),
+            inst_matcher: InstructionMatcher::new(definition),
+        });
+    }
+
 
     /// Encodes a given chip8 instruction into a 16-bit codeword.
     #[allow(unused_variables)]

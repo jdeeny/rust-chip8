@@ -174,25 +174,7 @@ pub fn op_waitkey(inst: &Instruction, core: &mut Execute) {
     panic!("WaitKey Unimplemented")
 }
 
-/// Jump to address
-pub fn op_jump(inst: &Instruction, core: &mut Execute) {
-    let addr = core.load(inst.dest()) as Address;
-    core.jump(addr);
-}
 
-/// Jump to address + V0
-pub fn op_jumpv0(inst: &Instruction, core: &mut Execute) {
-    let mut addr = core.load(inst.dest()) as Address;
-    addr += core.load(Operand::Register(0)) as Address;
-    core.jump(addr);
-}
-/// Add current program counter to the stack and jump to address.
-pub fn op_call(inst: &Instruction, core: &mut Execute) {
-    let addr = core.load(inst.dest()) as Address;
-    let pc = core.pc();
-    core.stack_push(pc);
-    core.jump(addr);
-}
 
 /// Return
 #[allow(unused_variables)]
