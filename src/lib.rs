@@ -42,7 +42,6 @@ extern crate strfmt;
 pub mod config;
 pub mod fonts;
 pub mod instruction;
-pub mod execution;
 //pub mod simulator;
 mod state;
 mod types;

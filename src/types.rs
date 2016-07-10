@@ -14,11 +14,8 @@ pub type Address = u16;
 pub type Memory = Vec<MemoryCell>;
 /// A 16-bit chip8 codeword.
 pub type Codeword = u16;
-/// A single pixel. Needs to be extended with color information.
-#[derive(Debug,Default,Copy,Clone)]
-pub struct Pixel {
-    state: bool,
-}
+/// A single pixel. 
+pub type Pixel = u8;
 /// The state of the keyboard.
 pub type Keyboard = [bool; 16];
 /// The state of the audio output.

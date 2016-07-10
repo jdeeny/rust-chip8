@@ -1,6 +1,6 @@
 use types::*;
 use instruction::{Instruction,Pattern, Coding, Definition, OperandKind};
-use execution::Operation;
+use instruction::execution::Operation;
 
 
 
@@ -65,9 +65,8 @@ impl InstructionMatcher {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use instruction::{Definition, Instruction, Operand, OperandKind};
+    use instruction::{Definition, Instruction, Operand, OperandKind, Operation};
     use instruction::Coding::*;
-    use execution::Operation;
 
     #[test]
     fn test_code_match() {
@@ -86,7 +85,7 @@ mod tests {
     #[test]
     fn test_inst_match() {
         let definition = Definition {
-            operation: Operation::OpAdd,
+            operation: Operation::Add,
             dest_kind: OperandKind::Register,
             src_kind: OperandKind::Register,
             aux_kind: OperandKind::Unused,
@@ -96,7 +95,7 @@ mod tests {
         let im = InstructionMatcher::new(&definition);
 
         let d2 = Definition {
-            operation: Operation::OpSub,
+            operation: Operation::Sub,
             dest_kind: OperandKind::Register,
             src_kind: OperandKind::Register,
             aux_kind: OperandKind::Unused,
@@ -104,22 +103,22 @@ mod tests {
         };
 
         let d3 = Definition {
-            operation: Operation::OpAdd,
+            operation: Operation::Add,
             dest_kind: OperandKind::Register,
             src_kind: OperandKind::Register,
             aux_kind: OperandKind::Unused,
             pattern: [C(0x2), D, S, C(0xF)],
         };
 
-        let inst = Instruction::new(&definition, 0x2740);
+        let inst = Instruction::from_definition(&definition, 0x2740);
         assert!( im.is_match(&inst) );
-        let inst = Instruction::new(&definition, 0x2380);
+        let inst = Instruction::from_definition(&definition, 0x2380);
         assert!( im.is_match(&inst) );
-        let inst = Instruction::new(&definition, 0x20D0);
+        let inst = Instruction::from_definition(&definition, 0x20D0);
         assert!( im.is_match(&inst) );
-        let inst = Instruction::new(&d2, 0x2340);
+        let inst = Instruction::from_definition(&d2, 0x2340);
         assert!( ! im.is_match(&inst) );
-        let inst = Instruction::new(&d3, 0x2340);
+        let inst = Instruction::from_definition(&d3, 0x2340);
         //matches because the pattern and codeword are not taken into account.
         assert!( im.is_match(&inst) );
 

@@ -1,10 +1,10 @@
 use instruction::Definition;
 use instruction::OperandKind::*;
 use instruction::Coding::*;
-use execution::Operation::*;
+use instruction::execution::Operation::*;
 
 const EMPTY_DEF: Definition = Definition {
-    operation: OpCls,
+    operation: NoOp,
     dest_kind: Unused,
     src_kind: Unused,
     aux_kind: Unused,
@@ -12,7 +12,7 @@ const EMPTY_DEF: Definition = Definition {
 };
 
 pub const CHIP8: &'static [Definition] = &[
-    Definition { operation: OpCls, pattern: [C(0x0), C(0x0), C(0xE), C(0x0)], ..EMPTY_DEF },
+    Definition { operation: Cls, pattern: [C(0x0), C(0x0), C(0xE), C(0x0)], ..EMPTY_DEF },
     //Definition::new(OpCls,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0x0)], /*"Cls"*/),
     /*Definition::new(op_ret,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0xE)], "Ret"),
     Definition::new(op_jump,     Literal12,  Unused,     Unused,     [C(0x1), D,      D,      D     ], "Jump {d}"),

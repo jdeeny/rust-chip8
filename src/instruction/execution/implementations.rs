@@ -1,7 +1,7 @@
 //! Generic 'microcode' implementations of the operations.
 
 use instruction::{Instruction, Operand};
-use execution::{Execute};
+use instruction::execution::{Execute};
 #[allow(unused_imports)]
 use config::Config;
 use types::*;
@@ -296,23 +296,23 @@ pub fn op_fetch(inst: &Instruction, core: &mut Execute) {
     }
     core.store(Operand::I, i + last + 1);
 }
-/*
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use Chip8;
-    use config::Config;
-    use instruction::{Instruction, Operand};
-    use execution::Execute;
-
+    use Config;
+    use instruction::{Execute, Instruction, Operand};
+    use instruction::Operation::*;
+    use instruction::execution::execute_microcode;
     #[test]
     fn test_add_reg() {
-        let mut core = Chip8::new(Config::default());
-        let inst = Instruction { operation: op_add, dest: Operand::Register(0), src: Operand::Register(1), aux: Operand::Nowhere };
+        let mut core = Chip8::default();
+        let inst = Instruction::new(Add, Operand::Register(0), Operand::Register(1), Operand::Nowhere);
 
         core.store(Operand::Register(0), 5);
         core.store(Operand::Register(1), 10);
-        op_add(&inst, &mut core);
+        execute_microcode(&inst, &mut core);
         assert_eq!(core.load(Operand::Register(0)), 15);
         assert_eq!(core.load(Operand::Register(1)), 10);
         assert_eq!(core.load(Operand::Register(0xF)), 0);
@@ -323,7 +323,5 @@ mod tests {
         assert_eq!(core.load(Operand::Register(0)), 9);
         assert_eq!(core.load(Operand::Register(1)), 10);
         assert_eq!(core.load(Operand::Register(0xF)), 1);
-
     }
 }
-*/

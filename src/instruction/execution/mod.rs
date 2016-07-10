@@ -12,7 +12,7 @@ pub type Microprogram = fn(&Instruction, &mut Execute);
 pub fn execute_microcode(inst: &Instruction, executor: &mut Execute) {
     let op = inst.operation();
     match op {
-        Operation::OpAdd => op_add(inst, executor),
+        Operation::Add => op_add(inst, executor),
         //Operation::OpSub => op_sub(inst, executor),
         _ => panic!("not implemented"),
     }
@@ -20,26 +20,33 @@ pub fn execute_microcode(inst: &Instruction, executor: &mut Execute) {
 
 #[derive(Copy,Clone,Eq,PartialEq)]
 pub enum Operation {
-    OpCls,
-    OpRet,
-    OpJump,
-    OpJumpV0,
-    OpCall,
-    OpSkipEq,
-    OpSkipNeq,
-    OpLoad,
-    OpAdd,
-    OpSub,
-    OpSubn,
-    OpOr,
-    OpAnd,
-    OpXor,
-    OpShr,
-    OpShl,
-    OpRand,
-    OpSprite,
-    OpFont,
-    OpBcd,
-    OpStash,
-    OpFetch,
+    NoOp,
+    Load,
+    Stash,
+    Fetch,
+
+    Jump,
+    JumpV0,
+    Call,
+    Ret,
+
+    SkipEq,
+    SkipNeq,
+
+    Add,
+    Sub,
+    Subn,
+
+    Or,
+    And,
+    Xor,
+    Shr,
+    Shl,
+
+    Rand,
+
+    Cls,
+    Sprite,
+    Font,
+    Bcd,
 }

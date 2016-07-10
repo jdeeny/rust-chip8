@@ -4,8 +4,7 @@ use std::iter::{FromIterator, repeat};
 use rand::{Rng, thread_rng};
 pub use types::*;
 use config::Config;
-use instruction::Operand;
-use execution::Execute;
+use instruction::{Execute, Operand};
 
 
 /// A struct that contains a Chip8 `Config` and the machine state.

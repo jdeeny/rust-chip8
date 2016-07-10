@@ -2,16 +2,18 @@
 
 use std::fmt;
 
+pub mod sets;
+mod matching;
 mod codec;
 mod definition;
+mod execution;
 mod operands;
-pub mod sets;
-pub mod matching;
 mod isa;
 mod instruction;
 
 pub use self::codec::{Decoder,Encoder};
 pub use self::definition::Definition;
+pub use self::execution::{Operation,Execute};
 pub use self::instruction::Instruction;
 pub use self::operands::{Operand, OperandKind};
 pub use self::isa::Set;
@@ -30,4 +32,6 @@ pub enum Coding {
     S,
     /// Auxillary
     A,
+    /// Ignore
+    X,
 }

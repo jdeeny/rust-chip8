@@ -1,9 +1,9 @@
 use std::fmt;
 use std::clone::Clone;
 
-use execution::{Operation, execute_microcode, Execute};
-use instruction::{Definition,Operand};
 use types::*;
+use instruction::{Definition,Operand};
+use instruction::execution::{Operation, execute_microcode, Execute};
 
 /// A fully specified chip8 instruction.
 #[derive(Copy)]
@@ -20,7 +20,23 @@ pub struct Instruction {
 
 impl Instruction {
     /// Returns a new Instruction.
-    pub fn new(def: &Definition, codeword: Codeword) -> Instruction {
+    pub fn new(op: Operation, dest: Operand, src: Operand, aux: Operand) -> Instruction {
+        Instruction {
+            operation: op,
+            dest: dest,
+            src: src,
+            aux: aux,
+        }
+    }
+    pub fn default() -> Instruction {
+        Instruction {
+            operation: Operation::NoOp,
+            dest: Operand::Nowhere,
+            src: Operand::Nowhere,
+            aux: Operand::Nowhere,
+        }
+    }
+    pub fn from_definition(def: &Definition, codeword: Codeword) -> Instruction {
         let mut dest_data: usize = 0;
         let mut src_data: usize = 0;
         let mut aux_data: usize = 0;

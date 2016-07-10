@@ -1,7 +1,7 @@
 use std::fmt;
 
 use instruction::{Operand, OperandKind, Pattern};
-use execution::{ Operation };
+use instruction::execution::{ Operation };
 
 
 /// Defines the structure of a specific instruction
