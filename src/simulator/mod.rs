@@ -119,10 +119,6 @@ impl Simulator {
         //instruction.operation()(instruction, self);
     }
 
-    // /// Returns the `UiState`.
-    // pub fn state(&self) -> UiState {
-    // self.state.clone()
-    // }
 }
 
 

@@ -4,8 +4,8 @@ use instruction::{Dest, Src};
 
 /// Implementations of `Execute` can manipulate the machine state.
 ///
-/// `Microprograms` make use of these functions to update the core as instructions are
-/// executed. Currently, there is only one implementation: `Simulator`.
+/// Each of the operations uses these fucntions to alter the state of the machine as instructions
+/// are executed. Currently, there is only one implementation: `Chip8`.
 pub trait Execute {
     /// Returns the Config being used by the Execute
     fn config(&self) -> Config;

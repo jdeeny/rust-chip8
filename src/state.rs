@@ -62,16 +62,6 @@ impl Chip8 {
 
 impl Execute for Chip8 {
 
-/*    /// Gets the value stored at an address in RAM.
-    fn ram(&self, addr: Address) -> MemoryCell {
-        self.ram[addr]
-    }
-
-    /// Sets the value stored at an address in RAM.
-    fn set_ram(&mut self, addr: Address, data: MemoryCell) {
-        self.ram[addr] = data;
-    }*/
-
     fn config(&self) -> Config {
         self.config
     }
