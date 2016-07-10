@@ -1,4 +1,4 @@
-use types::Address;
+use types::*;
 use config::Config;
 use instruction::{Dest, Src};
 
@@ -25,4 +25,10 @@ pub trait Execute {
     fn jump(&mut self, addr: Address);
     /// Store a flag in vF.
     fn set_flag(&mut self, state: bool);
+    /// Returns a mut reference to video buffer.
+    fn vram_mut(&mut self) -> &mut [Pixel];
+    /// Returns the keyboard state.
+    fn keyboard(&self) -> Keyboard;
+    /// Returns a mut reference to the audio buffer.
+    fn audio_mut(&mut self) -> &mut Audio;
 }

@@ -34,7 +34,9 @@ pub struct Chip8 {
     pub vram: Vec<Pixel>,
     /// The state of the keyboard.
     pub keys: Keyboard,
-    /// The state of the audio output.
+    /// The state of the chip8 buzzer.
+    pub buzzer: Buzzer,
+    /// The state of the audio buffer used with XOCHIP.
     pub audio: Audio,
 }
 
@@ -52,7 +54,8 @@ impl Chip8 {
             stack: Vec::with_capacity(config.stack_size),
             vram: Vec::from_iter(repeat(Pixel::default()).take(config.vram_size)),
             keys: [false;16],
-            audio: false,
+            buzzer: false,
+            audio: [0; 16],
         }
     }
 }
@@ -138,6 +141,18 @@ impl Execute for Chip8 {
     fn jump(&mut self, addr: Address) {
         self.pc = addr;
     }
+
+    fn keyboard(&self) -> Keyboard {
+        self.keys
+    }
+
+    fn vram_mut(&mut self) -> &mut [Pixel] {
+        &mut self.vram
+    }
+
+    fn audio_mut(&mut self) -> &mut Audio {
+        &mut self.audio
+    }
 }
 
 impl Default for Chip8 {
@@ -145,8 +160,3 @@ impl Default for Chip8 {
         Self::new(&Config::default())
     }
 }
-/*impl Debug for Chip8 {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Simulator {{}}")
-    }
-}*/

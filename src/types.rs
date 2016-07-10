@@ -10,13 +10,13 @@ pub type Register16 = u16;
 pub type Timer = u8;
 /// An Address.
 pub type Address = u16;
-/// A contiguous set of MemoryCells.
-pub type Memory = Vec<MemoryCell>;
 /// A 16-bit chip8 codeword.
 pub type Codeword = u16;
-/// A single pixel. 
+/// A single pixel.
 pub type Pixel = u8;
 /// The state of the keyboard.
 pub type Keyboard = [bool; 16];
-/// The state of the audio output.
-pub type Audio = bool;
+/// The state of the buzzer.
+pub type Buzzer = bool;
+/// The audio buffer.
+pub type Audio = [u8; 16];

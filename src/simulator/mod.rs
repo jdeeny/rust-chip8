@@ -108,8 +108,8 @@ impl Simulator {
 
     /// Fetch the current instruction, advance the PC, and execute the instruction.
     pub fn step(&mut self) {
-        let i = self.decode_at_addr(self.pc());
-        self.advance_pc();
+        let i = self.decode_at_addr(self.core.pc());
+        self.core.advance_pc();
         self.execute(&i);
     }
 
@@ -125,89 +125,6 @@ impl Simulator {
     // }
 }
 
-impl Execute for Simulator {
-    //    /// Gets the value stored at an address in RAM.
-    // fn ram(&self, addr: Address) -> MemoryCell {
-    // self.core.ram[addr]
-    // }
-    //
-    // Sets the value stored at an address in RAM.
-    // fn set_ram(&mut self, addr: Address, data: MemoryCell) {
-    // self.core.ram[addr] = data;
-    // }
-
-    fn config(&self) -> Config {
-        self.core.config
-    }
-
-    fn load(&mut self, src: Src) -> usize {
-        match src {
-            Src::Register(r) => self.core.v[r] as usize,
-            Src::Address12(a) => self.core.ram[a] as usize,
-            Src::I => self.core.i as usize,
-            Src::IndirectI => self.core.ram[self.core.i as usize] as usize,
-            Src::Literal12(n12) => n12,
-            Src::Literal8(n8) => n8,
-            Src::Literal4(n4) => n4,
-            Src::SoundTimer => self.core.st as usize,
-            Src::DelayTimer => self.core.dt as usize,
-            Src::Random => (thread_rng().next_u32() & 0xFF) as usize,
-            // _ => 0,
-            // Operand::Nowhere   => panic!("Cannot load nothing"),
-        }
-    }
-
-    fn store(&mut self, dest: Dest, data: usize) {
-        match dest {
-            Dest::Register(r) => {
-                self.core.v[r] = (data & 0xFF) as MemoryCell;
-            },
-            Dest::Address12(a) => {
-                self.core.ram[a] = (data & 0xFF) as MemoryCell;
-            },
-            Dest::I => {
-                self.core.i = (data & 0xFFFF) as Register16;
-            },
-            Dest::IndirectI => {
-                self.core.ram[self.core.i as usize] = data as MemoryCell;
-            },
-            Dest::SoundTimer => {
-                self.core.st = data as Timer;
-            },
-            Dest::DelayTimer => {
-                self.core.dt = data as Timer;
-            },
-        }
-    }
-
-    fn set_flag(&mut self, flag: bool) {
-        self.core.v[0xF] = if flag {
-            1
-        } else {
-            0
-        };
-    }
-
-    fn stack_pop(&mut self) -> Option<Address> {
-        self.core.stack.pop()
-    }
-
-    fn stack_push(&mut self, address: Address) {
-        self.core.stack.push(address);
-    }
-
-    fn pc(&self) -> Address {
-        self.core.pc
-    }
-
-    fn advance_pc(&mut self) {
-        self.core.pc += 2;
-    }
-
-    fn jump(&mut self, addr: Address) {
-        self.core.pc = addr;
-    }
-}
 
 
 impl fmt::Debug for Simulator {
