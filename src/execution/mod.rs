@@ -1,5 +1,5 @@
 mod execute;
-pub mod implementations;
+mod implementations;
 
 pub use self::execute::Execute;
 

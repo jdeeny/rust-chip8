@@ -1,4 +1,4 @@
-//! Contains the functions that perform the operations of each type of instruction.
+//! Generic 'microcode' implementations of the operations.
 
 use instruction::{Instruction, Operand};
 use execution::{Execute};

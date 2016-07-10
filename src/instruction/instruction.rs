@@ -1,7 +1,7 @@
 use std::fmt;
 use std::clone::Clone;
 
-use execution::{Operation};
+use execution::{Operation, execute_microcode, Execute};
 use instruction::{Definition,Operand};
 use types::*;
 
@@ -85,6 +85,10 @@ impl Instruction {
     pub fn operation(&self) -> Operation {
         let op: Operation = self.operation.clone();
         op
+    }
+
+    pub fn execute(&self, cpu: &mut Execute) {
+        execute_microcode(self, cpu)
     }
 
     /// Returns a string describing the instruction.
