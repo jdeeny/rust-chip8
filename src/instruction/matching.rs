@@ -40,6 +40,7 @@ pub struct InstructionMatcher {
     dest_kind: OperandKind,
     src_kind: OperandKind,
     aux_kind: OperandKind,
+    pattern: Pattern,
 }
 
 impl InstructionMatcher {
@@ -49,6 +50,7 @@ impl InstructionMatcher {
             dest_kind: definition.dest_kind,
             src_kind: definition.src_kind,
             aux_kind: definition.aux_kind,
+            pattern: definition.pattern,
         }
     }
 
@@ -110,17 +112,16 @@ mod tests {
         };
 
         let inst = Instruction::new(&definition, 0x2740);
-        assert!(im.is_match(&inst));
+        assert!( im.is_match(&inst) );
         let inst = Instruction::new(&definition, 0x2380);
-        assert!(im.is_match(&inst));
-
+        assert!( im.is_match(&inst) );
         let inst = Instruction::new(&definition, 0x20D0);
-        assert!(im.is_match(&inst));
+        assert!( im.is_match(&inst) );
         let inst = Instruction::new(&d2, 0x2340);
-        assert!(!im.is_match(&inst));
-        // same operation, src and aux
+        assert!( ! im.is_match(&inst) );
         let inst = Instruction::new(&d3, 0x2340);
-        assert!(im.is_match(&inst));
+        //matches because the pattern and codeword are not taken into account.
+        assert!( im.is_match(&inst) );
 
 
     }
