@@ -14,8 +14,7 @@
 //! A `Simulator` provides a thread-safe interface to a Chip8 simulator. It contains an
 //! `Set` and a `Chip8`. It is able to load programs and execute instructions.
 
-#![feature(inclusive_range_syntax)]
-#![feature(plugin)]
+#![feature(inclusive_range_syntax, fnbox, plugin)]
 #![plugin(drawbytes)]
 
 // enable errors for some additional lints

@@ -10,9 +10,9 @@ pub trait Execute {
     /// Returns the Config being used by the Execute
     fn config(&self) -> Config;
     /// Loads a value from the source Operand.
-    fn store(&mut self, dest: Operand, data: usize);
+    fn store(&mut self, dest: Dest, data: usize);
     /// Stores a value into the destination Operand.
-    fn load(&mut self, src: Operand) -> usize;
+    fn load(&mut self, src: Src) -> usize;
     /// Pops an item off the stack
     fn stack_pop(&mut self) -> Option<Address>;
     /// Pops an item off the stack

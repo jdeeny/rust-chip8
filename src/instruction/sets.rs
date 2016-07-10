@@ -1,18 +1,14 @@
-use instruction::Definition;
-use instruction::OperandKind::*;
+use instruction::{Definition, SrcKind, DestKind};
 use instruction::Coding::*;
-use instruction::execution::Operation::*;
+use instruction::execution::OperationKind::*;
 
 const EMPTY_DEF: Definition = Definition {
-    operation: NoOp,
-    dest_kind: Unused,
-    src_kind: Unused,
-    aux_kind: Unused,
-    pattern: [C(0x0), C(0x0), C(0x0), C(0x0)]
+    op: NoOp,
+    pattern: [X, X, X, X]
 };
 
 pub const CHIP8: &'static [Definition] = &[
-    Definition { operation: Cls, pattern: [C(0x0), C(0x0), C(0xE), C(0x0)], ..EMPTY_DEF },
+    Definition { op: NoOp, pattern: [L(0x0), L(0x0), L(0xE), L(0x0)] },
     //Definition::new(OpCls,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0x0)], /*"Cls"*/),
     /*Definition::new(op_ret,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0xE)], "Ret"),
     Definition::new(op_jump,     Literal12,  Unused,     Unused,     [C(0x1), D,      D,      D     ], "Jump {d}"),

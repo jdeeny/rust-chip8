@@ -1,7 +1,6 @@
 use std::fmt;
 
-use instruction::operands::OperandKind;
-use instruction::execution::{ Operation };
+use instruction::{ Operation, OperationKind, DestKind, SrcKind };
 
 /// Type to hold instruction word pattern
 pub type Pattern = [Coding; 4];
@@ -9,15 +8,13 @@ pub type Pattern = [Coding; 4];
 /// Used to define the coding of each instruction type
 #[derive(Clone,Copy,Debug)]
 pub enum Coding {
-    /// A constant nibble (literal)
-    C(u8),
-    /// Destination
-    D,
-    /// Source
-    S,
-    /// Auxillary
     A,
-    /// Ignore
+    B,
+    C,
+    D,
+    /// A literal value
+    L(u8),
+    /// Don't care
     X,
 }
 
@@ -34,27 +31,15 @@ pub enum Coding {
 #[derive(Copy,Clone)]
 pub struct Definition {
     /// The operation that will be performed when this type of instruction is executed.
-    pub operation: Operation,
-    pub dest_kind: OperandKind,
-    pub src_kind: OperandKind,
-    pub aux_kind: OperandKind,
+    pub op: OperationKind,
     pub pattern: Pattern,
     //pub mnemonic: String,
 }
 impl Definition {
     /// Returns a new Definition.
-    pub fn new(operation: Operation,
-               dest: OperandKind,
-               src: OperandKind,
-               aux: OperandKind,
-               pattern: Pattern,
-           /*mnemonic: String*/)
-               -> Definition {
+    pub fn new(op: OperationKind, pattern: Pattern) -> Definition {
         Definition {
-            operation: operation,
-            dest_kind: dest,
-            src_kind: src,
-            aux_kind: aux,
+            op: op,
             pattern: pattern,
     //        mnemonic: mnemonic,
         }

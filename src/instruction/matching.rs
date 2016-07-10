@@ -1,6 +1,6 @@
 use types::*;
-use instruction::{Instruction,Pattern, Coding, Definition, OperandKind};
-use instruction::execution::Operation;
+use instruction::{Instruction,Pattern, Coding, Definition, SrcKind, DestKind};
+use instruction::execution::OperationKind;
 
 
 
@@ -17,7 +17,7 @@ impl CodewordMatcher {
         for coding in &pattern {
             code <<= 4;
             mask <<= 4;
-            if let Coding::C(n) = *coding {
+            if let Coding::L(n) = *coding {
                 code |= n as Codeword;
                 mask |= 0xF;
             };
@@ -36,36 +36,27 @@ impl CodewordMatcher {
 
 /// Matches an instruction
 pub struct InstructionMatcher {
-    operation: Operation,
-    dest_kind: OperandKind,
-    src_kind: OperandKind,
-    aux_kind: OperandKind,
+    op_kind: OperationKind,
     pattern: Pattern,
 }
 
 impl InstructionMatcher {
     pub fn new(definition: &Definition) -> InstructionMatcher {
         InstructionMatcher {
-            operation: definition.operation,
-            dest_kind: definition.dest_kind,
-            src_kind: definition.src_kind,
-            aux_kind: definition.aux_kind,
+            op_kind: definition.op,
             pattern: definition.pattern,
         }
     }
 
     pub fn is_match(&self, inst: &Instruction) -> bool {
-        self.operation == inst.operation() &&
-        self.dest_kind == inst.dest().kind() &&
-        self.src_kind == inst.src().kind() &&
-        self.aux_kind == inst.aux().kind()
+        self.op_kind == inst.operation().kind()
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use instruction::{Definition, Instruction, Operand, OperandKind, Operation};
+    use instruction::{Definition, Instruction, Operand, SrcKind, Operation};
     use instruction::Coding::*;
 
     #[test]
@@ -86,9 +77,9 @@ mod tests {
     fn test_inst_match() {
         let definition = Definition {
             operation: Operation::Add,
-            dest_kind: OperandKind::Register,
-            src_kind: OperandKind::Register,
-            aux_kind: OperandKind::Unused,
+            dest_kind: SrcKind::Register,
+            src_kind: SrcKind::Register,
+            aux_kind: SrcKind::Unused,
             pattern: [C(0x2), D, S, C(0)],
         };
 
@@ -96,17 +87,17 @@ mod tests {
 
         let d2 = Definition {
             operation: Operation::Sub,
-            dest_kind: OperandKind::Register,
-            src_kind: OperandKind::Register,
-            aux_kind: OperandKind::Unused,
+            dest_kind: SrcKind::Register,
+            src_kind: SrcKind::Register,
+            aux_kind: SrcKind::Unused,
             pattern: [C(0x2), D, S, C(0)],
         };
 
         let d3 = Definition {
             operation: Operation::Add,
-            dest_kind: OperandKind::Register,
-            src_kind: OperandKind::Register,
-            aux_kind: OperandKind::Unused,
+            dest_kind: SrcKind::Register,
+            src_kind: SrcKind::Register,
+            aux_kind: SrcKind::Unused,
             pattern: [C(0x2), D, S, C(0xF)],
         };
 

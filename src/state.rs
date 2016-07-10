@@ -4,7 +4,7 @@ use std::iter::{FromIterator, repeat};
 use rand::{Rng, thread_rng};
 pub use types::*;
 use config::Config;
-use instruction::{Execute, Operand};
+use instruction::{Execute, Dest, Src};
 
 
 /// A struct that contains a Chip8 `Config` and the machine state.
@@ -73,46 +73,42 @@ impl Execute for Chip8 {
         self.config
     }
 
-    fn load(&mut self, src: Operand) -> usize {
+    fn load(&mut self, src: Src) -> usize {
         match src {
-            Operand::Register(r) => self.v[r] as usize,
-            Operand::Address12(a) => self.ram[a] as usize,
-            Operand::I => self.i as usize,
-            Operand::IndirectI => self.ram[self.i as usize] as usize,
-            Operand::Literal12(n12) => n12,
-            Operand::Literal8(n8) => n8,
-            Operand::Literal4(n4) => n4,
-            Operand::SoundTimer => self.st as usize,
-            Operand::DelayTimer => self.dt as usize,
-            Operand::Random => (thread_rng().next_u32() & 0xFF) as usize,
+            Src::Register(r) => self.v[r] as usize,
+            Src::Address12(a) => self.ram[a] as usize,
+            Src::I => self.i as usize,
+            Src::IndirectI => self.ram[self.i as usize] as usize,
+            Src::Literal12(n12) => n12,
+            Src::Literal8(n8) => n8,
+            Src::Literal4(n4) => n4,
+            Src::SoundTimer => self.st as usize,
+            Src::DelayTimer => self.dt as usize,
+            Src::Random => (thread_rng().next_u32() & 0xFF) as usize,
             _ => 0,
-            // Operand::Nowhere   => panic!("Cannot load nothing"),
+            // Src::Nowhere   => panic!("Cannot load nothing"),
         }
     }
 
-    fn store(&mut self, dest: Operand, data: usize) {
+    fn store(&mut self, dest: Dest, data: usize) {
         match dest {
-            Operand::Register(r) => {
+            Dest::Register(r) => {
                 self.v[r] = (data & 0xFF) as MemoryCell;
             }
-            Operand::Address12(a) => {
+            Dest::Address12(a) => {
                 self.ram[a] = (data & 0xFF) as MemoryCell;
             }
-            Operand::I => {
+            Dest::I => {
                 self.i = (data & 0xFFFF) as Register16;
             }
-            Operand::IndirectI => {
+            Dest::IndirectI => {
                 self.ram[self.i as usize] = data as MemoryCell;
             }
-            Operand::SoundTimer => {
+            Dest::SoundTimer => {
                 self.st = data as Timer;
             }
-            Operand::DelayTimer => {
+            Dest::DelayTimer => {
                 self.dt = data as Timer;
-            }
-            Operand::Literal12(_) | Operand::Literal8(_) | Operand::Literal4(_) |
-            Operand::Random | Operand::Nowhere => {
-                panic!("Cannot store");
             }
         }
     }

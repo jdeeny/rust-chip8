@@ -135,7 +135,7 @@ impl Executor for Simulator {
         self.core.config
     }
 
-    fn load(&mut self, src: Operand) -> usize {
+    fn load(&mut self, src: Src) -> usize {
         match src {
             Operand::Register(r) => self.core.v[r] as usize,
             Operand::Address12(a) => self.core.ram[a] as usize,
@@ -152,7 +152,7 @@ impl Executor for Simulator {
         }
     }
 
-    fn store(&mut self, dest: Operand, data: usize) {
+    fn store(&mut self, dest: Dest, data: usize) {
         match dest {
             Operand::Register(r) => {
                 self.core.v[r] = (data & 0xFF) as MemoryCell;

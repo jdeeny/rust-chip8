@@ -1,6 +1,6 @@
 //! Generic 'microcode' implementations of the operations.
 
-use instruction::{Instruction, Operand};
+use instruction::{Instruction};
 use instruction::execution::{Execute};
 #[allow(unused_imports)]
 use config::Config;
