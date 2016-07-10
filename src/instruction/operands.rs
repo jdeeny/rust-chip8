@@ -28,6 +28,10 @@ pub enum OperandKind {
     Unused,
 }
 
+pub trait Operand {
+    fn kind(&self) -> OperandKind;
+}
+
 impl OperandKind {
     /// Specify the operand with the supplied data.
     ///
@@ -35,7 +39,39 @@ impl OperandKind {
     /// data into an Operand::Register(n) where n is the specific register number. The given
     /// data is also used for Addresses and Literals. Other kinds of operands cannot be further
     /// specified.
-    pub fn specify(&self, data: usize) -> Operand {
+    pub fn dest(&self, data: usize) -> Operand {
+        match *self {
+            OperandKind::Register => Operand::Register(data),
+            OperandKind::I => Operand::I,
+            OperandKind::Address12 => Operand::Address12(data),
+            OperandKind::IndirectI => Operand::IndirectI,
+            OperandKind::Literal12 => Operand::Literal12(data),
+            OperandKind::Literal8 => Operand::Literal8(data),
+            OperandKind::Literal4 => Operand::Literal4(data),
+            OperandKind::DelayTimer => Operand::DelayTimer,
+            OperandKind::SoundTimer => Operand::SoundTimer,
+            OperandKind::Random => Operand::Random,
+            OperandKind::Unused => Operand::Nowhere,
+        }
+    }
+
+    pub fn src(&self, data: usize) -> Operand {
+        match *self {
+            OperandKind::Register => Operand::Register(data),
+            OperandKind::I => Operand::I,
+            OperandKind::Address12 => Operand::Address12(data),
+            OperandKind::IndirectI => Operand::IndirectI,
+            OperandKind::Literal12 => Operand::Literal12(data),
+            OperandKind::Literal8 => Operand::Literal8(data),
+            OperandKind::Literal4 => Operand::Literal4(data),
+            OperandKind::DelayTimer => Operand::DelayTimer,
+            OperandKind::SoundTimer => Operand::SoundTimer,
+            OperandKind::Random => Operand::Random,
+            OperandKind::Unused => Operand::Nowhere,
+        }
+    }
+
+    pub fn aux(&self, data: usize) -> Operand {
         match *self {
             OperandKind::Register => Operand::Register(data),
             OperandKind::I => Operand::I,
@@ -56,7 +92,7 @@ impl OperandKind {
 ///
 /// This is a fully specified operand, including the particular register, address, or value.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum Operand {
+pub enum Dest {
     /// A register, v0-vF.
     Register(usize),
     /// A 12-bit address.
@@ -81,26 +117,8 @@ pub enum Operand {
     Nowhere,
 }
 
-impl Operand {
-    /// Returns a string describing the operand.
-    pub fn to_string(&self) -> String {
-        match *self {
-            Operand::Register(r) => format!("v{:X}", r),
-            Operand::Address12(a) => format!("@0x{:X}", a),
-            Operand::Literal12(n) => format!("0x{:03X}", n),
-            Operand::Literal8(n) => format!("0x{:02X}", n),
-            Operand::Literal4(n) => format!("0x{:01X}", n),
-            Operand::I => "I".to_string(),
-            Operand::IndirectI => "Indirect".to_string(),
-            Operand::SoundTimer => "ST".to_string(),
-            Operand::DelayTimer => "DT".to_string(),
-            Operand::Random => "Random".to_string(),
-            Operand::Nowhere => "none".to_string(),
-        }
-
-    }
-
-    pub fn kind(&self) -> OperandKind {
+impl Operand for Dest {
+    fn kind(&self) -> Self {
         match *self {
             Operand::Register(_) => OperandKind::Register,
             Operand::I => OperandKind::I,
@@ -115,5 +133,103 @@ impl Operand {
             Operand::Nowhere => OperandKind::Unused,
         }
     }
+
+}
+
+/// An operand.
+///
+/// This is a fully specified operand, including the particular register, address, or value.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Src {
+    /// A register, v0-vF.
+    Register(usize),
+    /// A 12-bit address.
+    Address12(usize),
+    /// The I register.
+    I,
+    /// The memory location pointed to by I.
+    IndirectI,
+    /// A 12-bit literal.
+    Literal12(usize),
+    /// An 8-bit literal.
+    Literal8(usize),
+    /// A 4-bit literal.
+    Literal4(usize),
+    /// The delay timer.
+    DelayTimer,
+    /// The sound timer.
+    SoundTimer,
+    /// A random value.
+    Random,
+    /// No value.
+    Nowhere,
+}
+
+impl Operand for Src {
+    fn kind(&self) -> Self {
+        match *self {
+            Operand::Register(_) => OperandKind::Register,
+            Operand::I => OperandKind::I,
+            Operand::Address12(_) => OperandKind::Address12,
+            Operand::IndirectI => OperandKind::IndirectI,
+            Operand::Literal12(_) => OperandKind::Literal12,
+            Operand::Literal8(_) => OperandKind::Literal8,
+            Operand::Literal4(_) => OperandKind::Literal4,
+            Operand::DelayTimer => OperandKind::DelayTimer,
+            Operand::SoundTimer => OperandKind::SoundTimer,
+            Operand::Random => OperandKind::Random,
+            Operand::Nowhere => OperandKind::Unused,
+        }
+    }
+
+
+}
+
+/// An operand.
+///
+/// This is a fully specified operand, including the particular register, address, or value.
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+pub enum Aux {
+    /// A register, v0-vF.
+    Register(usize),
+    /// A 12-bit address.
+    Address12(usize),
+    /// The I register.
+    I,
+    /// The memory location pointed to by I.
+    IndirectI,
+    /// A 12-bit literal.
+    Literal12(usize),
+    /// An 8-bit literal.
+    Literal8(usize),
+    /// A 4-bit literal.
+    Literal4(usize),
+    /// The delay timer.
+    DelayTimer,
+    /// The sound timer.
+    SoundTimer,
+    /// A random value.
+    Random,
+    /// No value.
+    Nowhere,
+}
+
+impl Operand for Aux {
+    fn kind(&self) -> Self {
+        match *self {
+            Operand::Register(_) => OperandKind::Register,
+            Operand::I => OperandKind::I,
+            Operand::Address12(_) => OperandKind::Address12,
+            Operand::IndirectI => OperandKind::IndirectI,
+            Operand::Literal12(_) => OperandKind::Literal12,
+            Operand::Literal8(_) => OperandKind::Literal8,
+            Operand::Literal4(_) => OperandKind::Literal4,
+            Operand::DelayTimer => OperandKind::DelayTimer,
+            Operand::SoundTimer => OperandKind::SoundTimer,
+            Operand::Random => OperandKind::Random,
+            Operand::Nowhere => OperandKind::Unused,
+        }
+    }
+
 
 }

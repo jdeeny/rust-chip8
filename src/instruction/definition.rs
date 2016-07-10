@@ -1,8 +1,25 @@
 use std::fmt;
 
-use instruction::{Operand, OperandKind, Pattern};
+use instruction::operands::OperandKind;
 use instruction::execution::{ Operation };
 
+/// Type to hold instruction word pattern
+pub type Pattern = [Coding; 4];
+
+/// Used to define the coding of each instruction type
+#[derive(Clone,Copy,Debug)]
+pub enum Coding {
+    /// A constant nibble (literal)
+    C(u8),
+    /// Destination
+    D,
+    /// Source
+    S,
+    /// Auxillary
+    A,
+    /// Ignore
+    X,
+}
 
 /// Defines the structure of a specific instruction
 ///
