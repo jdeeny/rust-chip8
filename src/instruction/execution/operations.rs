@@ -1,4 +1,4 @@
-use instruction::{SrcKind,DestKind,Src,Dest};
+use instruction::{Dest, DestKind, Src, SrcKind};
 
 #[derive(Copy,Clone,Eq,PartialEq)]
 pub enum OperationKind {
@@ -38,7 +38,8 @@ impl OperationKind {
     pub fn specify(&self, data: usize) -> Operation {
         match *self {
             OperationKind::NoOp => Operation::NoOp,
-            _ => panic!("cannot specify")
+            OperationKind::Cls => Operation::Cls,
+            _ => panic!("cannot specify"),
         }
     }
 }
@@ -51,9 +52,9 @@ pub enum Operation {
     Stash(Src),
     Fetch(Dest),
 
-    Jump(Dest),
-    JumpV0(Dest),
-    Call(Dest),
+    Jump(Src),
+    JumpV0(Src),
+    Call(Src),
     Ret,
 
     SkipEq(Src),
@@ -81,7 +82,7 @@ impl Operation {
     pub fn kind(&self) -> OperationKind {
         match *self {
             Operation::NoOp => OperationKind::NoOp,
-            _ => panic!("cannot specify")
+            _ => panic!("cannot specify"),
         }
     }
 }
