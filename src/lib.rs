@@ -44,14 +44,14 @@ extern crate strfmt;
 pub mod config;
 pub mod fonts;
 pub mod instruction;
-mod simulator;
+//mod simulator;
 mod state;
 mod types;
 
 pub use config::Config;
 pub use types::*;
 pub use state::Chip8;
-pub use simulator::Simulator;
+//pub use simulator::Simulator;
 
 #[cfg(test)]
 mod tests {

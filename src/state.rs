@@ -1,4 +1,5 @@
 //! Defines the state of the Chip8 virtual machine.
+use std::sync::{Arc, RwLock};
 
 use std::iter::{FromIterator, repeat};
 use rand::{Rng, thread_rng};
@@ -6,6 +7,20 @@ pub use types::*;
 use config::Config;
 use instruction::{Execute, Dest, Src};
 
+#[derive(Debug, Clone)]
+pub struct Locked<T>(pub Arc<RwLock<T>>);
+
+impl<T> Locked<T> {
+    pub fn new(t: T) -> Locked<T> {
+        Locked(Arc::new(RwLock::new(t)))
+    }
+    pub fn try_read(&self) -> &T {
+        self.try_read()
+    }
+    pub fn try_write(&mut self) -> &mut T {
+        self.try_write()
+    }
+}
 
 /// A struct that contains a Chip8 `Config` and the machine state.
 ///
@@ -31,13 +46,13 @@ pub struct Chip8 {
     /// The delay timer.
     pub dt: Timer,
     /// The video ram, containing the state of the video output.
-    pub vram: Vec<Pixel>,
+    pub vram: Locked<Vram>,
     /// The state of the keyboard.
-    pub keys: Keyboard,
+    pub keys: Locked<Keyboard>,
     /// The state of the chip8 buzzer.
-    pub buzzer: Buzzer,
+    pub buzzer: Locked<Buzzer>,
     /// The state of the audio buffer used with XOCHIP.
-    pub audio: Audio,
+    pub audio: Locked<Audio>,
 }
 
 impl Chip8 {
@@ -52,11 +67,24 @@ impl Chip8 {
             dt: 0,
             pc: 0,
             stack: Vec::with_capacity(config.stack_size),
-            vram: Vec::from_iter(repeat(Pixel::default()).take(config.vram_size)),
-            keys: [false;16],
-            buzzer: false,
-            audio: [0; 16],
+            vram: Locked::new(Vec::from_iter(repeat(Pixel::default()).take(config.vram_size))),
+            keys: Locked::new([false; 16]),
+            buzzer: Locked::new(false),
+            audio: Locked::new([0; 16]),
         }
+    }
+
+    pub fn vram_clone(&self) -> Locked<Vram>{
+        self.vram.clone()
+    }
+    pub fn keys_clone(&self) -> Locked<Keyboard>{
+        self.keys.clone()
+    }
+    pub fn buzzer_clone(&self) -> Locked<Buzzer>{
+        self.buzzer.clone()
+    }
+    pub fn audio_clone(&self) -> Locked<Audio>{
+        self.audio.clone()
     }
 }
 
@@ -133,15 +161,15 @@ impl Execute for Chip8 {
     }
 
     fn keyboard(&self) -> Keyboard {
-        self.keys
+        *self.keys.try_read()
     }
 
     fn vram_mut(&mut self) -> &mut [Pixel] {
-        &mut self.vram
+        self.vram.try_write()
     }
 
     fn audio_mut(&mut self) -> &mut Audio {
-        &mut self.audio
+        self.audio.try_write()
     }
 }
 

@@ -2,8 +2,12 @@
 
 #[cfg(test)]
 mod tests;
+mod controller;
+
+pub use controller::Controller;
 
 use std::fmt;
+use std::sync::{Arc, RwLock};
 use rand::{Rng, thread_rng};
 
 use types::*;
@@ -11,27 +15,47 @@ use Chip8;
 use config::Config;
 use instruction::{Dest, Execute, Instruction, Src};
 
-/// Manages the state of a chip8 cpu.
-pub struct Simulator {
-    core: Chip8,
+pub trait Simulate {
+    fn load_bytes(&mut self, bytes: &[u8], addr: Address);
+    fn ram(&self, addr: Address) -> MemoryCell;
+    fn set_ram(&self, addr: Address, data: MemoryCell);
 }
 
-impl Simulator {
-    /// Returns a new Simulator.
-    pub fn new(config: &Config) -> Simulator {
-        let mut s = Simulator { core: Chip8::new(config) };
-        s.load_bytes(config.font_small, config.addr_font as Address);
-        s
-    }
 
+
+/// Manages the state of a chip8 cpu.
+pub struct Simulator {
+    core: Arc<RwLock<Chip8>>,
+}
+
+impl Simulate for Simulator {
     /// Loads bytes into RAM starting at the given address.
-    pub fn load_bytes(&mut self, bytes: &[u8], addr: Address) {
+    fn load_bytes(&mut self, bytes: &[u8], addr: Address) {
         let mut i = addr as usize;
         for b in bytes {
             self.core.ram[i] = *b;
             i += 1;
         }
     }
+    fn ram(&self, addr: Address) -> MemoryCell {
+        self.core.ram[addr as usize]
+    }
+    fn set_ram(&self, addr: Address, data: MemoryCell) {
+        self.core.ram[addr as usize] = data;
+    }
+
+}
+
+impl Simulator {
+    /// Returns a new Simulator.
+    pub fn new(config: &Config) -> Simulator {
+        let core = Arc::new(RwLock::new(Chip8::new(config)));
+        let mut s = Simulator { core: core };
+        s.load_bytes(config.font_small, config.addr_font as Address);
+        s
+    }
+
+
 
     pub fn ram(&self, addr: Address) -> MemoryCell {
         self.core.ram[addr as usize]

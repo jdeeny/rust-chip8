@@ -20,3 +20,5 @@ pub type Keyboard = [bool; 16];
 pub type Buzzer = bool;
 /// The audio buffer.
 pub type Audio = [u8; 16];
+/// Vram
+pub type Vram = Vec<Pixel>;
