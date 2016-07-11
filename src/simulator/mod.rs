@@ -4,7 +4,7 @@
 mod tests;
 mod controller;
 
-pub use controller::Controller;
+pub use self::controller::Controller;
 
 use std::fmt;
 use std::sync::{Arc, RwLock};
@@ -18,14 +18,14 @@ use instruction::{Dest, Execute, Instruction, Src};
 pub trait Simulate {
     fn load_bytes(&mut self, bytes: &[u8], addr: Address);
     fn ram(&self, addr: Address) -> MemoryCell;
-    fn set_ram(&self, addr: Address, data: MemoryCell);
+    fn set_ram(&mut self, addr: Address, data: MemoryCell);
 }
 
 
 
 /// Manages the state of a chip8 cpu.
 pub struct Simulator {
-    core: Arc<RwLock<Chip8>>,
+    core: Chip8,
 }
 
 impl Simulate for Simulator {
@@ -40,7 +40,7 @@ impl Simulate for Simulator {
     fn ram(&self, addr: Address) -> MemoryCell {
         self.core.ram[addr as usize]
     }
-    fn set_ram(&self, addr: Address, data: MemoryCell) {
+    fn set_ram(&mut self, addr: Address, data: MemoryCell) {
         self.core.ram[addr as usize] = data;
     }
 
@@ -49,7 +49,7 @@ impl Simulate for Simulator {
 impl Simulator {
     /// Returns a new Simulator.
     pub fn new(config: &Config) -> Simulator {
-        let core = Arc::new(RwLock::new(Chip8::new(config)));
+        let core = Chip8::new(config);
         let mut s = Simulator { core: core };
         s.load_bytes(config.font_small, config.addr_font as Address);
         s
