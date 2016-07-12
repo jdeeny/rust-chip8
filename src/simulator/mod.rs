@@ -2,9 +2,9 @@
 
 #[cfg(test)]
 mod tests;
-mod controller;
+//mod controller;
 
-pub use self::controller::Controller;
+//pub use self::controller::Controller;
 
 use std::fmt;
 use std::sync::{Arc, RwLock};
