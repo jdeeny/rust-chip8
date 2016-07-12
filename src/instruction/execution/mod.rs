@@ -14,6 +14,42 @@ use instruction::{Dest, Src, DestKind, SrcKind };
 // use self::implementations::*;
 
 #[derive(Copy,Clone,Eq,PartialEq)]
+pub enum OperationKind {
+    NoOp,
+    Load(DestKind, SrcKind),
+    Stash(SrcKind),
+    Fetch(SrcKind),
+
+    Jump(SrcKind),
+    JumpV0(SrcKind),
+    Call(SrcKind),
+    Ret,
+
+    SkipEq(SrcKind, SrcKind),
+    SkipNotEq(SrcKind, SrcKind),
+    SkipKey(SrcKind),
+    SkipNotKey(SrcKind),
+
+    Add(DestKind, SrcKind, SrcKind),
+    Sub(DestKind, SrcKind, SrcKind),
+
+    Or(DestKind, SrcKind, SrcKind),
+    And(DestKind, SrcKind, SrcKind),
+    Xor(DestKind, SrcKind, SrcKind),
+    Shr(DestKind, SrcKind),
+    Shl(DestKind, SrcKind),
+
+    Rand(DestKind, SrcKind, SrcKind),
+
+    Cls,
+    Sprite(SrcKind, SrcKind, SrcKind),
+    Font(SrcKind),
+    Bcd(SrcKind),
+    WaitKey(SrcKind),
+}
+
+
+#[derive(Copy,Clone,Eq,PartialEq)]
 pub enum Operation {
     NoOp,
     Load(Dest, Src),
@@ -49,13 +85,48 @@ pub enum Operation {
 }
 
 impl Operation {
+    ///
     pub fn kind(&self) -> OperationKind {
         match *self {
             Operation::NoOp => OperationKind::NoOp,
-            _ => panic!("cannot specify"),
+            Operation::Load(d, s) => OperationKind::Load(d.kind(), s.kind()),
+
+            Operation::Stash(s) => OperationKind::Stash(s.kind()),
+            Operation::Fetch(s) => OperationKind::Fetch(s.kind()),
+
+            Operation::Jump(d) => OperationKind::Jump(d.kind()),
+            Operation::JumpV0(d) => OperationKind::JumpV0(d.kind()),
+
+            Operation::Call(d) => OperationKind::Call(d.kind()),
+            Operation::Ret => OperationKind::Ret,
+
+            Operation::SkipEq(a, b) => OperationKind::SkipEq(a.kind(), b.kind()),
+            Operation::SkipNotEq(a, b) => OperationKind::SkipNotEq(a.kind(), b.kind()),
+            Operation::SkipKey(n) => OperationKind::SkipKey(n.kind()),
+            Operation::SkipNotKey(n) => OperationKind::SkipNotKey(n.kind()),
+
+            Operation::Add(d, a, b) => OperationKind::Add(d.kind(), a.kind(), b.kind()),
+            Operation::Sub(d, a, b) => OperationKind::Sub(d.kind(), a.kind(), b.kind()),
+
+            Operation::Or(d, a, b) => OperationKind::Or(d.kind(), a.kind(), b.kind()),
+            Operation::And(d, a, b) => OperationKind::And(d.kind(), a.kind(), b.kind()),
+            Operation::Xor(d, a, b) => OperationKind::Xor(d.kind(), a.kind(), b.kind()),
+            Operation::Shr(d, s) => OperationKind::Shr(d.kind(), s.kind()),
+            Operation::Shl(d, s) => OperationKind::Shl(d.kind(), s.kind()),
+
+            Operation::Rand(d, s, m) => OperationKind::Rand(d.kind(), s.kind(), m.kind()),
+
+            Operation::Cls => OperationKind::Cls,
+
+            Operation::Sprite(x, y, n) => OperationKind::Sprite(x.kind(), y.kind(), n.kind()),
+            Operation::Font(s) => OperationKind::Font(s.kind()),
+            Operation::Bcd(s) => OperationKind::Bcd(s.kind()),
+
+            Operation::WaitKey(n) => OperationKind::WaitKey(n.kind()),
         }
     }
 
+    /// Execute the operation on exec.
     pub fn execute(&self, exec: &mut Execute) -> Chip8Result<()> {
         match *self {
             Operation::NoOp                     => { Ok(()) },
@@ -85,41 +156,4 @@ impl Operation {
             Operation::Sprite(x, y, n)          => { implementations::sprite(exec, x, y, n) },
         }
     }
-}
-
-#[derive(Copy,Clone,Eq,PartialEq)]
-pub enum OperationKind {
-    NoOp,
-    Load(DestKind, SrcKind),
-    Store(DestKind),
-    Stash(SrcKind),
-    Fetch(DestKind),
-
-    Jump(DestKind),
-    JumpV0(DestKind),
-    Call(DestKind),
-    Ret,
-
-    SkipEq(SrcKind, SrcKind),
-    SkipNotEq(SrcKind, SrcKind),
-    SkipKey(SrcKind),
-    SkipNotKey(SrcKind),
-
-    Add(SrcKind, SrcKind, DestKind),
-    Sub(DestKind, SrcKind),
-    Subn(DestKind, SrcKind),
-
-    Or(DestKind, SrcKind),
-    And(DestKind, SrcKind),
-    Xor(DestKind, SrcKind),
-    Shr(DestKind, SrcKind),
-    Shl(DestKind, SrcKind),
-
-    Rand(DestKind),
-
-    Cls,
-    Sprite(SrcKind, SrcKind, SrcKind),
-    Font(SrcKind),
-    Bcd(SrcKind),
-    WaitKey(SrcKind),
 }
