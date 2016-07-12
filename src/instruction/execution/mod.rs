@@ -56,34 +56,34 @@ impl Operation {
         }
     }
 
-    pub fn execute(&self, exec: &mut Execute) {
+    pub fn execute(&self, exec: &mut Execute) -> Chip8Result<()> {
         match *self {
-            Operation::NoOp                     => { assert!(true); },
-            Operation::Load(dest, src)          => { implementations::load(exec, dest, src); },
-            Operation::Add(dest, lhs, rhs)      => { implementations::add(exec, dest, lhs, rhs); },
-            Operation::Sub(dest, lhs, rhs)      => { implementations::sub(exec, dest, lhs, rhs); },
-            Operation::Jump(addr)               => { implementations::jump(exec, addr); },
-            Operation::JumpV0(addr)             => { implementations::jump_v0(exec, addr); },
-            Operation::Call(addr)               => { implementations::call(exec, addr); },
-            Operation::Ret                      => { implementations::ret(exec); },
-            Operation::Or(dest, lhs, rhs)       => { implementations::or(exec, dest, lhs, rhs); },
-            Operation::And(dest, lhs, rhs)      => { implementations::and(exec, dest, lhs, rhs); },
-            Operation::Xor(dest, lhs, rhs)      => { implementations::xor(exec, dest, lhs, rhs); },
-            Operation::Shr(dest, src)           => { implementations::shr(exec, dest, src); },
-            Operation::Shl(dest, src)           => { implementations::shl(exec, dest, src); },
-            Operation::Font(glyph)              => { implementations::font(exec, glyph); },
-            Operation::Bcd(value)               => { implementations::bcd(exec, value); },
-            Operation::SkipEq(lhs, rhs)         => { implementations::skip_eq(exec, lhs, rhs); },
-            Operation::SkipNotEq(lhs, rhs)      => { implementations::skip_not_eq(exec, lhs, rhs); },
-            Operation::SkipKey(key)             => { implementations::skip_key_pressed(exec, key); },
-            Operation::SkipNotKey(key)          => { implementations::skip_key_not_pressed(exec, key); },
-            Operation::WaitKey(key)             => { implementations::wait_key(exec, key); },
-            Operation::Cls                      => { implementations::clear_screen(exec); },
-            Operation::Stash(last)              => { implementations::stash(exec, last); },
-            Operation::Fetch(last)              => { implementations::fetch(exec, last); },
-            Operation::Rand(dest, src, mask)    => { implementations::random(exec, dest, src, mask); },
-            Operation::Sprite(x, y, n)          => { implementations::sprite(exec, x, y, n); },
-        };
+            Operation::NoOp                     => { Ok(()) },
+            Operation::Load(dest, src)          => { implementations::load(exec, dest, src) },
+            Operation::Add(dest, lhs, rhs)      => { implementations::add(exec, dest, lhs, rhs) },
+            Operation::Sub(dest, lhs, rhs)      => { implementations::sub(exec, dest, lhs, rhs) },
+            Operation::Jump(addr)               => { implementations::jump(exec, addr) },
+            Operation::JumpV0(addr)             => { implementations::jump_v0(exec, addr) },
+            Operation::Call(addr)               => { implementations::call(exec, addr) },
+            Operation::Ret                      => { implementations::ret(exec) },
+            Operation::Or(dest, lhs, rhs)       => { implementations::or(exec, dest, lhs, rhs) },
+            Operation::And(dest, lhs, rhs)      => { implementations::and(exec, dest, lhs, rhs) },
+            Operation::Xor(dest, lhs, rhs)      => { implementations::xor(exec, dest, lhs, rhs) },
+            Operation::Shr(dest, src)           => { implementations::shr(exec, dest, src) },
+            Operation::Shl(dest, src)           => { implementations::shl(exec, dest, src) },
+            Operation::Font(glyph)              => { implementations::font(exec, glyph) },
+            Operation::Bcd(value)               => { implementations::bcd(exec, value) },
+            Operation::SkipEq(lhs, rhs)         => { implementations::skip_eq(exec, lhs, rhs) },
+            Operation::SkipNotEq(lhs, rhs)      => { implementations::skip_not_eq(exec, lhs, rhs) },
+            Operation::SkipKey(key)             => { implementations::skip_key_pressed(exec, key) },
+            Operation::SkipNotKey(key)          => { implementations::skip_key_not_pressed(exec, key) },
+            Operation::WaitKey(key)             => { implementations::wait_key(exec, key) },
+            Operation::Cls                      => { implementations::clear_screen(exec) },
+            Operation::Stash(last)              => { implementations::stash(exec, last) },
+            Operation::Fetch(last)              => { implementations::fetch(exec, last) },
+            Operation::Rand(dest, src, mask)    => { implementations::random(exec, dest, src, mask) },
+            Operation::Sprite(x, y, n)          => { implementations::sprite(exec, x, y, n) },
+        }
     }
 }
 

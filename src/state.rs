@@ -8,25 +8,7 @@ use config::Config;
 use instruction::{Execute, Dest, Src};
 
 
-struct Checked<'a, T: 'a>(&'a [T]);
-
-impl<'a, T> Checked<'a, T> {
-    fn get(&self, n: usize) -> Chip8Result<T> {
-        if n < self.0.len() {
-            Ok(self.0[n])
-        } else {
-            Err(Chip8Error::OutOfBoundsAt(n))
-        }
-    }
-    fn put(&mut self, n: usize, data: T) -> Chip8Result<()> {
-        if n < self.0.len() {
-            self.0[n] = data;
-            Ok(())
-        } else {
-            Err(Chip8Error::OutOfBoundsAt(n))
-        }
-    }
-}
+pub type ByteIter<'a> =  &'a mut Iterator<Item=MemoryCell>;
 
 #[derive(Debug, Clone)]
 pub struct Locked<T>(pub Arc<RwLock<T>>);
@@ -74,7 +56,7 @@ pub struct Chip8<'a> {
     /// The state of the audio buffer used with XOCHIP.
     pub audio: Locked<Audio>,
     ///
-    pub random: Option<&'a mut Iterator<Item=MemoryCell>>,
+    pub random: Option<ByteIter<'a>>,
     thread_rng: ThreadRng,
 }
 
@@ -107,17 +89,29 @@ impl<'a> Chip8<'a> {
 
     }
 
-    pub fn vram_clone(&self) -> Locked<Vram>{
+    pub fn vram_clone(&self) -> Locked<Vram> {
         self.vram.clone()
     }
-    pub fn keys_clone(&self) -> Locked<Keyboard>{
+    pub fn keys_clone(&self) -> Locked<Keyboard> {
         self.keys.clone()
     }
-    pub fn buzzer_clone(&self) -> Locked<Buzzer>{
+    pub fn buzzer_clone(&self) -> Locked<Buzzer> {
         self.buzzer.clone()
     }
-    pub fn audio_clone(&self) -> Locked<Audio>{
+    pub fn audio_clone(&self) -> Locked<Audio> {
         self.audio.clone()
+    }
+
+    pub fn next_random(&mut self) -> MemoryCell {
+        if let Some(ref mut r) = self.random {
+            r.next().unwrap_or(0)
+        } else {
+            self.thread_rng.gen()
+        }
+    }
+
+    pub fn set_random(&mut self, iter: Option<ByteIter<'a>>) {
+        self.random = iter;
     }
 }
 
@@ -158,15 +152,7 @@ impl<'a> Execute for Chip8<'a> {
             Src::Literal4(n4)   => Ok(n4),
             Src::SoundTimer     => Ok(self.st as usize),
             Src::DelayTimer     => Ok(self.dt as usize),
-            Src::Random         => Ok(0),
-            //self.random
-//                                    .ok_or(self.threadrng)
-//                                    .and_then(|iterator: &Iterator| iterator.next().map),
-            /*Src::Random         => Ok((if let Some(ref mut r) = self.random.try {
-                                        r.next().unwrap_or(0)
-                                    } else {
-                                        self.thread_rng.gen::<MemoryCell>()
-                                    }) as usize),*/
+            Src::Random         => Ok(self.next_random() as usize),
             Src::PC             => Ok(self.pc as usize),
         }
     }
@@ -180,7 +166,6 @@ impl<'a> Execute for Chip8<'a> {
             Dest::SoundTimer => { self.st = data as Timer; Ok(()) },
             Dest::DelayTimer => { self.dt = data as Timer; Ok(())},
             Dest::PC => { self.pc = data as Address; Ok(()) },
-            _ => Ok(())
         }
     }
 

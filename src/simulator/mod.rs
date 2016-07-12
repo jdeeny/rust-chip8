@@ -28,8 +28,8 @@ pub trait Simulate {
     fn timer_tick(&mut self);
 
     fn load_bytes(&mut self, bytes: &[u8], addr: Address);
-    fn load(&mut self, src: Src) -> usize;
-    fn store(&mut self, dest: Dest, value: usize);
+    fn load(&mut self, src: Src) -> Chip8Result<usize>;
+    fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()>;
 }
 
 
@@ -60,11 +60,11 @@ impl<'a> Simulate for Simulator<'a> {
         }
     }
 
-    fn load(&mut self, src: Src) -> usize {
+    fn load(&mut self, src: Src) -> Chip8Result<usize> {
         self.core.load(src)
     }
-    fn store(&mut self, dest: Dest, value: usize) {
-        self.core.store(dest, value);
+    fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()> {
+        self.core.store(dest, value)
     }
     fn run(&mut self, cycles_per_tick: Option<usize>) {
 

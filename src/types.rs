@@ -23,9 +23,11 @@ pub type Audio = [u8; 16];
 /// Vram
 pub type Vram = Vec<Pixel>;
 
-pub enum Chip8Error<'a> {
-    Generic(&'a str),
+#[derive(Debug)]
+pub enum Chip8Error {
     OutOfBoundsAt(usize),
     OutOfBounds,
+    PopEmptyStack,
+    InvalidOperand,
 }
-pub type Chip8Result<'a, T> = Result<T, Chip8Error<'a>>;
+pub type Chip8Result<T> = Result<T, Chip8Error>;
