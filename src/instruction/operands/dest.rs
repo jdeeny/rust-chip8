@@ -18,8 +18,9 @@ pub enum DestKind {
     DelayTimer,
     /// The sound timer.
     SoundTimer,
-    // No value.
-    //Unused,
+    /// Program Counter
+    PC,
+
 }
 
 impl DestKind {
@@ -37,6 +38,7 @@ impl DestKind {
             DestKind::IndirectI => Dest::IndirectI,
             DestKind::DelayTimer => Dest::DelayTimer,
             DestKind::SoundTimer => Dest::SoundTimer,
+            DestKind::PC => Dest::PC,
             //DestKind::Unused => Dest::Nowhere,
         }
     }
@@ -60,8 +62,8 @@ pub enum Dest {
     DelayTimer,
     /// The sound timer.
     SoundTimer,
-    // A random value.
-    //Nowhere,
+    // The program counter.
+    PC,
 }
 
 impl Dest {
@@ -73,7 +75,7 @@ impl Dest {
             Dest::IndirectI => DestKind::IndirectI,
             Dest::DelayTimer => DestKind::DelayTimer,
             Dest::SoundTimer => DestKind::SoundTimer,
-            //Dest::Nowhere => DestKind::Unused,
+            Dest::PC => DestKind::PC,
         }
     }
 

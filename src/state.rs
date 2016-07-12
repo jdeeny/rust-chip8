@@ -1,11 +1,12 @@
 //! Defines the state of the Chip8 virtual machine.
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
-use std::iter::{FromIterator, repeat};
-use rand::{Rng, thread_rng};
+use std::iter::{Iterator, FromIterator, repeat};
+use rand::{Rng, thread_rng, ThreadRng};
 pub use types::*;
 use config::Config;
 use instruction::{Execute, Dest, Src};
+
 
 #[derive(Debug, Clone)]
 pub struct Locked<T>(pub Arc<RwLock<T>>);
@@ -14,11 +15,11 @@ impl<T> Locked<T> {
     pub fn new(t: T) -> Locked<T> {
         Locked(Arc::new(RwLock::new(t)))
     }
-    pub fn try_read(&self) -> &T {
-        self.try_read()
+    pub fn try_read(&self) -> RwLockReadGuard<T> {
+        self.0.try_read().unwrap()
     }
-    pub fn try_write(&mut self) -> &mut T {
-        self.try_write()
+    pub fn try_write(&mut self) -> RwLockWriteGuard<T> {
+        self.0.try_write().unwrap()
     }
 }
 
@@ -27,8 +28,7 @@ impl<T> Locked<T> {
 /// The machine state includes the RAM, registers, program counter, stack, timers, and the
 /// state of the IO subsystems.
 #[allow(dead_code)]
-#[derive(Debug, Clone)]
-pub struct Chip8 {
+pub struct Chip8<'a> {
     /// Sets the configuration of the machine.
     pub config: Config,
     /// The ram.
@@ -53,11 +53,15 @@ pub struct Chip8 {
     pub buzzer: Locked<Buzzer>,
     /// The state of the audio buffer used with XOCHIP.
     pub audio: Locked<Audio>,
+    ///
+    pub random: Option<&'a mut Iterator<Item=MemoryCell>>,
+    thread_rng: ThreadRng,
 }
 
-impl Chip8 {
+impl<'a> Chip8<'a> {
     /// Create a new Chip8 using the supplied Config.
-    pub fn new(config: &Config) -> Chip8 {
+    pub fn new(config: &Config, rand_iterator: Option<&'a mut Iterator<Item=MemoryCell>>) -> Chip8<'a> {
+
         Chip8 {
             config: *config,
             ram: Vec::from_iter(repeat(0).take(config.ram_bytes)),
@@ -71,6 +75,8 @@ impl Chip8 {
             keys: Locked::new([false; 16]),
             buzzer: Locked::new(false),
             audio: Locked::new([0; 16]),
+            random: rand_iterator,
+            thread_rng: thread_rng(),
         }
     }
 
@@ -88,7 +94,7 @@ impl Chip8 {
     }
 }
 
-impl Execute for Chip8 {
+impl<'a> Execute for Chip8<'a> {
 
     fn config(&self) -> Config {
         self.config
@@ -96,16 +102,21 @@ impl Execute for Chip8 {
 
     fn load(&mut self, src: Src) -> usize {
         match src {
-            Src::Register(r) => self.v[r] as usize,
-            Src::Address12(a) => self.ram[a] as usize,
-            Src::I => self.i as usize,
-            Src::IndirectI => self.ram[self.i as usize] as usize,
+            Src::Register(r)    => self.v[r] as usize,
+            Src::Address12(a)   => self.ram[a] as usize,
+            Src::I              => self.i as usize,
+            Src::IndirectI      => self.ram[self.i as usize] as usize,
             Src::Literal12(n12) => n12,
-            Src::Literal8(n8) => n8,
-            Src::Literal4(n4) => n4,
-            Src::SoundTimer => self.st as usize,
-            Src::DelayTimer => self.dt as usize,
-            Src::Random => (thread_rng().next_u32() & 0xFF) as usize,
+            Src::Literal8(n8)   => n8,
+            Src::Literal4(n4)   => n4,
+            Src::SoundTimer     => self.st as usize,
+            Src::DelayTimer     => self.dt as usize,
+            Src::Random         => (if let Some(ref mut r) = self.random {
+                                        r.next().unwrap_or(0)
+                                    } else {
+                                        self.thread_rng.gen::<MemoryCell>()
+                                    }) as usize,
+            Src::PC             => self.pc as usize,
         }
     }
 
@@ -128,6 +139,9 @@ impl Execute for Chip8 {
             }
             Dest::DelayTimer => {
                 self.dt = data as Timer;
+            }
+            Dest::PC => {
+                self.pc = data as Address;
             }
         }
     }
@@ -164,17 +178,17 @@ impl Execute for Chip8 {
         *self.keys.try_read()
     }
 
-    fn vram_mut(&mut self) -> &mut [Pixel] {
+    fn vram_mut(&mut self) -> RwLockWriteGuard<Vram> {
         self.vram.try_write()
     }
 
-    fn audio_mut(&mut self) -> &mut Audio {
+    fn audio_mut(&mut self) -> RwLockWriteGuard<Audio> {
         self.audio.try_write()
     }
 }
 
-impl Default for Chip8 {
+impl<'a> Default for Chip8<'a> {
     fn default() -> Self {
-        Self::new(&Config::default())
+        Self::new(&Config::default(), None)
     }
 }

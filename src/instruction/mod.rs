@@ -11,7 +11,7 @@ mod operands;
 mod instruction;
 mod set;
 
-pub use self::codec::{Decoder,Encoder};
+//pub use self::codec::{Decoder,Encoder};
 pub use self::definition::{Definition, Coding, Pattern};
 pub use self::execution::{Operation, OperationKind, Execute};
 pub use self::instruction::Instruction;

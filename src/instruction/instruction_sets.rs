@@ -3,10 +3,11 @@ use instruction::Coding::*;
 use instruction::execution::OperationKind::*;
 
 pub const CHIP8: &'static [Definition] = &[
-    Definition { op: NoOp, pattern: [C(0x0), C(0x0), C(0xE), C(0x0)] },
-    //Definition::new(OpCls,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0x0)], /*"Cls"*/),
-    /*Definition::new(op_ret,      Unused,     Unused,     Unused,     [C(0x0), C(0x0), C(0xE), C(0xE)], "Ret"),
-    Definition::new(op_jump,     Literal12,  Unused,     Unused,     [C(0x1), D,      D,      D     ], "Jump {d}"),
+    Definition { op: NoOp,              pattern: [C(0x0), C(0x0), C(0x0), C(0x0)] },
+    Definition { op: Cls,               pattern: [C(0x0), C(0x0), C(0xE), C(0x0)] },
+    Definition { op: Ret,               pattern: [C(0x0), C(0x0), C(0xE), C(0xE)] },
+    //Definition { op: Jump(Literal12),   pattern: [C(0x0), ]}
+/*    Definition::new(op_jump,     Literal12,  Unused,     Unused,     [C(0x1), D,      D,      D     ], "Jump {d}"),
     Definition::new(op_call,     Literal12,  Unused,     Unused,     [C(0x2), D,      D,      D     ], "Call {d}"),
     Definition::new(op_skipeq,   Register,   Literal8,   Unused,     [C(0x3), D,      S,      S     ], "SkipEq {d}, {s}"),
     Definition::new(op_skipneq,  Register,   Literal8,   Unused,     [C(0x4), D,      S,      S     ], "SkipNeq {d}, {s}"),

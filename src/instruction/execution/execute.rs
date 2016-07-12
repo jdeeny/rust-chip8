@@ -1,3 +1,4 @@
+use std::sync::{RwLockWriteGuard, RwLockReadGuard};
 use types::*;
 use config::Config;
 use instruction::{Dest, Src};
@@ -10,9 +11,9 @@ pub trait Execute {
     /// Returns the Config being used by the Execute
     fn config(&self) -> Config;
     /// Loads a value from the source Operand.
-    fn store(&mut self, dest: Dest, data: usize);
-    /// Stores a value into the destination Operand.
     fn load(&mut self, src: Src) -> usize;
+    /// Stores a value into the destination Operand.
+    fn store(&mut self, dest: Dest, data: usize);
     /// Pops an item off the stack
     fn stack_pop(&mut self) -> Option<Address>;
     /// Pops an item off the stack
@@ -26,9 +27,9 @@ pub trait Execute {
     /// Store a flag in vF.
     fn set_flag(&mut self, state: bool);
     /// Returns a mut reference to video buffer.
-    fn vram_mut(&mut self) -> &mut [Pixel];
+    fn vram_mut(&mut self) -> RwLockWriteGuard<Vram>;
     /// Returns the keyboard state.
     fn keyboard(&self) -> Keyboard;
     /// Returns a mut reference to the audio buffer.
-    fn audio_mut(&mut self) -> &mut Audio;
+    fn audio_mut(&mut self) -> RwLockWriteGuard<Audio>;
 }
