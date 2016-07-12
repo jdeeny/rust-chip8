@@ -1,6 +1,6 @@
 use types::*;
 use instruction::{Instruction,Pattern, Coding, Definition, SrcKind, DestKind};
-use instruction::execution::{OperationKind, Operation};
+use instruction::{OperationKind, Operation};
 
 
 

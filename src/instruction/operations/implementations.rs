@@ -1,7 +1,7 @@
 //! Generic 'microcode' implementations of the operations.
 
 use instruction::{Dest, Instruction, Src};
-use instruction::execution::Execute;
+use instruction::Execute;
 #[allow(unused_imports)]
 use config::Config;
 use types::*;

@@ -3,7 +3,7 @@ use std::clone::Clone;
 
 use types::*;
 use instruction::{Definition, Dest, Src};
-use instruction::execution::{Operation, Execute};
+use instruction::{Operation, Execute};
 
 /// A fully specified chip8 instruction.
 #[derive(Copy,Clone)]

@@ -1,6 +1,6 @@
 use instruction::{Definition, SrcKind, DestKind};
 use instruction::Coding::*;
-use instruction::execution::OperationKind::*;
+use instruction::OperationKind::*;
 
 pub const CHIP8: &'static [Definition] = &[
     Definition { op: NoOp,              pattern: [C(0x0), C(0x0), C(0x0), C(0x0)] },
