@@ -15,7 +15,7 @@
 //! `Set` and a `Chip8`. It is able to load programs and execute instructions.
 
 #![feature(inclusive_range_syntax, fnbox, plugin)]
-#![feature(question_mark)] 
+#![feature(question_mark)]
 #![plugin(drawbytes)]
 
 // enable errors for some additional lints

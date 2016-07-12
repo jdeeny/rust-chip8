@@ -11,9 +11,9 @@ pub trait Execute {
     /// Returns the Config being used by the Execute
     fn config(&self) -> Config;
     /// Loads a value from the source Operand.
-    fn load(&mut self, src: Src) -> usize;
+    fn load(&mut self, src: Src) -> Chip8Result<usize>;
     /// Stores a value into the destination Operand.
-    fn store(&mut self, dest: Dest, data: usize);
+    fn store(&mut self, dest: Dest, data: usize) -> Chip8Result<()>;
     /// Pops an item off the stack
     fn stack_pop(&mut self) -> Option<Address>;
     /// Pops an item off the stack

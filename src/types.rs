@@ -22,3 +22,10 @@ pub type Buzzer = bool;
 pub type Audio = [u8; 16];
 /// Vram
 pub type Vram = Vec<Pixel>;
+
+pub enum Chip8Error<'a> {
+    Generic(&'a str),
+    OutOfBoundsAt(usize),
+    OutOfBounds,
+}
+pub type Chip8Result<'a, T> = Result<T, Chip8Error<'a>>;
