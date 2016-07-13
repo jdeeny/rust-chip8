@@ -19,31 +19,25 @@ pub enum OperationKind {
     Load(DestKind, SrcKind),
     Stash(SrcKind),
     Fetch(SrcKind),
-
     Jump(SrcKind),
     JumpV0(SrcKind),
     Call(SrcKind),
     Ret,
-
     SkipEq(SrcKind, SrcKind),
     SkipNotEq(SrcKind, SrcKind),
     SkipKey(SrcKind),
     SkipNotKey(SrcKind),
-
     Add(DestKind, SrcKind, SrcKind),
     Sub(DestKind, SrcKind, SrcKind),
-
     Or(DestKind, SrcKind, SrcKind),
     And(DestKind, SrcKind, SrcKind),
     Xor(DestKind, SrcKind, SrcKind),
     Shr(DestKind, SrcKind),
     Shl(DestKind, SrcKind),
-
     Rand(DestKind, SrcKind, SrcKind),
-
     Cls,
     Sprite(SrcKind, SrcKind, SrcKind),
-    Font(SrcKind),
+    Font(SrcKind, SrcKind),     // Glyph number, font number - 0 is small font, 1 is big font
     Bcd(SrcKind),
     WaitKey(DestKind, SrcKind),
 }
@@ -79,7 +73,7 @@ pub enum Operation {
 
     Cls,
     Sprite(Src, Src, Src),
-    Font(Src),
+    Font(Src, Src),
     Bcd(Src),
     WaitKey(Dest, Src),
 }
@@ -119,7 +113,7 @@ impl Operation {
             Operation::Cls => OperationKind::Cls,
 
             Operation::Sprite(x, y, n) => OperationKind::Sprite(x.kind(), y.kind(), n.kind()),
-            Operation::Font(s) => OperationKind::Font(s.kind()),
+            Operation::Font(s, c) => OperationKind::Font(s.kind(), c.kind()),
             Operation::Bcd(s) => OperationKind::Bcd(s.kind()),
 
             Operation::WaitKey(d, n) => OperationKind::WaitKey(d.kind(), n.kind()),
@@ -142,7 +136,7 @@ impl Operation {
             Operation::Xor(dest, lhs, rhs)      => { implementations::xor(exec, dest, lhs, rhs) },
             Operation::Shr(dest, src)           => { implementations::shr(exec, dest, src) },
             Operation::Shl(dest, src)           => { implementations::shl(exec, dest, src) },
-            Operation::Font(glyph)              => { implementations::font(exec, glyph) },
+            Operation::Font(glyph, font)        => { implementations::font(exec, glyph, font) },
             Operation::Bcd(value)               => { implementations::bcd(exec, value) },
             Operation::SkipEq(lhs, rhs)         => { implementations::skip_eq(exec, lhs, rhs) },
             Operation::SkipNotEq(lhs, rhs)      => { implementations::skip_not_eq(exec, lhs, rhs) },

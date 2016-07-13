@@ -1,10 +1,10 @@
 //! Generic 'microcode' implementations of the operations.
 
+use types::*;
 use instruction::{Dest, Instruction, Src};
 use instruction::Execute;
-#[allow(unused_imports)]
+use fonts;
 use config::Config;
-use types::*;
 
 pub fn add(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()> {
     let l = try!(exec.load(lhs));
@@ -133,8 +133,14 @@ pub fn shl(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
     Ok(())
 }
 
-pub fn font(exec: &mut Execute, glyph: Src) -> Chip8Result<()> {
-    let addr = exec.config().addr_font + try!(exec.load(glyph)) * 5;
+pub fn font(exec: &mut Execute, glyph: Src, font: Src) -> Chip8Result<()> {
+    let font_code = try!(exec.load(font));
+    let addr;
+    if font_code == fonts::CODE_SMALL {
+        addr = exec.config().addr_font + try!(exec.load(glyph)) * 5;
+    } else {
+        addr = exec.config().addr_font_big + try!(exec.load(glyph)) * 10;
+    }
     exec.store(Dest::I, addr)
 }
 

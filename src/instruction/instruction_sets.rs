@@ -1,6 +1,7 @@
 use instruction::{Definition, SrcKind, DestKind};
 use instruction::Coding::*;
 use instruction::OperationKind::*;
+use fonts;
 
 // Possible instruction set extensions to add:
 //   http://www.mattmik.com/files/chip8/extensions/CHIP8ExtensionsReference.pdf
@@ -49,7 +50,7 @@ pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0xF), A(2),   C(0x1), C(0x5)], op: Load(DestKind::DelayTimer, SrcKind::Register) },
     Definition { pattern: [C(0xF), A(2),   C(0x1), C(0x8)], op: Load(DestKind::SoundTimer, SrcKind::Register) },
     Definition { pattern: [C(0xF), A(4),   C(0x1), C(0xE)], op: Add(DestKind::I, SrcKind::I, SrcKind::Register) },
-    Definition { pattern: [C(0xF), A(1),   C(0x2), C(0x9)], op: Font(SrcKind::Register) },
+    Definition { pattern: [C(0xF), A(1),   C(0x2), C(0x9)], op: Font(SrcKind::Register, SrcKind::Const(fonts::CODE_SMALL)) },
     Definition { pattern: [C(0xF), A(1),   C(0x3), C(0x3)], op: Bcd(SrcKind::Register) },
     Definition { pattern: [C(0xF), A(1),   C(0x5), C(0x5)], op: Stash(SrcKind::Register) },
     Definition { pattern: [C(0xF), A(1),   C(0x6), C(0x5)], op: Fetch(SrcKind::Register) },
@@ -62,7 +63,7 @@ pub const SUPERCHIP: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xD)], op: NoOp /*Exit*/ },
     Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xE)], op: NoOp /*LowRes*/ },
     Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xF)], op: NoOp /*HighRes*/ },
-    Definition { pattern: [C(0xD), A(1),   C(0x3), C(0x0)], op: NoOp /*BigFont(SrcKind::Register)*/ },
+    Definition { pattern: [C(0xD), A(1),   C(0x3), C(0x0)], op: Font(SrcKind::Register, SrcKind::Const(fonts::CODE_BIG)) },
     Definition { pattern: [C(0xF), A(1),   C(0x7), C(0x5)], op: NoOp /*SaveFlags(SrcKind::Register)*/},
     Definition { pattern: [C(0xF), A(1),   C(0x8), C(0x5)], op: NoOp /*LoadFlags(SrcKind::Register)*/},
 ];

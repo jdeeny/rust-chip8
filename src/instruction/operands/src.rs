@@ -6,6 +6,8 @@
 /// value, or address is not known.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum SrcKind {
+    /// A constant value.
+    Const(usize),
     /// A register, v0-vF.
     Register,
     /// A 12-bit address.
@@ -39,6 +41,7 @@ impl SrcKind {
     /// specified.
     pub fn specify(&self, data: usize) -> Src {
         match *self {
+            SrcKind::Const(n) => Src::Const(n),
             SrcKind::Register => Src::Register(data),
             SrcKind::I => Src::I,
             SrcKind::Address12 => Src::Address12(data),
@@ -61,6 +64,8 @@ impl SrcKind {
 /// This is a fully specified operand, including the particular register, address, or value.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Src {
+    /// A constant value from the instruction definition.
+    Const(usize),
     /// A register, v0-vF.
     Register(usize),
     /// A 12-bit address.
@@ -88,6 +93,7 @@ pub enum Src {
 impl Src {
     pub fn kind(&self) -> SrcKind {
         match *self {
+            Src::Const(n) => SrcKind::Const(n),
             Src::Register(_) => SrcKind::Register,
             Src::I => SrcKind::I,
             Src::Address12(_) => SrcKind::Address12,

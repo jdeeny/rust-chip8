@@ -1,6 +1,10 @@
 //! Chip8 fonts
 use types::MemoryCell;
 
+
+pub const CODE_SMALL: usize = 0;
+pub const CODE_BIG: usize = 1;
+
 /// Each glyph is 5 bytes. The most significant 4 bits are used.
 pub type Font4x5 = [MemoryCell; 5 * 16];
 

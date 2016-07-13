@@ -142,7 +142,7 @@ impl<'a> Execute for Chip8<'a> {
 
     fn load(&mut self, src: Src) -> Chip8Result<usize> {
         match src {
-//            Src::Register(r)    => Checked(&self.v).get(r),
+            Src::Const(n)       => Ok(n),
             Src::Register(r)    => self.v.get(r).map(|reg| *reg as usize).ok_or(Chip8Error::OutOfBoundsAt(r)),
             Src::Address12(a)   => self.ram.get(a).map(|cell| *cell as usize).ok_or(Chip8Error::OutOfBoundsAt(a)),
             Src::I              => Ok(self.i as usize),

@@ -24,8 +24,12 @@ pub struct Config {
     pub addr_program: usize,
     /// Sets the base address where the system font will be loaded.
     pub addr_font: usize,
+    /// Sets the base address where the system large font will be loaded.
+    pub addr_font_big: usize,
     /// Sets the small font.
     pub font_small: &'static Font4x5,
+    /// Sets the big font.
+    pub font_big: &'static Font4x5,
     /// When true, shifts modify vx in place and ignore vy.
     pub quirk_shift: bool,
 
@@ -70,7 +74,9 @@ pub mod presets {
         vram_size: 64*32,
         addr_program: 0x0200,
         addr_font: 0x0000,
+        addr_font_big: 0x0050,
         font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
+        font_big: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
         quirk_shift: false,
         isa_chip8: true,
         isa_superchip: false,
