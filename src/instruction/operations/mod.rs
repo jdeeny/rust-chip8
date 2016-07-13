@@ -17,8 +17,8 @@ use instruction::{Dest, Src, DestKind, SrcKind };
 pub enum OperationKind {
     NoOp,
     Load(DestKind, SrcKind),
-    Stash(SrcKind),
-    Fetch(SrcKind),
+    Stash(SrcKind, SrcKind),
+    Fetch(SrcKind, SrcKind),
     Jump(SrcKind),
     JumpV0(SrcKind),
     Call(SrcKind),
@@ -47,8 +47,8 @@ pub enum OperationKind {
 pub enum Operation {
     NoOp,
     Load(Dest, Src),
-    Stash(Src),
-    Fetch(Src),
+    Stash(Src, Src),
+    Fetch(Src, Src),
 
     Jump(Src),
     JumpV0(Src),
@@ -85,8 +85,8 @@ impl Operation {
             Operation::NoOp => OperationKind::NoOp,
             Operation::Load(d, s) => OperationKind::Load(d.kind(), s.kind()),
 
-            Operation::Stash(s) => OperationKind::Stash(s.kind()),
-            Operation::Fetch(s) => OperationKind::Fetch(s.kind()),
+            Operation::Stash(f, l) => OperationKind::Stash(f.kind(), l.kind()),
+            Operation::Fetch(f, l) => OperationKind::Fetch(f.kind(), l.kind()),
 
             Operation::Jump(d) => OperationKind::Jump(d.kind()),
             Operation::JumpV0(d) => OperationKind::JumpV0(d.kind()),
@@ -144,8 +144,8 @@ impl Operation {
             Operation::SkipNotKey(key)          => { implementations::skip_key_not_pressed(exec, key) },
             Operation::WaitKey(dest, key)       => { implementations::wait_key(exec, dest, key) },
             Operation::Cls                      => { implementations::clear_screen(exec) },
-            Operation::Stash(last)              => { implementations::stash(exec, last) },
-            Operation::Fetch(last)              => { implementations::fetch(exec, last) },
+            Operation::Stash(first, last)       => { implementations::stash(exec, first, last) },
+            Operation::Fetch(first, last)       => { implementations::fetch(exec, first, last) },
             Operation::Rand(dest, src, mask)    => { implementations::random(exec, dest, src, mask) },
             Operation::Sprite(x, y, n)          => { implementations::sprite(exec, x, y, n) },
         }

@@ -170,11 +170,7 @@ impl<'a> Execute for Chip8<'a> {
     }
 
     fn set_flag(&mut self, flag: bool) {
-        self.v[0xF] = if flag {
-            1
-        } else {
-            0
-        };
+        self.v[0xF] = if flag { 1 } else { 0 };
     }
 
     fn stack_pop(&mut self) -> Option<Address> {

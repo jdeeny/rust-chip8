@@ -29,28 +29,25 @@ pub fn load(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
 }
 
 // Stores registers v0.. to ram[I]
-pub fn stash(exec: &mut Execute, last: Src) -> Chip8Result<()> {
-    let last_reg = if let Src::Register(r) = last {
-        r
-    } else {
-        return Err(Chip8Error::InvalidOperand)
-    };
+pub fn stash(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
+    let first_reg = if let Src::Register(r) = first { r } else { return Err(Chip8Error::InvalidOperand) };
+    let last_reg = if let Src::Register(r) = last { r } else { return Err(Chip8Error::InvalidOperand) };
 
     let i = try!(exec.load(Src::I));
-    for r in 0...last_reg {
+    let mut offset = 0;
+    for r in first_reg...last_reg {
         let value = try!(exec.load(Src::Register(r)));
-        try!(exec.store(Dest::Address12(i + r), value));
+        try!(exec.store(Dest::Address12(i + offset), value));
+        offset += 1;
     }
-    exec.store(Dest::I, i + last_reg + 1)
+    exec.store(Dest::I, i + offset)
 }
 
 // Fetches several bytes, pointed to by I, into v0..
-pub fn fetch(exec: &mut Execute, last: Src) -> Chip8Result<()> {
-    let last_reg = if let Src::Register(r) = last {
-        r
-    } else {
-        return Err(Chip8Error::InvalidOperand)
-    };
+pub fn fetch(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
+    let first_reg = if let Src::Register(r) = first { r } else { return Err(Chip8Error::InvalidOperand) };
+    let last_reg = if let Src::Register(r) = last { r } else { return Err(Chip8Error::InvalidOperand) };
+
     let i = try!(exec.load(Src::I));
     for r in 0...last_reg {
         let value = try!(exec.load(Src::Address12(i + r)));
