@@ -4,19 +4,6 @@
 //! This crate contains tools to enable working with [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
 //! virtual machine instructions and a CHIP-8 virtual machine simulator.
 //!
-//! Instruction defintions for the original CHIP-8 instruction set and several instruction set
-//! extensions are provided. Decoding and encoding functions are provided to enable converting
-//! from binary codewords to an abstract instruction representation and vice versa.
-//!
-//! A CHIP-8 virtual machine simulator system is provided to allow the creation of CHIP-8 emulators
-//! or other tools that need to execute CHIP-8 instructions. The simulator provides a thread-safe
-//! mechanism for simulator control and access to system state.
-//!
-//! A flexible configuration system allows customization of the CHIP-8 virtual machine, including
-//! available instructions, hardware configuration, and execution quirks of the CHIP-8 virtual
-//! machine. Several preset configurations corresponding to historical CHIP-8 machines, such as
-//! the COSMAC VIP, are provided.
-//!
 //! ## Configuration
 //!
 //! A `Config` is used to store the configuration of a specific CHIP-8 system. A `Config` is

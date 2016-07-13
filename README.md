@@ -2,9 +2,11 @@
 
 ## Introduction
 This crate contains tools to enable working with [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
-virtual machine instructions and a CHIP-8 virtual machine simulator.
+virtual machine instructions and a CHIP-8 virtual machine simulator. It is
+intended to be used as the core of CHIP-8 emulators, CHIP-8 assemblers, CHIP-8
+disassmblers, and other programs that need to deal with CHIP-8 instructions.
 
-Instruction defintions for the original CHIP-8 instruction set and several instruction set
+Instruction definitions for the original CHIP-8 instruction set and several instruction set
 extensions are provided. Decoding and encoding functions are provided to enable converting
 from binary codewords to an abstract instruction representation and vice versa.
 
