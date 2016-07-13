@@ -1,6 +1,6 @@
 //! # A CHIP-8 cpu simulator and instruction coding/decoding library.
 //!
-//! ## Instroduction
+//! ## Introduction
 //! This crate contains tools to enable working with [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
 //! virtual machine instructions and a CHIP-8 virtual machine simulator.
 //!
@@ -35,7 +35,7 @@
 //! and return `instruction::Instruction`s and *encode* `instruction::Instruction`s into codewords.
 //!
 //! `Definition`s and `Instruction`s are very similar, but a key difference sets them apart - a
-//! `Definition` only stores the *kind* of operands that will be used and the `Instrucion` stores
+//! `Definition` only stores the *kind* of operands that will be used and the `Instruction` stores
 //! the specific operands that will be used. When a codeword is decoded, information about the
 //! operands is extracted based on the pattern in the definition. For example, a generic 'Register'
 //! operand in a `Definition` could be specified as 'the v6 register' when the Instruction is
