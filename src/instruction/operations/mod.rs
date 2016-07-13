@@ -45,7 +45,7 @@ pub enum OperationKind {
     Sprite(SrcKind, SrcKind, SrcKind),
     Font(SrcKind),
     Bcd(SrcKind),
-    WaitKey(SrcKind),
+    WaitKey(DestKind, SrcKind),
 }
 
 
@@ -81,7 +81,7 @@ pub enum Operation {
     Sprite(Src, Src, Src),
     Font(Src),
     Bcd(Src),
-    WaitKey(Src),
+    WaitKey(Dest, Src),
 }
 
 impl Operation {
@@ -122,7 +122,7 @@ impl Operation {
             Operation::Font(s) => OperationKind::Font(s.kind()),
             Operation::Bcd(s) => OperationKind::Bcd(s.kind()),
 
-            Operation::WaitKey(n) => OperationKind::WaitKey(n.kind()),
+            Operation::WaitKey(d, n) => OperationKind::WaitKey(d.kind(), n.kind()),
         }
     }
 
@@ -148,7 +148,7 @@ impl Operation {
             Operation::SkipNotEq(lhs, rhs)      => { implementations::skip_not_eq(exec, lhs, rhs) },
             Operation::SkipKey(key)             => { implementations::skip_key_pressed(exec, key) },
             Operation::SkipNotKey(key)          => { implementations::skip_key_not_pressed(exec, key) },
-            Operation::WaitKey(key)             => { implementations::wait_key(exec, key) },
+            Operation::WaitKey(dest, key)       => { implementations::wait_key(exec, dest, key) },
             Operation::Cls                      => { implementations::clear_screen(exec) },
             Operation::Stash(last)              => { implementations::stash(exec, last) },
             Operation::Fetch(last)              => { implementations::fetch(exec, last) },

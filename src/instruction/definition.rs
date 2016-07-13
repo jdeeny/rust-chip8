@@ -9,6 +9,7 @@ pub type Pattern = [Coding; 4];
 /// Used to define the coding of each instruction type
 #[derive(Clone,Copy,Debug)]
 pub enum Coding {
+    /// Nibble applies to an argument.
     A(usize),
     /// A literal value
     C(u8),

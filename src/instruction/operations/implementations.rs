@@ -180,7 +180,7 @@ pub fn skip_key_not_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
 }
 
 /// Halt execution until a key is pressed.
-pub fn wait_key(exec: &mut Execute, key: Src) -> Chip8Result<()> {
+pub fn wait_key(exec: &mut Execute, dest: Dest, key: Src) -> Chip8Result<()> {
     Ok(())
 }
 
