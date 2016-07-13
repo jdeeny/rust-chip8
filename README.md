@@ -1,6 +1,5 @@
-# rust-chip8 - CHIP-8 simulation and instruction coding/decoding library.
+# rust-chip8
 
-## Introduction
 This crate contains tools to enable working with [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
 virtual machine instructions and a CHIP-8 virtual machine simulator. It is
 intended to be used as the core of CHIP-8 emulators, CHIP-8 assemblers, CHIP-8
