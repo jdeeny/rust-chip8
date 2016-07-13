@@ -3,12 +3,19 @@ use instruction::Coding::*;
 use instruction::OperationKind::*;
 
 // Possible instruction set extensions to add:
-//  http://www.mattmik.com/files/chip8/extensions/CHIP8ExtensionsReference.pdf
-// Chip-8C, Chip-8I, Chip-10, Chip-8 II, Hi-Res Chip-8, Chip-8III, Chip-8E, Chip-8X, Chip-8Y,
-// Chip-8M, Mega-Chip8
-
+//   http://www.mattmik.com/files/chip8/extensions/CHIP8ExtensionsReference.pdf
+// Unlikely:
+//   Chip-8C (limited info), Chip-8I (adds hardware IO), Chip-8 II (more hardware IO, for ASCII keyboard), Chip-8III (capability of Chip-8I&II but
+//   maintains compatibility with original Chip8), Chip-8E (14 new instructions and hardware IO), Chip-8Y (hardware IO and compatibility)
+// Might just be machine config changes
+//   Chip-10 (Expanded resolution of 128x64)
+//   Hi-Res Chip-8 (128x64 resolution, faster),
+// Interesting:
+//   MegaChip8 - Adds color
+//   Chip-8X - Big update from RCA with color, sound, 2nd keypad
+//   Chip-8M (Add morse code; http://www.mattmik.com/files/viper/Volume4Issue05.pdf)
 // Already added:
-//  Original Chip8, SuperChip, XOChip
+//   Original Chip8, SuperChip, XOChip
 
 pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0), C(0x0), C(0x0)], op: NoOp },
@@ -55,18 +62,16 @@ pub const SUPERCHIP: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xD)], op: NoOp /*Exit*/ },
     Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xE)], op: NoOp /*LowRes*/ },
     Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xF)], op: NoOp /*HighRes*/ },
-    Definition { pattern: [C(0xD), A(1),   C(0x3), C(0x0)], op: NoOp /*BigFont*/ },
-    Definition { pattern: [C(0xF), A(1),   C(0x7), C(0x5)], op: NoOp /*SaveFlags*/},
-    Definition { pattern: [C(0xF), A(1),   C(0x8), C(0x5)], op: NoOp /*LoadFlags*/},
+    Definition { pattern: [C(0xD), A(1),   C(0x3), C(0x0)], op: NoOp /*BigFont(SrcKind::Register)*/ },
+    Definition { pattern: [C(0xF), A(1),   C(0x7), C(0x5)], op: NoOp /*SaveFlags(SrcKind::Register)*/},
+    Definition { pattern: [C(0xF), A(1),   C(0x8), C(0x5)], op: NoOp /*LoadFlags(SrcKind::Register)*/},
 ];
 
 pub const XOCHIP: &'static [Definition] = &[
-    Definition { pattern: [C(0x5), A(1),   A(2),   C(0x2)], op: NoOp /*StashRange*/ },
-    Definition { pattern: [C(0x5), A(1),   A(2),   C(0x3)], op: NoOp /*FetchRange*/ },
+    Definition { pattern: [C(0x5), A(1),   A(2),   C(0x2)], op: NoOp /*StashRange(SrcKind::Literal4, SrcKind::Literal4)*/ },
+    Definition { pattern: [C(0x5), A(1),   A(2),   C(0x3)], op: NoOp /*FetchRange(SrcKind::Literal4, SrcKind::Literal4)*/ },
     Definition { pattern: [C(0xF), C(0x0), C(0x0), C(0x0)], op: NoOp /*LoadI16*/ },
-    Definition { pattern: [C(0xF), A(1),   C(0x0), C(0x1)], op: NoOp /*SelectDrawPlane*/ },
+    Definition { pattern: [C(0xF), A(1),   C(0x0), C(0x1)], op: NoOp /*SelectDrawPlane(SrcKind::Literal4)*/ },
     Definition { pattern: [C(0xF), A(1),   C(0x0), C(0x2)], op: NoOp /*StoreAudio*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xD), A(1)],   op: NoOp /*ScrollUp*/ },
+    Definition { pattern: [C(0x0), C(0x0), C(0xD), A(1)],   op: NoOp /*ScrollUp(SrcKind::Literal4)*/ },
 ];
-
-pub const : &'static [Definition] = &[];
