@@ -21,19 +21,18 @@ use fonts;
 const A1:usize = 1;
 const A2:usize = 2;
 const A3:usize = 4;
-const A4:usize = 8;
 
 pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0),   C(0x0),   C(0x0)], op: NoOp },
     Definition { pattern: [C(0x0), C(0x0),   C(0xE),   C(0x0)], op: Cls },
     Definition { pattern: [C(0x0), C(0x0),   C(0xE),   C(0xE)], op: Ret },
-    Definition { pattern: [C(0x1), A(A1),    A(A1),    A(A1)  ], op: Jump(SrcKind::Address12) },
-    Definition { pattern: [C(0x2), A(A1),    A(A1),    A(A1)  ], op: Call(SrcKind::Address12) },
-    Definition { pattern: [C(0x3), A(A1),    A(A2),    A(A2)  ], op: SkipEq(SrcKind::Register, SrcKind::Literal8) },
-    Definition { pattern: [C(0x4), A(A1),    A(A2),    A(A3)  ], op: SkipNotEq(SrcKind::Register, SrcKind::Literal8) },
+    Definition { pattern: [C(0x1), A(A1),    A(A1),    A(A1) ], op: Jump(SrcKind::Address12) },
+    Definition { pattern: [C(0x2), A(A1),    A(A1),    A(A1) ], op: Call(SrcKind::Address12) },
+    Definition { pattern: [C(0x3), A(A1),    A(A2),    A(A2) ], op: SkipEq(SrcKind::Register, SrcKind::Literal8) },
+    Definition { pattern: [C(0x4), A(A1),    A(A2),    A(A3) ], op: SkipNotEq(SrcKind::Register, SrcKind::Literal8) },
     Definition { pattern: [C(0x5), A(A1),    A(A2),    C(0x0)], op: SkipEq(SrcKind::Register, SrcKind::Register) },
-    Definition { pattern: [C(0x6), A(A1),    A(A2),    A(A2)  ], op: Load(DestKind::Register, SrcKind::Literal8) },
-    Definition { pattern: [C(0x7), A(A1|A2), A(A3),    A(A3)  ], op: Add(DestKind::Register, SrcKind::Register, SrcKind::Literal8) },
+    Definition { pattern: [C(0x6), A(A1),    A(A2),    A(A2) ], op: Load(DestKind::Register, SrcKind::Literal8) },
+    Definition { pattern: [C(0x7), A(A1|A2), A(A3),    A(A3) ], op: Add(DestKind::Register, SrcKind::Register, SrcKind::Literal8) },
     Definition { pattern: [C(0x8), A(A1),    A(A2),    C(0x0)], op: Load(DestKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x8), A(A1|A3), A(A3),    C(0x1)], op: Or(DestKind::Register, SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x8), A(A1|A3), A(A3),    C(0x2)], op: And(DestKind::Register, SrcKind::Register, SrcKind::Register) },
@@ -44,10 +43,10 @@ pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x8), A(A1),    A(A2|A3), C(0x7)], op: Sub(DestKind::Register, SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x8), A(A1),    A(A2),    C(0xE)], op: Shl(DestKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x9), A(A1),    A(A2),    C(0x0)], op: SkipNotEq(SrcKind::Register, SrcKind::Register) },
-    Definition { pattern: [C(0xA), A(A1),    A(A1),    A(A1)  ], op: Load(DestKind::I, SrcKind::Literal12 ) },
-    Definition { pattern: [C(0xB), A(A1),    A(A1),    A(A1)  ], op: JumpV0(SrcKind::Literal12 ) },
-    Definition { pattern: [C(0xC), A(A1),    A(A3),    A(A3)  ], op: Rand(DestKind::Register, SrcKind::Random, SrcKind::Literal8) },
-    Definition { pattern: [C(0xD), A(A1),    A(A2),    A(A3)  ], op: Sprite(SrcKind::Register, SrcKind::Register, SrcKind::Literal4) },
+    Definition { pattern: [C(0xA), A(A1),    A(A1),    A(A1) ], op: Load(DestKind::I, SrcKind::Literal12 ) },
+    Definition { pattern: [C(0xB), A(A1),    A(A1),    A(A1) ], op: JumpV0(SrcKind::Literal12 ) },
+    Definition { pattern: [C(0xC), A(A1),    A(A3),    A(A3) ], op: Rand(DestKind::Register, SrcKind::Random, SrcKind::Literal8) },
+    Definition { pattern: [C(0xD), A(A1),    A(A2),    A(A3) ], op: Sprite(SrcKind::Register, SrcKind::Register, SrcKind::Literal4) },
     Definition { pattern: [C(0xE), A(A1),    C(0x9),   C(0xE)], op: SkipKey(SrcKind::Register) },
     Definition { pattern: [C(0xE), A(A1),    C(0xA),   C(0x1)], op: SkipNotKey(SrcKind::Register) },
     Definition { pattern: [C(0xF), A(A1),    C(0x0),   C(0x7)], op: Load(DestKind::Register, SrcKind::DelayTimer) },
@@ -62,22 +61,22 @@ pub const CHIP8: &'static [Definition] = &[
 ];
 
 pub const SUPERCHIP: &'static [Definition] = &[
-    Definition { pattern: [C(0x0), C(0x0), C(0xC), A(A1)],   op: NoOp /*ScrollDown(SrcKind::Literal4)*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xB)], op: NoOp /*ScrollRight*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xC)], op: NoOp /*ScrollLeft*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xD)], op: NoOp /*Exit*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xE)], op: NoOp /*LowRes*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xF), C(0xF)], op: NoOp /*HighRes*/ },
-    Definition { pattern: [C(0xD), A(A1),   C(0x3), C(0x0)], op: Font(SrcKind::Register, SrcKind::Const(fonts::CODE_BIG)) },
-    Definition { pattern: [C(0xF), A(A1),   C(0x7), C(0x5)], op: NoOp /*SaveFlags(SrcKind::Register)*/},
-    Definition { pattern: [C(0xF), A(A1),   C(0x8), C(0x5)], op: NoOp /*LoadFlags(SrcKind::Register)*/},
+    Definition { pattern: [C(0x0), C(0x0),   C(0xC),   A(A1)],  op: NoOp /*ScrollDown(SrcKind::Literal4)*/ },
+    Definition { pattern: [C(0x0), C(0x0),   C(0xF),   C(0xB)], op: NoOp /*ScrollRight*/ },
+    Definition { pattern: [C(0x0), C(0x0),   C(0xF),   C(0xC)], op: NoOp /*ScrollLeft*/ },
+    Definition { pattern: [C(0x0), C(0x0),   C(0xF),   C(0xD)], op: NoOp /*Exit*/ },
+    Definition { pattern: [C(0x0), C(0x0),   C(0xF),   C(0xE)], op: NoOp /*LowRes*/ },
+    Definition { pattern: [C(0x0), C(0x0),   C(0xF),   C(0xF)], op: NoOp /*HighRes*/ },
+    Definition { pattern: [C(0xD), A(A1),    C(0x3),   C(0x0)], op: Font(SrcKind::Register, SrcKind::Const(fonts::CODE_BIG)) },
+    Definition { pattern: [C(0xF), A(A1),    C(0x7),   C(0x5)], op: NoOp /*SaveFlags(SrcKind::Register)*/},
+    Definition { pattern: [C(0xF), A(A1),    C(0x8),   C(0x5)], op: NoOp /*LoadFlags(SrcKind::Register)*/},
 ];
 
 pub const XOCHIP: &'static [Definition] = &[
-    Definition { pattern: [C(0x5), A(A1),   A(A2),   C(0x2)], op: Stash(SrcKind::Literal4, SrcKind::Literal4) },
-    Definition { pattern: [C(0x5), A(A1),   A(A2),   C(0x3)], op: Fetch(SrcKind::Literal4, SrcKind::Literal4) },
-    Definition { pattern: [C(0xF), C(0x0), C(0x0), C(0x0)], op: NoOp /*LoadI16*/ },
-    Definition { pattern: [C(0xF), A(A1),   C(0x0), C(0x1)], op: NoOp /*SelectDrawPlane(SrcKind::Literal4)*/ },
-    Definition { pattern: [C(0xF), A(A1),   C(0x0), C(0x2)], op: NoOp /*StoreAudio*/ },
-    Definition { pattern: [C(0x0), C(0x0), C(0xD), A(A1)],   op: NoOp /*ScrollUp(SrcKind::Literal4)*/ },
+    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x2)], op: Stash(SrcKind::Literal4, SrcKind::Literal4) },
+    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x3)], op: Fetch(SrcKind::Literal4, SrcKind::Literal4) },
+    Definition { pattern: [C(0xF), C(0x0),  C(0x0),    C(0x0)], op: NoOp /*LoadI16*/ },
+    Definition { pattern: [C(0xF), A(A1),   C(0x0),    C(0x1)], op: NoOp /*SelectDrawPlane(SrcKind::Literal4)*/ },
+    Definition { pattern: [C(0xF), A(A1),   C(0x0),    C(0x2)], op: NoOp /*StoreAudio*/ },
+    Definition { pattern: [C(0x0), C(0x0),  C(0xD),    A(A1)],  op: NoOp /*ScrollUp(SrcKind::Literal4)*/ },
 ];
