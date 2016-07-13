@@ -1,4 +1,4 @@
-# rust-chip8: A CHIP-8 CPU simulator and instruction coding/decoding library.
+# rust-chip8 - CHIP-8 simulation and instruction coding/decoding library.
 
 ## Introduction
 This crate contains tools to enable working with [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
