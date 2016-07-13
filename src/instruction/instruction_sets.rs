@@ -2,6 +2,14 @@ use instruction::{Definition, SrcKind, DestKind};
 use instruction::Coding::*;
 use instruction::OperationKind::*;
 
+// Possible instruction set extensions to add:
+//  http://www.mattmik.com/files/chip8/extensions/CHIP8ExtensionsReference.pdf
+// Chip-8C, Chip-8I, Chip-10, Chip-8 II, Hi-Res Chip-8, Chip-8III, Chip-8E, Chip-8X, Chip-8Y,
+// Chip-8M, Mega-Chip8
+
+// Already added:
+//  Original Chip8, SuperChip, XOChip
+
 pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0), C(0x0), C(0x0)], op: NoOp },
     Definition { pattern: [C(0x0), C(0x0), C(0xE), C(0x0)], op: Cls },
@@ -60,3 +68,5 @@ pub const XOCHIP: &'static [Definition] = &[
     Definition { pattern: [C(0xF), A(1),   C(0x0), C(0x2)], op: NoOp /*StoreAudio*/ },
     Definition { pattern: [C(0x0), C(0x0), C(0xD), A(1)],   op: NoOp /*ScrollUp*/ },
 ];
+
+pub const : &'static [Definition] = &[];
