@@ -12,9 +12,11 @@
 //! use chip8::{Simulator, Simulate};
 //! use chip8::instruction::Src::Register;
 //! let mut chip8 = Simulator::default();
-//! //A simple program: LD v6, 25  /  LD v7, 17  /  ADD v6, v7
+//! // A simple program: LD v6, 25  /  LD v7, 17  /  ADD v6, v7
 //! chip8.load_program( &[0x66, 0x19, 0x67, 0x11, 0x86, 0x74] ).unwrap();
+//! // Execute three instructions.
 //! chip8.step_n(3).unwrap();
+//! // Fetch the contents of register v6.
 //! let result = chip8.load(Register(6)).unwrap();
 //! assert_eq!( result, 25+17 );
 //! ```
