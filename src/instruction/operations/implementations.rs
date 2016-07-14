@@ -33,6 +33,8 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
     let first_reg = if let Src::Register(r) = first { r } else { return Err(Chip8Error::InvalidOperand) };
     let last_reg = if let Src::Register(r) = last { r } else { return Err(Chip8Error::InvalidOperand) };
 
+    println!("stash {:?}-{:?}", first_reg, last_reg);
+
     let i = try!(exec.load(Src::I));
     let mut offset = 0;
     for r in first_reg...last_reg {
@@ -45,9 +47,21 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
 
 // Fetches several bytes, pointed to by I, into v0..
 pub fn fetch(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
-    let first_reg = if let Src::Register(r) = first { r } else { return Err(Chip8Error::InvalidOperand) };
-    let last_reg = if let Src::Register(r) = last { r } else { return Err(Chip8Error::InvalidOperand) };
+    println!("fetch {:?} {:?}", first, last);
+    let first_reg = match first {
+        Src::Register(r) => r,
+        Src::Const(n) => n,
+        _ => { return Err(Chip8Error::InvalidOperand) },
+    };
 
+    let last_reg = match last {
+        Src::Register(r) => r,
+        Src::Const(n) => n,
+        _ => { return Err(Chip8Error::InvalidOperand) },
+    };
+
+
+    println!("fetch {:?}-{:?}", first_reg, last_reg);
     let i = try!(exec.load(Src::I));
     for r in 0...last_reg {
         let value = try!(exec.load(Src::Address12(i + r)));

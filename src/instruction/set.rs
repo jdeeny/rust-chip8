@@ -76,9 +76,11 @@ impl Set {
     pub fn decode(&self, codeword: Codeword) -> Option<Instruction> {
         for i in &self.table {
             if i.code_matcher.is_match(codeword) {
+                println!("decoded {:X}", codeword);
                 return Some(Instruction::new(i.definition.specify(codeword)))
             }
         }
+        println!("failed to decode {:X}", codeword);
         None
     }
 

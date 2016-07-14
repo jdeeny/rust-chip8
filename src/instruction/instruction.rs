@@ -92,8 +92,8 @@ impl Instruction {
         self.operation.clone()
     }
 
-    pub fn execute(&self, cpu: &mut Execute) {
-        self.operation.execute(cpu);
+    pub fn execute(&self, cpu: &mut Execute) -> Chip8Result<()> {
+        self.operation.execute(cpu)
     }
 
 }
@@ -111,6 +111,6 @@ impl Instruction {
 
 impl fmt::Debug for Instruction {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Instruction")
+        write!(f, "Instruction {:?}", self.operation)
     }
 }

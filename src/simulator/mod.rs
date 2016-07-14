@@ -79,7 +79,7 @@ impl<'a> Simulate for Simulator<'a> {
     }
     fn step(&mut self) -> Chip8Result<()> {
         let instruction = self.decode_at_addr(self.core.pc());
-        println!("{:?}", instruction);
+        println!("{:?} @ {:X}", instruction, self.core.pc());
         self.core.advance_pc();
         self.execute(&instruction);
         Ok(())

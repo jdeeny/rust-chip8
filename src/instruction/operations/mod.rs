@@ -38,7 +38,7 @@ pub enum OperationKind {
 }
 
 
-#[derive(Copy,Clone,Eq,PartialEq)]
+#[derive(Copy,Clone,Eq,PartialEq,Debug)]
 pub enum Operation {
     NoOp,
     Load(Dest, Src),
