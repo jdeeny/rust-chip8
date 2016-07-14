@@ -2,7 +2,6 @@
 
 use types::*;
 use instruction::{Dest, Instruction, Src};
-use instruction::Execute;
 use fonts;
 use config::Config;
 

@@ -1,6 +1,6 @@
 
 use simulator::{Simulator, Simulate};
-use instruction::{Execute, Src};
+use instruction::{Src};
 use config::Config;
 use types::Address;
 

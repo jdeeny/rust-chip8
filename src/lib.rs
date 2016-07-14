@@ -1,12 +1,29 @@
 //! # A CHIP-8 cpu simulator and instruction coding/decoding library.
 //!
-//! ## Introduction
-//! This crate contains tools to enable working with [CHIP-8](https://en.wikipedia.org/wiki/CHIP-8)
-//! virtual machine instructions and a CHIP-8 virtual machine simulator.
+//! `chip8` provides tools to enable working with
+//! [CHIP-8 virtual machine](https://en.wikipedia.org/wiki/CHIP-8)
+//! instructions, and a CHIP-8 virtual machine simulator. No GUI is provided,
+//! it is intended to be used by another crate. For example, this crate could:
+//!  - encode abstract instructions into CHIP-8 codewords for a CHIP-8 assembler
+//!  - decode CHIP-8 binary machine codes into abstract instruction objects for a CHIP-8 disassembler
+//!  - decode instructions and execute them in a CHIP-8 virtual machine as the core of a GUI CHIP-8 emulator
+//!
+//! ```rust
+//! use chip8::{Simulator, Simulate};
+//! use chip8::instruction::Src::Register;
+//! let mut chip8 = Simulator::default();
+//! //A simple program: LD v6, 25  /  LD v7, 17  /  ADD v6, v7
+//! chip8.load_program( &[0x66, 0x19, 0x67, 0x11, 0x86, 0x24] ).unwrap();
+//! chip8.step_n(3).unwrap();
+//! let result = chip8.load(Register(6)).unwrap();
+//! assert_eq!( result, 25+17 );
+//! ```
+//!
+//!
+//!
 //!
 //! ## Configuration
-//!
-//! A `Config` is used to store the configuration of a specific CHIP-8 system. A `Config` is
+//! A `Config` stores the configuration of a CHIP-8 system. It contains the A `Config` is
 //! used when instantiating machine state or an instruction set.
 //!
 //! ## Instructions
@@ -76,7 +93,7 @@ mod types;
 pub use config::Config;
 pub use types::*;
 pub use state::Chip8;
-pub use simulator::Simulator;
+pub use simulator::{Simulator, Simulate};
 
 #[cfg(test)]
 mod tests {

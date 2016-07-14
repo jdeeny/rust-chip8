@@ -6,7 +6,7 @@
 use std::fmt::{self, Debug};
 use fonts::Font4x5;
 use instruction::Set;
-use self::presets::*;
+pub use self::presets::*;
 
 /// Defines the configuration of the chip8 system being used.
 ///
@@ -59,16 +59,16 @@ impl Debug for Config {
     }
 }
 
-pub mod presets {
+mod presets {
     use config::Config;
     use fonts::*;
     /// The default configuration.
-    pub const DEFAULT: Config = COSMAC_VIP_STOCK;
+    pub const DEFAULT: Config = COSMAC_VIP;
 
     /// Configuration of a stock COSMAC VIP
     ///
     /// Reference: https://en.wikipedia.org/wiki/COSMAC_VIP
-    pub const COSMAC_VIP_STOCK: Config = Config {
+    pub const COSMAC_VIP: Config = Config {
         ram_bytes: 2048,
         stack_size: 12,
         vram_size: 64*32,

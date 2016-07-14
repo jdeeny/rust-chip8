@@ -3,15 +3,10 @@
 //! An `OperationKind` can be converted to an Operation by
 
 use std::boxed::FnBox;
-
-mod execute;
-mod implementations;
-
-pub use self::execute::Execute;
-
 use types::*;
 use instruction::{Dest, Src, DestKind, SrcKind };
-// use self::implementations::*;
+
+mod implementations;
 
 #[derive(Copy,Clone,Eq,PartialEq)]
 pub enum OperationKind {

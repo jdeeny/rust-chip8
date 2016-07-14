@@ -5,7 +5,7 @@ use std::iter::{Iterator, FromIterator, repeat};
 use rand::{Rng, thread_rng, ThreadRng};
 pub use types::*;
 use config::Config;
-use instruction::{Execute, Dest, Src};
+use instruction::{Dest, Src};
 
 
 pub type ByteIter<'a> =  &'a mut Iterator<Item=MemoryCell>;
@@ -55,16 +55,10 @@ pub struct Chip8<'a> {
     pub buzzer: Locked<Buzzer>,
     /// The state of the audio buffer used with XOCHIP.
     pub audio: Locked<Audio>,
-    ///
+    /// Optional user-provided random data for replay.
     pub random: Option<ByteIter<'a>>,
+    /// System random number generator.
     thread_rng: ThreadRng,
-}
-
-pub trait StateControl {
-    /// Reset the state of the machine.
-    fn reset(&mut self);
-    /// Execute the current instruction.
-    fn step(&mut self) -> Result<(),()>;
 }
 
 impl<'a> Chip8<'a> {
@@ -102,7 +96,7 @@ impl<'a> Chip8<'a> {
         self.audio.clone()
     }
 
-    pub fn next_random(&mut self) -> MemoryCell {
+    fn next_random(&mut self) -> MemoryCell {
         if let Some(ref mut r) = self.random {
             r.next().unwrap_or(0)
         } else {
@@ -113,10 +107,21 @@ impl<'a> Chip8<'a> {
     pub fn set_random(&mut self, iter: Option<ByteIter<'a>>) {
         self.random = iter;
     }
+
+    pub fn load_bytes(&mut self, bytes: &[u8], address: Address) -> Chip8Result<()> {
+        let last_byte = address as usize + bytes.len();
+        if last_byte > self.config.ram_bytes { return Err(Chip8Error::OutOfBoundsAt(address as usize)); }
+        let mut i = address as usize;
+        for b in bytes {
+            self.ram[i] = *b;
+            i += 1;
+        }
+        Ok(())
+    }
 }
 
-impl<'a> StateControl for Chip8<'a> {
-        fn reset(&mut self) {
+impl<'a> Chip8<'a> {
+        pub fn reset(&mut self) {
             self.ram = Vec::from_iter(repeat(0).take(self.config.ram_bytes));
             self.v = [0; 16];
             self.i = 0;
@@ -129,7 +134,14 @@ impl<'a> StateControl for Chip8<'a> {
             *self.buzzer.try_write() = false;
             *self.audio.try_write() = [0; 16];
         }
-        fn step(&mut self) -> Result<(),()> {
+        pub fn step(&mut self) -> Chip8Result<()> {
+
+            Ok(())
+        }
+        pub fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
+            for _ in 0..number_of_steps {
+                try!(self.step());
+            }
             Ok(())
         }
 }

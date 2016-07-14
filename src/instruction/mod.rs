@@ -13,7 +13,7 @@ mod set;
 
 //pub use self::codec::{Decoder,Encoder};
 pub use self::definition::{Definition, Coding, Pattern};
-pub use self::operations::{Operation, OperationKind, Execute};
+pub use self::operations::{Operation, OperationKind};
 pub use self::instruction::Instruction;
 pub use self::operands::{SrcKind, DestKind, Dest, Src};
 pub use self::set::Set;
