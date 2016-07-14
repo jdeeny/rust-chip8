@@ -153,6 +153,8 @@ impl<'a> Execute for Chip8<'a> {
     }
 
     fn load(&mut self, src: Src) -> Chip8Result<usize> {
+        print!("load src: {:?} ", src);
+        let x =
         match src {
             Src::Const(n)       => Ok(n),
             Src::Register(r)    => self.v.get(r).map(|reg| *reg as usize).ok_or(Chip8Error::OutOfBoundsAt(r)),
@@ -166,7 +168,9 @@ impl<'a> Execute for Chip8<'a> {
             Src::DelayTimer     => Ok(self.dt as usize),
             Src::Random         => Ok(self.next_random() as usize),
             Src::PC             => Ok(self.pc as usize),
-        }
+        };
+        println!("= {:?}", x);
+        x
     }
 
     fn store(&mut self, dest: Dest, data: usize) -> Chip8Result<()> {
@@ -201,8 +205,14 @@ impl<'a> Execute for Chip8<'a> {
         self.pc += 2;
     }
 
-    fn jump(&mut self, addr: Address) {
+    fn jump(&mut self, addr: Address) -> Chip8Result<()> {
+        let address = addr as usize;
+        if address > self.config.ram_bytes - 1 {
+            return Err(Chip8Error::OutOfBoundsAt(address));
+        }
+
         self.pc = addr;
+        Ok(())
     }
 
     fn keyboard(&self) -> Keyboard {

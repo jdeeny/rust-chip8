@@ -60,7 +60,7 @@ pub trait Execute {
     /// Advances the program counter one instruction.
     fn advance_pc(&mut self);
     /// Jumps the program counter to a given address.
-    fn jump(&mut self, addr: Address);
+    fn jump(&mut self, addr: Address) -> Chip8Result<()>;
     /// Store a flag in vF.
     fn set_flag(&mut self, state: bool);
     /// Returns a mut reference to video buffer.

@@ -1,12 +1,12 @@
 //! A set of instructions.
 //!
 //! # Examples
-//! ```
+//! ` ``
 //! use chip8::instruction::{Set};
 //! use chip8::config::Config;
 //! let set = Set::new(&Config::default());
-//! let word = 0x1234;
-//! let inst = set.decode(word);
+//! let word = 0x4234;
+//! let inst = set.decode(word).unwrap();
 //! assert_eq!( word, set.encode(inst) );
 //! ```
 
@@ -73,8 +73,13 @@ impl Set {
     }
 
     /// Decodes a 16-bit codeword into an Instruction.
-    pub fn decode(&self, codeword: Codeword) -> Instruction {
-        unimplemented!()
+    pub fn decode(&self, codeword: Codeword) -> Option<Instruction> {
+        for i in &self.table {
+            if i.code_matcher.is_match(codeword) {
+                return Some(Instruction::new(i.definition.specify(codeword)))
+            }
+        }
+        None
     }
 
     pub fn codeword_exists(&self, codeword: Codeword) -> bool {

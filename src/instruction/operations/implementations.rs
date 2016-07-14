@@ -24,6 +24,7 @@ pub fn sub(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()
 
 pub fn load(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
     let data = try!(exec.load(src));
+    println!("{:?}", data);
     exec.store(dest, data)
 }
 
@@ -57,30 +58,36 @@ pub fn fetch(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
 
 
 pub fn jump(exec: &mut Execute, addr: Src) -> Chip8Result<()> {
-    let a = try!(exec.load(addr)) as Address;
-    exec.jump(a);
-    Ok(())
+    if let Src::Address12(a) = addr {
+        exec.jump(a as Address)
+    } else {
+        Err(Chip8Error::InvalidOperand)
+    }
 }
 
 pub fn jump_v0(exec: &mut Execute, addr: Src) -> Chip8Result<()> {
-    let mut a = try!(exec.load(addr)) as Address;
-    a += try!(exec.load(Src::Register(0))) as Address;
-    exec.jump(a);
-    Ok(())
+    let v0 = try!(exec.load(Src::Register(0)));
+    if let Src::Address12(a) = addr {
+        exec.jump((a + v0) as Address)
+    } else {
+        Err(Chip8Error::InvalidOperand)
+    }
 }
 
+
 pub fn call(exec: &mut Execute, addr: Src) -> Chip8Result<()> {
-    let a = try!(exec.load(addr)) as Address;
-    let pc = exec.pc();
-    exec.stack_push(pc);
-    exec.jump(a);
-    Ok(())
+    if let Src::Address12(a) = addr {
+        let pc = exec.pc();
+        exec.stack_push(pc);
+        exec.jump(a as Address)
+    } else {
+        Err(Chip8Error::InvalidOperand)
+    }
 }
 
 pub fn ret(exec: &mut Execute) -> Chip8Result<()> {
     if let Some(a) = exec.stack_pop() {
-        exec.jump(a);
-        Ok(())
+        exec.jump(a)
     } else {
         Err(Chip8Error::PopEmptyStack)
     }

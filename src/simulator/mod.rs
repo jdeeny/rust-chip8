@@ -13,7 +13,7 @@ use rand::{Rng, ThreadRng, thread_rng};
 use types::*;
 use Chip8;
 use config::Config;
-use instruction::{Dest, Instruction, Src};
+use instruction::{self, Dest, Instruction, Src};
 
 enum RunState {
     RESET,
@@ -24,6 +24,7 @@ enum RunState {
 pub trait Simulate {
     fn run(&mut self, cycles_per_tick: Option<usize>);
     fn halt(&mut self);
+    /// Fetch the current instruction, advance the PC, and execute the instruction.
     fn step(&mut self) -> Chip8Result<()>;
     fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()>;
     fn timer_tick(&mut self);
@@ -39,6 +40,7 @@ pub trait Simulate {
 /// Manages the state of a chip8 cpu.
 pub struct Simulator<'a> {
     core: Chip8<'a>,
+    instruction_set: instruction::Set,
     execution_state: RunState,
 }
 
@@ -76,11 +78,16 @@ impl<'a> Simulate for Simulator<'a> {
 
     }
     fn step(&mut self) -> Chip8Result<()> {
+        let instruction = self.decode_at_addr(self.core.pc());
+        println!("{:?}", instruction);
+        self.core.advance_pc();
+        self.execute(&instruction);
         Ok(())
     }
+
     fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
         for _ in 0..number_of_steps {
-            self.step();
+            try!(self.step())
         }
         Ok(())
     }
@@ -91,11 +98,14 @@ impl<'a> Simulator<'a> {
     /// Returns a new Simulator.
     pub fn new(config: &Config, rand_iterator: Option<&'a mut Iterator<Item=MemoryCell>>) -> Simulator<'a> {
         let core = Chip8::new(config, rand_iterator);
+        let iset = instruction::Set::new(config);
         let mut s = Simulator {
             core: core,
+            instruction_set: iset,
             execution_state: RunState::RESET,
         };
-        s.load_bytes(config.font_small, config.addr_font as Address);
+        s.load_bytes(config.font_small, config.addr_font as Address).unwrap();
+        s.core.store(Dest::PC, config.addr_program).unwrap();
         s
     }
 
@@ -105,8 +115,7 @@ impl<'a> Simulator<'a> {
 
     /// Decodes an instruction. TODO: Move to ::instruction
     pub fn decode_instruction(&self, codeword: Codeword) -> Instruction {
-        //        self.itable.decode(codeword)
-        Instruction::default()
+        self.instruction_set.decode(codeword).unwrap()
     }
 
     /// Decodes the instruction stored in RAM at the given address.
@@ -116,8 +125,7 @@ impl<'a> Simulator<'a> {
         let lo = self.core.ram[a + 1] as Codeword;
         let codeword = hi | lo;
 
-        // self.itable.decode(codeword)
-        Instruction::default()
+        self.decode_instruction(codeword)
     }
 
     /// Get the 16-bit word stored at the location pointed to by the program counter.
@@ -128,20 +136,9 @@ impl<'a> Simulator<'a> {
         (hi << 8) | lo
     }
 
-
-
-
-    /// Fetch the current instruction, advance the PC, and execute the instruction.
-    pub fn step(&mut self) {
-        let i = self.decode_at_addr(self.core.pc());
-        self.core.advance_pc();
-        self.execute(&i);
-    }
-
-
     /// Executes an instruction.
     pub fn execute(&mut self, instruction: &Instruction) {
-        //instruction.operation()(instruction, self);
+        instruction.execute(&mut self.core);
     }
 
 }
