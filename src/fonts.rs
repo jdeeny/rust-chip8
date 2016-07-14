@@ -235,7 +235,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn test_draw() {
         assert_eq!(draw_u8!( X___ ), 0x80);

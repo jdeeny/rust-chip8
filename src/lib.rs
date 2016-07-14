@@ -13,11 +13,11 @@
 //! use chip8::{Simulator, Simulate};
 //! use chip8::instruction::Src::Register;
 //! let mut chip8 = Simulator::default();
-//! // A simple program: LD v6, 25  /  LD v7, 17  /  ADD v6, v7
-//! chip8.load_program( &[0x66, 0x19, 0x67, 0x11, 0x86, 0x74] ).unwrap();
-//! // Execute three instructions.
+//! // A simple program:   LD v6, 25    LD v7, 17    ADD v6, v7
+//! chip8.load_program( &[ 0x66, 0x19,  0x67, 0x11,  0x86, 0x74 ] ).unwrap();
+//! // Execute the three instructions.
 //! chip8.step_n(3).unwrap();
-//! // Fetch the contents of register v6.
+//! // Fetch the result from register v6.
 //! let result = chip8.load(Register(6)).unwrap();
 //! assert_eq!( result, 25+17 );
 //! ```
@@ -77,19 +77,3 @@ pub use config::Config;
 pub use types::*;
 pub use state::Chip8;
 pub use simulator::{Simulator, Simulate};
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-/*    #[test]
-    fn test_chip8_system() {
-        let conf = config::presets::COSMAC_VIP_STOCK;
-        let chip8 = Chip8::new(&conf, None);
-        let mut isa = instruction::Set::new(&conf);
-        let d = instruction::Decoder::new(&conf, &isa);
-        let e = instruction::Encoder::new(&conf, &isa);
-
-        assert!(true)
-    }*/
-}
