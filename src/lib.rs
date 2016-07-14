@@ -3,10 +3,11 @@
 //! `chip8` provides tools to enable working with
 //! [CHIP-8 virtual machine](https://en.wikipedia.org/wiki/CHIP-8)
 //! instructions, and a CHIP-8 virtual machine simulator. No GUI is provided,
-//! it is intended to be used by another crate. For example, this crate could:
-//!  - encode abstract instructions into CHIP-8 codewords for a CHIP-8 assembler
-//!  - decode CHIP-8 binary machine codes into abstract instruction objects for a CHIP-8 disassembler
-//!  - decode instructions and execute them in a CHIP-8 virtual machine as the core of a GUI CHIP-8 emulator
+//! `chip8` is intended to be used by another crate. For example, this crate could be used to:
+//!
+//!  * encode abstract instructions into machine code for a CHIP-8 assembler
+//!  * decode binary machine code into abstract instruction for a CHIP-8 disassembler
+//!  * simulate the execution of instructions in a CHIP-8 virtual machine for a GUI CHIP-8 emulator
 //!
 //! ```rust
 //! use chip8::{Simulator, Simulate};
@@ -21,40 +22,20 @@
 //! assert_eq!( result, 25+17 );
 //! ```
 //!
-//!
-//!
-//!
-//! ## Configuration
-//! A `Config` stores the configuration of a CHIP-8 system. It contains the A `Config` is
-//! used when instantiating machine state or an instruction set.
-//!
 //! ## Instructions
-//! A set of `Operation`s are supported by this library. These operations correspond
-//! with instructions from the CHIP-8 instruction set, but are typically more flexible to allow
-//! re-use.
+//! An `instruction::Definition` is a combination of an `OperationKind` like *Add* or *Jump* and
+//! a `Pattern` that specifies how the codword is structured.
 //!
-//! A `Pattern` defines how the operands required by an `Operation` will be defined by the
-//! codeword.
-//!
-//! An `instruction::Definition` is a combination of an `Operation` and a `Pattern`.
-//! These `Definition`s can be combined into an `instruction::Set` that is able to *decode* codewords
-//! and return `instruction::Instruction`s and *encode* `instruction::Instruction`s into codewords.
-//!
-//! `Definition`s and `Instruction`s are very similar, but a key difference sets them apart - a
-//! `Definition` only stores the *kind* of operands that will be used and the `Instruction` stores
-//! the specific operands that will be used. When a codeword is decoded, information about the
-//! operands is extracted based on the pattern in the definition. For example, a generic 'Register'
-//! operand in a `Definition` could be specified as 'the v6 register' when the Instruction is
-//! created.
+//! An `instruction::Set` contains one or more `Definition`. The `Set` can decode
+//! machine codewords into `Operation`s and encode `Operation`s into codewords.
 //!
 //! ## Simulation
-//! The state of a CHIP-8 system, including CPU and peripherals, is represented by a `Chip8`.
-//! It is able to execute instructions by providing an implementation of the `Execute` trait.
+//! A `Chip8` represents the state of a CHIP-8 system, including CPU and peripherals.
+//! It implements the `Execute` trait, so it is able to execute `Operation`s.
 //!
-//! A `Simulator` contains a `Chip8` and an `instruction::Set`, which allows it to simulate
-//! a CHIP-8 machine fetching codewords from memory, decoding the codewords, and executing the
-//! resulting instructions. The `Simulator` provides a mechanism for thread-safe control
-//! of the machine and access to state information.
+//! A `Simulator` contains a `Chip8` and an `instruction::Set`, which allows it to decode
+//! instructions and simulate their execution. The `Simulator` provides thread-safe mechanisms
+//! for control of execution and inspection of machine state.
 
 
 #![feature(inclusive_range_syntax, fnbox, plugin)]
