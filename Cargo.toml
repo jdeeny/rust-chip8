@@ -1,6 +1,6 @@
 [package]
 name = "chip8"
-version = "0.1.1"
+version = "0.2.0"
 authors = ["John Deeny <jdeeny@gmail.com> "]
 repository = "https://github.com/jdeeny/rust-chip8.git"
 homepage = "https://github.com/jdeeny/rust-chip8"
