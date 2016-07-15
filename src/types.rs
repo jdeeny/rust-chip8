@@ -36,6 +36,8 @@ pub enum Chip8Error {
     OutOfBounds,
     PopEmptyStack,
     InvalidOperand,
+    ChannelRxFailure,
+    ChannelTxFailure,
 }
 /// The result type used throughout the library.
 pub type Chip8Result<T> = Result<T, Chip8Error>;

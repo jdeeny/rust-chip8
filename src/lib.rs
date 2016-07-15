@@ -76,4 +76,4 @@ mod types;
 pub use config::Config;
 pub use types::*;
 pub use state::Chip8;
-pub use simulator::{Simulator, Simulate};
+pub use simulator::{Simulator, SimulatorTask, Simulate};

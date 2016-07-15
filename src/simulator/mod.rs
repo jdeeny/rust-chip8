@@ -2,9 +2,7 @@
 
 #[cfg(test)]
 mod tests;
-//mod controller;
-
-//pub use self::controller::Controller;
+mod threaded;
 
 use std::fmt;
 use std::sync::{Arc, RwLock};
@@ -15,33 +13,23 @@ use Chip8;
 use config::Config;
 use instruction::{self, Dest, Instruction, Src};
 
-enum RunState {
-    RESET,
-    IDLE,
-    RUN
-}
+pub use self::threaded::SimulatorTask;
 
 pub trait Simulate {
-    fn run(&mut self, cycles_per_tick: Option<usize>);
-    fn halt(&mut self);
     /// Fetch the current instruction, advance the PC, and execute the instruction.
     fn step(&mut self) -> Chip8Result<()>;
     fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()>;
-    fn timer_tick(&mut self);
-
+    fn timer_tick(&mut self) -> Chip8Result<()>;
     fn load_bytes(&mut self, bytes: &[u8], addr: Address) -> Chip8Result<()>;
     fn load_program(&mut self, bytes: &[u8]) -> Chip8Result<()>;
     fn load(&mut self, src: Src) -> Chip8Result<usize>;
     fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()>;
 }
 
-
-
 /// Manages the state of a chip8 cpu.
 pub struct Simulator<'a> {
     core: Chip8<'a>,
     instruction_set: instruction::Set,
-    execution_state: RunState,
 }
 
 impl<'a> Simulate for Simulator<'a> {
@@ -56,13 +44,14 @@ impl<'a> Simulate for Simulator<'a> {
     }
 
     /// Decrements the delay and sound timer.
-    fn timer_tick(&mut self) {
+    fn timer_tick(&mut self) -> Chip8Result<()> {
         if self.core.dt > 0 {
             self.core.dt -= 1;
         }
         if self.core.st > 0 {
             self.core.st -= 1;
         }
+        Ok(())
     }
 
     fn load(&mut self, src: Src) -> Chip8Result<usize> {
@@ -71,12 +60,7 @@ impl<'a> Simulate for Simulator<'a> {
     fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()> {
         self.core.store(dest, value)
     }
-    fn run(&mut self, cycles_per_tick: Option<usize>) {
 
-    }
-    fn halt(&mut self) {
-
-    }
     fn step(&mut self) -> Chip8Result<()> {
         let instruction = self.decode_at_addr(self.core.pc());
         println!("{:?} @ {:X}", instruction, self.core.pc());
@@ -102,7 +86,6 @@ impl<'a> Simulator<'a> {
         let mut s = Simulator {
             core: core,
             instruction_set: iset,
-            execution_state: RunState::RESET,
         };
         s.load_bytes(config.font_small, config.addr_font as Address).unwrap();
         s.core.store(Dest::PC, config.addr_program).unwrap();
