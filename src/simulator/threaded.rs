@@ -159,6 +159,11 @@ impl Simulate for SimulatorTask {
         *self.keyboard_lock.write().unwrap() = *keys;
         Ok(())
     }
+    fn keyboard(&self) -> Chip8Result<Keyboard> {
+        let keyboard_ref = self.keyboard_lock.read().unwrap();
+        let keyboard = keyboard_ref.clone();
+        Ok(keyboard)
+    }
     fn vram(&self) -> Chip8Result<Vram> {
         let vram_ref = self.vram_lock.read().unwrap();
         let vram = vram_ref.clone();

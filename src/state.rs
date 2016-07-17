@@ -240,6 +240,10 @@ impl<'a> Execute for Chip8<'a> {
 
     }
 
+    fn keyboard(&self) -> Chip8Result<Keyboard> {
+        Ok(self.keys.try_read().unwrap().clone())
+    }
+
     fn vram(&self) -> Chip8Result<Vram> {
         Ok(self.vram.try_read().unwrap().clone())
     }

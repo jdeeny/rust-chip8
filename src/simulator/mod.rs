@@ -25,6 +25,7 @@ pub trait Simulate {
     fn load(&mut self, src: Src) -> Chip8Result<usize>;
     fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()>;
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
+    fn keyboard(&self) -> Chip8Result<Keyboard>;
     fn vram(&self) -> Chip8Result<Vram>;
     fn buzzer(&self) -> Chip8Result<Buzzer>;
     fn audio(&self) -> Chip8Result<Audio>;
@@ -82,6 +83,9 @@ impl<'a> Simulate for Simulator<'a> {
 
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()> {
         self.core.set_keyboard(keys)
+    }
+    fn keyboard(&self) -> Chip8Result<Keyboard> {
+        self.core.keyboard()
     }
     fn vram(&self) -> Chip8Result<Vram> {
         self.core.vram()

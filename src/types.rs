@@ -67,6 +67,7 @@ pub trait Execute {
     fn set_flag(&mut self, state: bool);
     /// Returns the keyboard state.
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
+    fn keyboard(&self) -> Chip8Result<Keyboard>;
     /// Returns a reference to video buffer.
     fn vram(&self) -> Chip8Result<Vram>;
     /// Returns the buzzer state.
