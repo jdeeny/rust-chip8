@@ -10,7 +10,7 @@ use instruction::{Dest, Src};
 
 pub type ByteIter<'a> =  &'a mut Iterator<Item=MemoryCell>;
 
-#[derive(Debug, Clone)]
+/*#[derive(Debug, Clone)]
 pub struct Locked<T>(pub Arc<RwLock<T>>);
 
 impl<T> Locked<T> {
@@ -23,7 +23,10 @@ impl<T> Locked<T> {
     pub fn try_write(&mut self) -> RwLockWriteGuard<T> {
         self.0.try_write().unwrap()
     }
-}
+    pub fn clone_lock(&mut self) -> Arc<RwLock<T>> {
+        self.0.clone()
+    }
+}*/
 
 /// A struct that contains a Chip8 `Config` and the machine state.
 ///
@@ -48,13 +51,13 @@ pub struct Chip8<'a> {
     /// The delay timer.
     pub dt: Timer,
     /// The video ram, containing the state of the video output.
-    pub vram: Locked<Vram>,
+    pub vram: Arc<RwLock<Vram>>,
     /// The state of the keyboard.
-    pub keys: Locked<Keyboard>,
+    pub keys: Arc<RwLock<Keyboard>>,
     /// The state of the chip8 buzzer.
-    pub buzzer: Locked<Buzzer>,
+    pub buzzer: Arc<RwLock<Buzzer>>,
     /// The state of the audio buffer used with XOCHIP.
-    pub audio: Locked<Audio>,
+    pub audio: Arc<RwLock<Audio>>,
     /// Optional user-provided random data for replay.
     pub random: Option<ByteIter<'a>>,
     /// System random number generator.
@@ -73,26 +76,26 @@ impl<'a> Chip8<'a> {
             dt: 0,
             pc: 0,
             stack: Vec::with_capacity(config.stack_size),
-            vram: Locked::new(Vec::from_iter(repeat(Pixel::default()).take(config.vram_size))),
-            keys: Locked::new([false; 16]),
-            buzzer: Locked::new(false),
-            audio: Locked::new([0; 16]),
+            vram: Arc::new(RwLock::new(Vec::from_iter(repeat(Pixel::default()).take(config.vram_size)))),
+            keys: Arc::new(RwLock::new([false; 16])),
+            buzzer: Arc::new(RwLock::new(false)),
+            audio: Arc::new(RwLock::new([0; 16])),
             random: rand_iterator,
             thread_rng: thread_rng(),
         }
 
     }
 
-    pub fn vram_clone(&self) -> Locked<Vram> {
+    pub fn vram_clone(&self) -> Arc<RwLock<Vram>> {
         self.vram.clone()
     }
-    pub fn keys_clone(&self) -> Locked<Keyboard> {
+    pub fn keys_clone(&self) -> Arc<RwLock<Keyboard>> {
         self.keys.clone()
     }
-    pub fn buzzer_clone(&self) -> Locked<Buzzer> {
+    pub fn buzzer_clone(&self) -> Arc<RwLock<Buzzer>> {
         self.buzzer.clone()
     }
-    pub fn audio_clone(&self) -> Locked<Audio> {
+    pub fn audio_clone(&self) -> Arc<RwLock<Audio>> {
         self.audio.clone()
     }
 
@@ -121,29 +124,44 @@ impl<'a> Chip8<'a> {
 }
 
 impl<'a> Chip8<'a> {
-        pub fn reset(&mut self) {
-            self.ram = Vec::from_iter(repeat(0).take(self.config.ram_bytes));
-            self.v = [0; 16];
-            self.i = 0;
-            self.st = 0;
-            self.dt = 0;
-            self.pc = 0;
-            self.stack = Vec::with_capacity(self.config.stack_size);
-            *self.vram.try_write() = Vec::from_iter(repeat(Pixel::default()).take(self.config.vram_size));
-            *self.keys.try_write() = [false; 16];
-            *self.buzzer.try_write() = false;
-            *self.audio.try_write() = [0; 16];
-        }
-        pub fn step(&mut self) -> Chip8Result<()> {
+    pub fn reset(&mut self) {
+        self.ram = Vec::from_iter(repeat(0).take(self.config.ram_bytes));
+        self.v = [0; 16];
+        self.i = 0;
+        self.st = 0;
+        self.dt = 0;
+        self.pc = 0;
+        self.stack = Vec::with_capacity(self.config.stack_size);
+        *self.vram.try_write().unwrap() = Vec::from_iter(repeat(Pixel::default()).take(self.config.vram_size));
+        *self.keys.try_write().unwrap() = [false; 16];
+        *self.buzzer.try_write().unwrap() = false;
+        *self.audio.try_write().unwrap() = [0; 16];
+    }
+    pub fn step(&mut self) -> Chip8Result<()> {
 
-            Ok(())
+        Ok(())
+    }
+    pub fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
+        for _ in 0..number_of_steps {
+            try!(self.step());
         }
-        pub fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
-            for _ in 0..number_of_steps {
-                try!(self.step());
-            }
-            Ok(())
-        }
+        Ok(())
+    }
+    pub fn keyboard_lock(&mut self) -> Arc<RwLock<Keyboard>> {
+        self.keys.clone()
+    }
+
+    pub fn vram_lock(&mut self) -> Arc<RwLock<Vram>> {
+        self.vram.clone()
+    }
+
+    pub fn buzzer_lock(&mut self) -> Arc<RwLock<Buzzer>> {
+        self.buzzer.clone()
+    }
+
+    pub fn audio_lock(&mut self) -> Arc<RwLock<Audio>> {
+        self.audio.clone()
+    }
 }
 
 impl<'a> Execute for Chip8<'a> {
@@ -215,16 +233,23 @@ impl<'a> Execute for Chip8<'a> {
         Ok(())
     }
 
-    fn keyboard(&self) -> Keyboard {
-        *self.keys.try_read()
+    fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()> {
+        let mut k = self.keys.try_write().unwrap();
+        *k = *keys;
+        Ok(())
+
     }
 
-    fn vram_mut(&mut self) -> RwLockWriteGuard<Vram> {
-        self.vram.try_write()
+    fn vram(&self) -> Chip8Result<Vram> {
+        Ok(self.vram.try_read().unwrap().clone())
     }
 
-    fn audio_mut(&mut self) -> RwLockWriteGuard<Audio> {
-        self.audio.try_write()
+    fn buzzer(&self) -> Chip8Result<Buzzer> {
+        Ok(*self.buzzer.try_read().unwrap())
+    }
+
+    fn audio(&self) -> Chip8Result<Audio> {
+        Ok(*self.audio.try_read().unwrap())
     }
 }
 

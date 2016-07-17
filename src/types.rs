@@ -65,10 +65,12 @@ pub trait Execute {
     fn jump(&mut self, addr: Address) -> Chip8Result<()>;
     /// Store a flag in vF.
     fn set_flag(&mut self, state: bool);
-    /// Returns a mut reference to video buffer.
-    fn vram_mut(&mut self) -> RwLockWriteGuard<Vram>;
     /// Returns the keyboard state.
-    fn keyboard(&self) -> Keyboard;
+    fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
+    /// Returns a reference to video buffer.
+    fn vram(&self) -> Chip8Result<Vram>;
+    /// Returns the buzzer state.
+    fn buzzer(&self) -> Chip8Result<Buzzer>;
     /// Returns a mut reference to the audio buffer.
-    fn audio_mut(&mut self) -> RwLockWriteGuard<Audio>;
+    fn audio(&self) -> Chip8Result<Audio>;
 }

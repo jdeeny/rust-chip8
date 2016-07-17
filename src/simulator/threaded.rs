@@ -1,5 +1,6 @@
 use std::thread::{self, JoinHandle};
 use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::{Arc, RwLock, RwLockWriteGuard, RwLockReadGuard};
 
 use types::*;
 use simulator::{Simulator, Simulate};
@@ -13,20 +14,37 @@ enum Command {
     Tick(Sender<Chip8Result<()>>),
     LoadBytes(Sender<Chip8Result<()>>, Vec<u8>, Address),
     LoadProgram(Sender<Chip8Result<()>>, Vec<u8>),
+    VramLock(Sender<Chip8Result<Arc<RwLock<Vram>>>>),
+    KeyboardLock(Sender<Chip8Result<Arc<RwLock<Keyboard>>>>),
+    BuzzerLock(Sender<Chip8Result<Arc<RwLock<Buzzer>>>>),
+    AudioLock(Sender<Chip8Result<Arc<RwLock<Audio>>>>),
 }
 
 
 struct Manager<'a> {
     rx_chan: Receiver<Command>,
     sim: Simulator<'a>,
+    keyboard_lock: Arc<RwLock<Keyboard>>,
+    vram_lock: Arc<RwLock<Vram>>,
+    buzzer_lock: Arc<RwLock<Buzzer>>,
+    audio_lock: Arc<RwLock<Audio>>,
 }
 
 impl<'a> Manager<'a> {
     pub fn new(config: Config, rx_chan: Receiver<Command>) -> Manager<'a> {
-        let simulator = Simulator::new(&config, None);
+        let mut simulator = Simulator::new(&config, None);
+        let keyboard_lock = simulator.keyboard_lock().unwrap();
+        let vram_lock = simulator.vram_lock().unwrap();
+        let buzzer_lock = simulator.buzzer_lock().unwrap();
+        let audio_lock = simulator.audio_lock().unwrap();
+
         Manager {
             rx_chan: rx_chan,
             sim: simulator,
+            keyboard_lock: keyboard_lock,
+            vram_lock: vram_lock,
+            buzzer_lock: buzzer_lock,
+            audio_lock: audio_lock,
         }
     }
 
@@ -40,6 +58,10 @@ impl<'a> Manager<'a> {
                     Command::Tick(tx_chan) => { tx_chan.send(self.sim.timer_tick()).unwrap(); },
                     Command::LoadBytes(tx_chan, bytes, addr) => { tx_chan.send(self.sim.load_bytes(&bytes, addr)).unwrap(); },
                     Command::LoadProgram(tx_chan, bytes) => { tx_chan.send(self.sim.load_program(&bytes)).unwrap(); },
+                    Command::KeyboardLock(tx_chan) => { tx_chan.send(self.sim.keyboard_lock()).unwrap(); },
+                    Command::VramLock(tx_chan) => { tx_chan.send(self.sim.vram_lock()).unwrap(); },
+                    Command::BuzzerLock(tx_chan) => { tx_chan.send(self.sim.buzzer_lock()).unwrap(); },
+                    Command::AudioLock(tx_chan) => { tx_chan.send(self.sim.audio_lock()).unwrap(); },
                 }
             } else { return; }
         }
@@ -49,21 +71,48 @@ impl<'a> Manager<'a> {
 pub struct SimulatorTask {
     child: JoinHandle<()>,
     tx_chan: Sender<Command>,
+    keyboard_lock: Arc<RwLock<Keyboard>>,
+    vram_lock: Arc<RwLock<Vram>>,
+    buzzer_lock: Arc<RwLock<Buzzer>>,
+    audio_lock: Arc<RwLock<Audio>>,
 }
 
-impl<'a> SimulatorTask {
+impl SimulatorTask {
     pub fn spawn(config: Config) -> SimulatorTask {
         let (tx, rx) = channel();
 
         let child = thread::spawn(move || {
             Manager::new(config, rx).run();
         });
+
+        let (tx_locks, rx_locks) = channel();
+        tx.send(Command::VramLock(tx_locks)).unwrap();
+        let vram_lock = rx_locks.recv().unwrap().unwrap();
+
+        let (tx_locks, rx_locks) = channel();
+        tx.send(Command::KeyboardLock(tx_locks)).unwrap();
+        let keyboard_lock = rx_locks.recv().unwrap().unwrap();
+
+        let (tx_locks, rx_locks) = channel();
+        tx.send(Command::BuzzerLock(tx_locks)).unwrap();
+        let buzzer_lock = rx_locks.recv().unwrap().unwrap();
+
+        let (tx_locks, rx_locks) = channel();
+        tx.send(Command::AudioLock(tx_locks)).unwrap();
+        let audio_lock = rx_locks.recv().unwrap().unwrap();
+
+
+
         SimulatorTask {
             child: child,
             tx_chan: tx,
+            keyboard_lock: keyboard_lock,
+            vram_lock: vram_lock,
+            buzzer_lock: buzzer_lock,
+            audio_lock: audio_lock,
         }
-    }
 
+    }
 
 }
 
@@ -104,6 +153,22 @@ impl Simulate for SimulatorTask {
         let (tx, rx) = channel();
         try!(self.tx_chan.send(Command::Store(tx, dest, value)).map_err(|_| Chip8Error::ChannelTxFailure));
         try!(rx.recv().map_err(|_| Chip8Error::ChannelRxFailure))
+    }
+
+    fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()> {
+        *self.keyboard_lock.write().unwrap() = *keys;
+        Ok(())
+    }
+    fn vram(&self) -> Chip8Result<Vram> {
+        let vram_ref = self.vram_lock.read().unwrap();
+        let vram = vram_ref.clone();
+        Ok(vram)
+    }
+    fn buzzer(&self) -> Chip8Result<Buzzer> {
+        Ok(*self.buzzer_lock.read().unwrap())
+    }
+    fn audio(&self) -> Chip8Result<Audio> {
+        Ok(*self.audio_lock.read().unwrap())
     }
 }
 

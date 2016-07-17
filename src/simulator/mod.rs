@@ -5,7 +5,7 @@ mod tests;
 mod threaded;
 
 use std::fmt;
-use std::sync::{Arc, RwLock};
+use std::sync::{Arc, RwLock, RwLockWriteGuard, RwLockReadGuard};
 use rand::{Rng, ThreadRng, thread_rng};
 
 use types::*;
@@ -24,6 +24,10 @@ pub trait Simulate {
     fn load_program(&mut self, bytes: &[u8]) -> Chip8Result<()>;
     fn load(&mut self, src: Src) -> Chip8Result<usize>;
     fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()>;
+    fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
+    fn vram(&self) -> Chip8Result<Vram>;
+    fn buzzer(&self) -> Chip8Result<Buzzer>;
+    fn audio(&self) -> Chip8Result<Audio>;
 }
 
 /// Manages the state of a chip8 cpu.
@@ -65,7 +69,7 @@ impl<'a> Simulate for Simulator<'a> {
         let instruction = self.decode_at_addr(self.core.pc());
         println!("{:?} @ {:X}", instruction, self.core.pc());
         self.core.advance_pc();
-        self.execute(&instruction);
+        instruction.execute(&mut self.core);
         Ok(())
     }
 
@@ -74,6 +78,19 @@ impl<'a> Simulate for Simulator<'a> {
             try!(self.step())
         }
         Ok(())
+    }
+
+    fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()> {
+        self.core.set_keyboard(keys)
+    }
+    fn vram(&self) -> Chip8Result<Vram> {
+        self.core.vram()
+    }
+    fn buzzer(&self) -> Chip8Result<Buzzer> {
+        self.core.buzzer()
+    }
+    fn audio(&self) -> Chip8Result<Audio> {
+        self.core.audio()
     }
 
 }
@@ -119,9 +136,18 @@ impl<'a> Simulator<'a> {
         (hi << 8) | lo
     }
 
-    /// Executes an instruction.
-    pub fn execute(&mut self, instruction: &Instruction) {
-        instruction.execute(&mut self.core);
+    fn keyboard_lock(&mut self) -> Chip8Result<Arc<RwLock<Keyboard>>> {
+        Ok(self.core.keyboard_lock())
     }
+    fn vram_lock(&mut self) -> Chip8Result<Arc<RwLock<Vram>>> {
+        Ok(self.core.vram_lock())
+    }
+    fn buzzer_lock(&mut self) -> Chip8Result<Arc<RwLock<Buzzer>>> {
+        Ok(self.core.buzzer_lock())
+    }
+    fn audio_lock(&mut self) -> Chip8Result<Arc<RwLock<Audio>>> {
+        Ok(self.core.audio_lock())
+    }
+
 
 }
