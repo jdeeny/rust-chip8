@@ -125,8 +125,11 @@ fn test_sprite() {
     s.step_n(3);
     let vram = s.vram().unwrap();
     assert_eq!(vram[0 * 64 + 0], 0);
-    assert_eq!(vram[0 * 64 + 1], 1);
-    assert_eq!(vram[1 * 64 + 0], 1);
+    assert_eq!(vram[0 * 64 + 1], 0);
+    assert_eq!(vram[1 * 64 + 0], 0);
+    assert_eq!(vram[1 * 64 + 2], 1);
+    assert_eq!(vram[2 * 64 + 1], 1);
+    assert_eq!(vram[2 * 64 + 2], 0);
     assert_eq!(vram[31 * 64 + 62], 1);
     assert_eq!(vram[31 * 64 + 63], 0);
 

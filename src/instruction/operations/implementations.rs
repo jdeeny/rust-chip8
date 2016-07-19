@@ -225,7 +225,9 @@ pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
         for bit in 0..8 {
             flag |= try!(exec.set_pixel(x+(7-bit), y, ((data >> bit) & 1) as Pixel));
         }
+        addr += 1;
     }
+    exec.set_flag(flag);
     Ok(())
 }
 
