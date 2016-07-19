@@ -212,6 +212,7 @@ pub fn clear_screen(exec: &mut Execute) -> Chip8Result<()> {
 }
 
 pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
+
     Ok(())
 }
 
@@ -221,35 +222,4 @@ pub fn random(exec: &mut Execute, dest: Dest, src: Src, mask: Src) -> Chip8Resul
     let mask = try!(exec.load(mask));
     let result = data & mask;
     exec.store(dest, result)
-}
-
-
-
-#[cfg(test)]
-mod tests {
-/*    use super::*;
-    use Chip8;
-    use Config;
-    use instruction::{Execute, Instruction, Operand};
-    use instruction::Operation::*;
-    use instruction::execution::execute_microcode;
-    #[test]
-    fn test_add_reg() {
-        let mut core = Chip8::default();
-        let inst = Instruction::new(Add, Dest::Nowhere, Src::Register(0), Src::Register(1));
-
-        core.store(Operand::Register(0), 5);
-        core.store(Operand::Register(1), 10);
-        execute_microcode(&inst, &mut core);
-        assert_eq!(core.load(Src::Register(0)), 15);
-        assert_eq!(core.load(Src::Register(1)), 10);
-        assert_eq!(core.load(Src::Register(0xF)), 0);
-
-        // with overflow
-        core.store(Operand::Register(0), 0xFF);
-        op_add(&inst, &mut core);
-        assert_eq!(core.load(Src::Register(0)), 9);
-        assert_eq!(core.load(Src::Register(1)), 10);
-        assert_eq!(core.load(Src::Register(0xF)), 1);
-    }*/
 }

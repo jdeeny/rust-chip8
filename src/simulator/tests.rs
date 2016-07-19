@@ -79,3 +79,18 @@ fn test_jump_threaded() {
     s.step();
     assert_eq!(s.load(Src::PC).unwrap(), 0x200);
 }
+
+fn test_add() {
+    let config = COSMAC_VIP;
+    let mut s = SimulatorTask::spawn(config);
+
+    let prog = [0x64, 0x32, 0x67, 0xC8, 0x84, 0x74, 0x84, 0x74];    //v4 := 50, v7 := 200, v4 += v7, v4 += v7
+    s.load_program(&prog);
+
+    s.step_n(3);
+    assert_eq!(s.load(Src::Register(4)).unwrap(), 250);
+    assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
+    s.step();
+    assert_eq!(s.load(Src::Register(4)).unwrap(), 0xC2);
+    assert_eq!(s.load(Src::Register(0xF)).unwrap(), 00);
+}
