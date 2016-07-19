@@ -212,7 +212,20 @@ pub fn clear_screen(exec: &mut Execute) -> Chip8Result<()> {
 }
 
 pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
+    let mut x = try!(exec.load(x));
+    let mut y = try!(exec.load(y));
+    let n = try!(exec.load(n));
 
+    let mut addr = try!(exec.load(Src::I));
+
+    let mut flag = false;
+
+    for x in x..n+x {
+        let data = try!(exec.load(Src::Address12(addr)));
+        for bit in 0..8 {
+            flag |= try!(exec.set_pixel(x, y+(7-bit), ((data >> bit) & 1) as Pixel));
+        }
+    }
     Ok(())
 }
 

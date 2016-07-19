@@ -63,6 +63,7 @@ fn test_fetch_equality_or() {
     assert_eq!(s.load(Src::Register(0xD)).unwrap(), 1);
 }
 
+#[test]
 fn test_jump_threaded() {
     let config = COSMAC_VIP;
     let mut s = SimulatorTask::spawn(config);
@@ -80,6 +81,7 @@ fn test_jump_threaded() {
     assert_eq!(s.load(Src::PC).unwrap(), 0x200);
 }
 
+#[test]
 fn test_add() {
     let config = COSMAC_VIP;
     let mut s = SimulatorTask::spawn(config);
@@ -92,5 +94,41 @@ fn test_add() {
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
     s.step();
     assert_eq!(s.load(Src::Register(4)).unwrap(), 0xC2);
-    assert_eq!(s.load(Src::Register(0xF)).unwrap(), 00);
+    assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
+}
+
+#[test]
+fn test_sprite() {
+    // Octo equivalent:
+    // : main
+    //   i := the_sprite
+    //   v0 := 62
+    //   v1 := 30
+    //   sprite v0 v1 4
+    //   v0 := 0
+    //   v1 := 0
+    //   sprite v0 v1 4
+    // : the_sprite 0x50 0xA0 0x50 0xA0
+    let prog = [0xA2, 0x0E, 0x60, 0x3E, 0x61, 0x1E, 0xD0, 0x14, 0x60, 0x00, 0x61, 0x00, 0xD0, 0x14, 0x50, 0xA0, 0x50, 0xA0];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    s.load_program(&prog);
+
+    s.step_n(4);
+    let vram = s.vram().unwrap();
+    assert_eq!(vram[0 * 64 + 0], 0);
+    assert_eq!(vram[0 * 64 + 1], 1);
+    assert_eq!(vram[1 * 64 + 0], 1);
+    assert_eq!(vram[31 * 64 + 62], 1);
+    assert_eq!(vram[31 * 64 + 63], 0);
+    assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
+
+    s.step_n(3);
+    let vram = s.vram().unwrap();
+    assert_eq!(vram[0 * 64 + 0], 0);
+    assert_eq!(vram[0 * 64 + 1], 1);
+    assert_eq!(vram[1 * 64 + 0], 1);
+    assert_eq!(vram[31 * 64 + 62], 1);
+    assert_eq!(vram[31 * 64 + 63], 0);
+
+    assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
 }
