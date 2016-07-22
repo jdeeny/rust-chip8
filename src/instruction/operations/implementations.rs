@@ -167,7 +167,7 @@ pub fn shr(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
     let value = try!(exec.load(src));
     let carry = (value & 1) == 1;
     let result = value >> 1;
-    exec.store(dest, result);
+    try!(exec.store(dest, result));
     exec.set_flag(carry);
     Ok(())
 }
@@ -227,7 +227,9 @@ pub fn skip_not_eq(exec: &mut Execute, lhs: Src, rhs: Src) -> Chip8Result<()> {
 }
 
 pub fn skip_key_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
-    let key_state = false;
+    let key = try!(exec.load(key));
+    let key_state = try!(exec.keyboard())[key];
+    println!("key {:X}? {:?}", key, key_state);
     if key_state {
         exec.advance_pc();
     }
@@ -235,7 +237,9 @@ pub fn skip_key_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
 }
 
 pub fn skip_key_not_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
-    let key_state = false;
+    let key = try!(exec.load(key));
+    let key_state = try!(exec.keyboard())[key];
+    println!("key {:X}? {:?}", key, key_state);
     if !key_state {
         exec.advance_pc();
     }

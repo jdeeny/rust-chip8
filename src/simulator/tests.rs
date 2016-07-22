@@ -394,3 +394,32 @@ fn test_random_provided() {
     assert_eq!(s.load(Src::Register(4)).unwrap(), 0x00);
 
 }
+
+#[test]
+fn test_skip_key() {
+    // : main
+    // v1 := 5
+    // if v1 key then jump main
+    // v3 := 8
+    // : notkey
+    // if v3 -key then jump notkey
+    // : theend
+    // jump theend
+    let prog = [0x61, 0x05, 0xE1, 0xA1, 0x12, 0x00, 0x63, 0x08, 0xE3, 0x9E, 0x12, 0x08, 0x12, 0x0C];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    let mut keys: Keyboard = [false; 16];
+    keys[5] = true;
+    s.load_program(&prog).unwrap();
+    s.set_keyboard(&keys);
+    s.step_n(13).unwrap();
+    assert_eq!(s.load(Src::PC).unwrap(), 0x202);
+    keys[5] = false;
+    s.set_keyboard(&keys);
+    s.step_n(13).unwrap();
+    assert_eq!(s.load(Src::PC).unwrap(), 0x20A);
+    keys[8] = true;
+    s.set_keyboard(&keys);
+    s.step_n(2).unwrap();
+    assert_eq!(s.load(Src::PC).unwrap(), 0x20C);
+
+}
