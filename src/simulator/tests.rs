@@ -248,3 +248,30 @@ fn test_stash_fetch() {
     assert_eq!(s.load(Src::Register(0xC)).unwrap(), 0x58);
     assert_eq!(s.load(Src::I).unwrap(), 0x232);
 }
+
+#[test]
+fn test_and_xor() {
+    // Octo equivalent:
+    // : main
+    // v0 := 0x55
+    // v1 := 0xAA
+    // v2 := 0x00
+    // v2 &= v0
+    // v1 &= v0
+    // v1 := 0xAA
+    // v0 ^= v1
+    // v0 ^= v0
+    let prog = [0x60, 0x55, 0x61, 0xAA, 0x62, 0x00, 0x82, 0x02, 0x81, 0x02, 0x61, 0xAA, 0x80, 0x13, 0x80, 0x03];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    s.load_program(&prog);
+
+    s.step_n(5);
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
+    assert_eq!(s.load(Src::Register(1)).unwrap(), 0x00);
+    assert_eq!(s.load(Src::Register(2)).unwrap(), 0x00);
+    s.step_n(2);
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 0xFF);
+    assert_eq!(s.load(Src::Register(1)).unwrap(), 0xAA);
+    s.step();
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 0x00);
+}
