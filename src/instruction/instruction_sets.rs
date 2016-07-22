@@ -32,7 +32,7 @@ pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x1), A(A1),    A(A1),    A(A1) ], op: Jump(SrcKind::Address12) },
     Definition { pattern: [C(0x2), A(A1),    A(A1),    A(A1) ], op: Call(SrcKind::Address12) },
     Definition { pattern: [C(0x3), A(A1),    A(A2),    A(A2) ], op: SkipEq(SrcKind::Register, SrcKind::Literal8) },
-    Definition { pattern: [C(0x4), A(A1),    A(A2),    A(A3) ], op: SkipNotEq(SrcKind::Register, SrcKind::Literal8) },
+    Definition { pattern: [C(0x4), A(A1),    A(A2),    A(A2) ], op: SkipNotEq(SrcKind::Register, SrcKind::Literal8) },
     Definition { pattern: [C(0x5), A(A1),    A(A2),    C(0x0)], op: SkipEq(SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x6), A(A1),    A(A2),    A(A2) ], op: Load(DestKind::Register, SrcKind::Literal8) },
     Definition { pattern: [C(0x7), A(A1|A2), A(A3),    A(A3) ], op: Add(DestKind::Register, SrcKind::Register, SrcKind::Literal8) },

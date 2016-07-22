@@ -427,7 +427,6 @@ fn test_skip_key() {
     s.set_keyboard(&keys);
     s.step_n(2).unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x20C);
-
 }
 
 #[test]
@@ -473,4 +472,27 @@ fn test_bcd_font() {
     assert_eq!(vram[1 * 64 + 14], 1);
     assert_eq!(vram[2 * 64 + 13], 1);
     assert_eq!(vram[2 * 64 + 14], 1);
+}
+
+#[test]
+fn test_equality_literal() {
+    // Octo equivalent:
+    // : main
+    // v0 := 0
+    // : the_loop
+    // v0 += 1
+    // if v0 != 10 then jump the_loop
+    // v0 := 0
+    // if v0 == 10 then v1 := 1
+    // if v0 == 11 then v2 := 1
+    // : the_end
+    // jump the_end
+    let prog = [0x60, 0x00, 0x70, 0x01, 0x30, 0x0A, 0x12, 0x02, 0x40, 0x0A, 0x61, 0x01, 0x40, 0x0B, 0x62, 0x01, 0x12, 0x10];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    s.load_program(&prog).unwrap();
+
+    s.step_n(50).unwrap();
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 10);
+    assert_eq!(s.load(Src::Register(1)).unwrap(), 1);
+    assert_eq!(s.load(Src::Register(2)).unwrap(), 0);
 }

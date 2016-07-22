@@ -44,6 +44,8 @@ pub enum Chip8Error {
     ChannelRxFailure,
     /// A failure occured while trying to write to a channel.
     ChannelTxFailure,
+    /// An instruction was not recognized.
+    InvalidInstruction(Codeword),
 }
 /// The result type used throughout the library.
 pub type Chip8Result<T> = Result<T, Chip8Error>;

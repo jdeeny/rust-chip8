@@ -69,10 +69,10 @@ impl Simulate for Simulator {
     }
 
     fn step(&mut self) -> Chip8Result<()> {
-        let instruction = self.decode_at_addr(self.core.pc());
+        let instruction = try!(self.decode_at_addr(self.core.pc()));
         println!("{:?} @ {:X}", instruction, self.core.pc());
         self.core.advance_pc();
-        instruction.execute(&mut self.core);
+        try!(instruction.execute(&mut self.core));
         Ok(())
     }
 
@@ -119,12 +119,12 @@ impl Simulator {
     }
 
     /// Decodes an instruction. TODO: Move to ::instruction
-    pub fn decode_instruction(&self, codeword: Codeword) -> Instruction {
-        self.instruction_set.decode(codeword).unwrap()
+    pub fn decode_instruction(&self, codeword: Codeword) -> Chip8Result<Instruction> {
+        self.instruction_set.decode(codeword).ok_or(Chip8Error::InvalidInstruction(codeword))
     }
 
     /// Decodes the instruction stored in RAM at the given address.
-    pub fn decode_at_addr(&self, addr: Address) -> Instruction {
+    pub fn decode_at_addr(&self, addr: Address) -> Chip8Result<Instruction> {
         let a = addr as usize;
         let hi = (self.core.ram[a] as Codeword) << 8;
         let lo = self.core.ram[a + 1] as Codeword;
