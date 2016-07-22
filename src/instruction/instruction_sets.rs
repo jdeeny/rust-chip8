@@ -73,8 +73,8 @@ pub const SUPERCHIP: &'static [Definition] = &[
 ];
 
 pub const XOCHIP: &'static [Definition] = &[
-    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x2)], op: Stash(SrcKind::Literal4, SrcKind::Literal4, SrcKind::Const(0)) },
-    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x3)], op: Fetch(SrcKind::Literal4, SrcKind::Literal4, SrcKind::Const(0)) },
+    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x2)], op: Stash(SrcKind::Register, SrcKind::Register, SrcKind::Const(0)) },
+    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x3)], op: Fetch(SrcKind::Register, SrcKind::Register, SrcKind::Const(0)) },
     Definition { pattern: [C(0xF), C(0x0),  C(0x0),    C(0x0)], op: NoOp /*LoadI16*/ },
     Definition { pattern: [C(0xF), A(A1),   C(0x0),    C(0x1)], op: NoOp /*SelectDrawPlane(SrcKind::Literal4)*/ },
     Definition { pattern: [C(0xF), A(A1),   C(0x0),    C(0x2)], op: NoOp /*StoreAudio*/ },

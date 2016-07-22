@@ -34,14 +34,12 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
     let first_reg = match first {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        Src::Literal4(n) => n,
         _ => { return Err(Chip8Error::InvalidOperand) },
     };
 
     let last_reg = match last {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        Src::Literal4(n) => n,
         _ => { return Err(Chip8Error::InvalidOperand) },
     };
 
@@ -68,14 +66,12 @@ pub fn fetch(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
     let first_reg = match first {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        Src::Literal4(n) => n,
         _ => { return Err(Chip8Error::InvalidOperand) },
     };
 
     let last_reg = match last {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        Src::Literal4(n) => n,
         _ => { return Err(Chip8Error::InvalidOperand) },
     };
 
