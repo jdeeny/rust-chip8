@@ -40,7 +40,7 @@ pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x8), A(A1|A3), A(A2),    C(0x4)], op: Add(DestKind::Register, SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x8), A(A1|A2), A(A3),    C(0x5)], op: Sub(DestKind::Register, SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x8), A(A1),    A(A2),    C(0x6)], op: Shr(DestKind::Register, SrcKind::Register) },
-    Definition { pattern: [C(0x8), A(A1),    A(A2|A3), C(0x7)], op: Sub(DestKind::Register, SrcKind::Register, SrcKind::Register) },
+    Definition { pattern: [C(0x8), A(A1|A3), A(A2),    C(0x7)], op: Sub(DestKind::Register, SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x8), A(A1),    A(A2),    C(0xE)], op: Shl(DestKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0x9), A(A1),    A(A2),    C(0x0)], op: SkipNotEq(SrcKind::Register, SrcKind::Register) },
     Definition { pattern: [C(0xA), A(A2),    A(A2),    A(A2) ], op: Load(DestKind::I, SrcKind::Literal12 ) },
@@ -56,8 +56,8 @@ pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0xF), A(A3),    C(0x1),   C(0xE)], op: Add(DestKind::I, SrcKind::I, SrcKind::Register) },
     Definition { pattern: [C(0xF), A(A1),    C(0x2),   C(0x9)], op: Font(SrcKind::Register, SrcKind::Const(fonts::CODE_SMALL)) },
     Definition { pattern: [C(0xF), A(A1),    C(0x3),   C(0x3)], op: Bcd(SrcKind::Register) },
-    Definition { pattern: [C(0xF), A(A2),    C(0x5),   C(0x5)], op: Stash(SrcKind::Const(0), SrcKind::Register) },
-    Definition { pattern: [C(0xF), A(A2),    C(0x6),   C(0x5)], op: Fetch(SrcKind::Const(0), SrcKind::Register) },
+    Definition { pattern: [C(0xF), A(A2),    C(0x5),   C(0x5)], op: Stash(SrcKind::Const(0), SrcKind::Register, SrcKind::Const(1)) },
+    Definition { pattern: [C(0xF), A(A2),    C(0x6),   C(0x5)], op: Fetch(SrcKind::Const(0), SrcKind::Register, SrcKind::Const(1)) },
 ];
 
 pub const SUPERCHIP: &'static [Definition] = &[
@@ -73,8 +73,8 @@ pub const SUPERCHIP: &'static [Definition] = &[
 ];
 
 pub const XOCHIP: &'static [Definition] = &[
-    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x2)], op: Stash(SrcKind::Literal4, SrcKind::Literal4) },
-    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x3)], op: Fetch(SrcKind::Literal4, SrcKind::Literal4) },
+    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x2)], op: Stash(SrcKind::Literal4, SrcKind::Literal4, SrcKind::Const(0)) },
+    Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x3)], op: Fetch(SrcKind::Literal4, SrcKind::Literal4, SrcKind::Const(0)) },
     Definition { pattern: [C(0xF), C(0x0),  C(0x0),    C(0x0)], op: NoOp /*LoadI16*/ },
     Definition { pattern: [C(0xF), A(A1),   C(0x0),    C(0x1)], op: NoOp /*SelectDrawPlane(SrcKind::Literal4)*/ },
     Definition { pattern: [C(0xF), A(A1),   C(0x0),    C(0x2)], op: NoOp /*StoreAudio*/ },

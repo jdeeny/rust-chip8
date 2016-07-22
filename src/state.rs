@@ -192,6 +192,7 @@ impl<'a> Execute for Chip8<'a> {
     }
 
     fn store(&mut self, dest: Dest, data: usize) -> Chip8Result<()> {
+        println!("store {:?} = {:?} ", dest, data);
         match dest {
             Dest::Register(r) => self.v.get_mut(r).map(|reg| {*reg = data as Register8 & 0xFF; () }).ok_or(Chip8Error::OutOfBoundsAt(r)),
             Dest::Address12(a) => self.ram.get_mut(a).map(|cell| {*cell = data as MemoryCell; () }).ok_or(Chip8Error::OutOfBoundsAt(a)),

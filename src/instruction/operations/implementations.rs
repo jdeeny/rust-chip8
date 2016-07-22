@@ -14,11 +14,12 @@ pub fn add(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()
 }
 
 pub fn sub(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()> {
-    let l = try!(exec.load(lhs));
+    let mut l = try!(exec.load(lhs));
     let r = try!(exec.load(rhs));
-    let total = (l - r) & 0xFF;
     //set vF if NOT borrow
-    exec.set_flag(l > r);
+    exec.set_flag(l >= r);
+    if r > l { l += 256; }
+    let total = (l - r) & 0xFF;
     exec.store(dest, total)
 }
 
@@ -29,9 +30,22 @@ pub fn load(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
 }
 
 // Stores registers v0.. to ram[I]
-pub fn stash(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
-    let first_reg = if let Src::Register(r) = first { r } else { return Err(Chip8Error::InvalidOperand) };
-    let last_reg = if let Src::Register(r) = last { r } else { return Err(Chip8Error::InvalidOperand) };
+pub fn stash(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Result<()> {
+    let first_reg = match first {
+        Src::Register(r) => r,
+        Src::Const(n) => n,
+        Src::Literal4(n) => n,
+        _ => { return Err(Chip8Error::InvalidOperand) },
+    };
+
+    let last_reg = match last {
+        Src::Register(r) => r,
+        Src::Const(n) => n,
+        Src::Literal4(n) => n,
+        _ => { return Err(Chip8Error::InvalidOperand) },
+    };
+
+    let flag = try!(exec.load(flag));
 
     println!("stash {:?}-{:?}", first_reg, last_reg);
 
@@ -42,32 +56,44 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
         try!(exec.store(Dest::Address12(i + offset), value));
         offset += 1;
     }
-    exec.store(Dest::I, i + offset)
+    if flag == 1 {
+        try!(exec.store(Dest::I, i + offset));
+    }
+    Ok(())
 }
 
 // Fetches several bytes, pointed to by I, into v0..
-pub fn fetch(exec: &mut Execute, first: Src, last: Src) -> Chip8Result<()> {
+pub fn fetch(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Result<()> {
     println!("fetch {:?} {:?}", first, last);
     let first_reg = match first {
         Src::Register(r) => r,
         Src::Const(n) => n,
+        Src::Literal4(n) => n,
         _ => { return Err(Chip8Error::InvalidOperand) },
     };
 
     let last_reg = match last {
         Src::Register(r) => r,
         Src::Const(n) => n,
+        Src::Literal4(n) => n,
         _ => { return Err(Chip8Error::InvalidOperand) },
     };
 
+    let flag = try!(exec.load(flag));
 
     println!("fetch {:?}-{:?}", first_reg, last_reg);
     let i = try!(exec.load(Src::I));
-    for r in 0...last_reg {
-        let value = try!(exec.load(Src::Address12(i + r)));
+    let mut offset = 0;
+    for r in first_reg...last_reg {
+        let value = try!(exec.load(Src::Address12(i + offset)));
+        println!("val: {:?}", value);
         try!(exec.store(Dest::Register(r), value));
+        offset += 1;
     }
-    exec.store(Dest::I, i + last_reg + 1)
+    if flag == 1 {
+        try!(exec.store(Dest::I, i + offset));
+    }
+    Ok(())
 }
 
 

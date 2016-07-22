@@ -101,8 +101,6 @@ impl SimulatorTask {
         tx.send(Command::AudioLock(tx_locks)).unwrap();
         let audio_lock = rx_locks.recv().unwrap().unwrap();
 
-
-
         SimulatorTask {
             child: child,
             tx_chan: tx,
@@ -167,6 +165,7 @@ impl Simulate for SimulatorTask {
     fn vram(&self) -> Chip8Result<Vram> {
         let vram_ref = self.vram_lock.read().unwrap();
         let vram = vram_ref.clone();
+        println!("{:?} {:?}", *vram_ref, vram);
         Ok(vram)
     }
     fn buzzer(&self) -> Chip8Result<Buzzer> {
