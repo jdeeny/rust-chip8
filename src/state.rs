@@ -226,11 +226,13 @@ impl<'a> Execute for Chip8<'a> {
 
     fn jump(&mut self, addr: Address) -> Chip8Result<()> {
         let address = addr as usize;
+        println!("addr: {:?}", addr);
         if address > self.config.ram_bytes - 1 {
             return Err(Chip8Error::OutOfBoundsAt(address));
         }
-
         self.pc = addr;
+        println!("pc: {:?}", self.pc);
+
         Ok(())
     }
 

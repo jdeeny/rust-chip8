@@ -275,3 +275,45 @@ fn test_and_xor() {
     s.step();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x00);
 }
+
+#[test]
+fn test_call_return_jump_jumpv0() {
+    // : main
+    // v0 := 1
+    // v1 := 3
+    // v3 := 2
+    // v4 := 7
+    // sub1
+    // sub2
+    // jump0 table
+    // : wait-here
+    // wait-here
+    // : sub1
+    // v3 <<= v3
+    // return
+    // : sub2
+    // v0 >>= v3
+    // return
+    // : table
+    // vA := 10
+    // vA := 20
+    // vA := 30
+    // vA := 40
+    // jump wait-here
+    let prog = [0x60, 0x01, 0x61, 0x03, 0x63, 0x02, 0x64, 0x07, 0x22, 0x10, 0x22, 0x14, 0xB2, 0x18, 0x22, 0x0E, 0x83, 0x3E, 0x00, 0xEE, 0x80, 0x36, 0x00, 0xEE, 0x6A, 0x0A, 0x6A, 0x14, 0x6A, 0x1E, 0x6A, 0x28, 0x12, 0x0E];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    s.load_program(&prog);
+
+    s.step_n(6);
+    assert_eq!(s.load(Src::Register(3)).unwrap(), 0x4);
+    assert_eq!(s.load(Src::PC).unwrap(), 0x212);
+    s.step_n(3);
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 2);
+    assert_eq!(s.load(Src::PC).unwrap(), 0x216);
+    s.step_n(2);
+    assert_eq!(s.load(Src::PC).unwrap(), 0x21A);
+    s.step_n(3);
+    assert_eq!(s.load(Src::PC).unwrap(), 0x220);
+    s.step();
+    assert_eq!(s.load(Src::PC).unwrap(), 0x20E);
+}
