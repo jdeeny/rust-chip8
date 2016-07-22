@@ -21,17 +21,17 @@ enum Command {
 }
 
 
-struct Manager<'a> {
+struct Manager {
     rx_chan: Receiver<Command>,
-    sim: Simulator<'a>,
+    sim: Simulator,
     keyboard_lock: Arc<RwLock<Keyboard>>,
     vram_lock: Arc<RwLock<Vram>>,
     buzzer_lock: Arc<RwLock<Buzzer>>,
     audio_lock: Arc<RwLock<Audio>>,
 }
 
-impl<'a> Manager<'a> {
-    pub fn new(config: Config, rx_chan: Receiver<Command>) -> Manager<'a> {
+impl Manager {
+    pub fn new(config: Config, rx_chan: Receiver<Command>) -> Manager {
         let mut simulator = Simulator::new(&config, None);
         let keyboard_lock = simulator.keyboard_lock().unwrap();
         let vram_lock = simulator.vram_lock().unwrap();

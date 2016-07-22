@@ -1,9 +1,9 @@
+use std::collections::VecDeque;
 
 use simulator::{Simulator, Simulate, SimulatorTask};
 use instruction::{Src};
 use config::{Config, COSMAC_VIP};
-use types::Address;
-
+use types::*;
 
 #[test]
 fn test_jump() {
@@ -316,4 +316,67 @@ fn test_call_return_jump_jumpv0() {
     assert_eq!(s.load(Src::PC).unwrap(), 0x220);
     s.step();
     assert_eq!(s.load(Src::PC).unwrap(), 0x20E);
+}
+
+#[test]
+fn test_random_threadrng() {
+    // Looping 256 times means each bit has ~10^-78 chance of not being set. Should be good.
+    // : main
+    // v0 := 0
+    // v2 := 0
+    // : theloop
+    // v1 := random 0x55
+    // v0 |= v1
+    // v2 += 1
+    // if v2 != 0 then jump theloop
+    // v3 := 0
+    // : theloop2
+    // v1 := random 0xFF
+    // v3 |= v1
+    // v2 += 1
+    // if v2 != 0 then jump theloop2
+    // v3 ^= v0
+    let prog = [0x60, 0x00, 0x62, 0x00, 0xC1, 0x55, 0x80, 0x11, 0x72, 0x01, 0x32, 0x00, 0x12, 0x04, 0x63, 0x00, 0xC1, 0xFF, 0x83, 0x11, 0x72, 0x01, 0x32, 0x00, 0x12, 0x10, 0x83, 0x03];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    s.load_program(&prog);
+
+    s.step_n(1281);
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
+    assert_eq!(s.load(Src::PC).unwrap(), 0x20E);
+    s.step_n(1280);
+    assert_eq!(s.load(Src::Register(3)).unwrap(), 0xFF);
+    assert_eq!(s.load(Src::PC).unwrap(), 0x21A);
+    s.step();
+    assert_eq!(s.load(Src::Register(3)).unwrap(), 0xAA);
+}
+
+#[test]
+fn test_random_provided() {
+    // : main
+    // v0 := random 0x55
+    // v1 := random 0xAA
+    // v2 := random 0xFF
+    // v3 := random 0x00
+    // v4 := random 0xFF
+    let prog = [0xC0, 0x55, 0xC1, 0xAA, 0xC2, 0xFF, 0xC3, 0x00, 0xC4, 0xFF];
+    //let mut random_values: Vec<MemoryCell> = Vec::new();
+    //random_values.push(0xF0);
+    //random_values.push(0x0F);
+    //random_values.push(0x23);
+    //random_values.push(0xFF);
+    let mut random_values: VecDeque<u8> = VecDeque::new();
+    random_values.push_back(0xF0);
+    random_values.push_back(0x0F);
+    random_values.push_back(0x23);
+    random_values.push_back(0xFF);
+    let mut s = Simulator::new(&COSMAC_VIP, Some(random_values));
+    s.load_program(&prog);
+
+    s.step_n(5);
+    assert_eq!(s.load(Src::Register(0)).unwrap(), 0x50);
+    assert_eq!(s.load(Src::Register(1)).unwrap(), 0x0A);
+    assert_eq!(s.load(Src::Register(2)).unwrap(), 0x23);
+    assert_eq!(s.load(Src::Register(3)).unwrap(), 0x00);
+    assert_eq!(s.load(Src::Register(4)).unwrap(), 0x00);
+
 }

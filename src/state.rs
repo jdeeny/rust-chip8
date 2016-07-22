@@ -2,13 +2,14 @@
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 use std::panic;
 use std::iter::{Iterator, FromIterator, repeat};
+use std::collections::VecDeque;
 use rand::{Rng, thread_rng, ThreadRng};
 pub use types::*;
 use config::Config;
 use instruction::{Dest, Src};
 
 
-pub type ByteIter<'a> =  &'a mut Iterator<Item=MemoryCell>;
+pub type RandomBytes = VecDeque<u8>;
 
 /*#[derive(Debug, Clone)]
 pub struct Locked<T>(pub Arc<RwLock<T>>);
@@ -21,7 +22,7 @@ impl<T> Locked<T> {
         self.0.try_read().unwrap()
     }
     pub fn try_write(&mut self) -> RwLockWriteGuard<T> {
-        self.0.try_write().unwrap()
+        self.0.try_write().unwrap()s
     }
     pub fn clone_lock(&mut self) -> Arc<RwLock<T>> {
         self.0.clone()
@@ -33,7 +34,7 @@ impl<T> Locked<T> {
 /// The machine state includes the RAM, registers, program counter, stack, timers, and the
 /// state of the IO subsystems.
 #[allow(dead_code)]
-pub struct Chip8<'a> {
+pub struct Chip8 {
     /// Sets the configuration of the machine.
     pub config: Config,
     /// The ram.
@@ -59,14 +60,14 @@ pub struct Chip8<'a> {
     /// The state of the audio buffer used with XOCHIP.
     pub audio: Arc<RwLock<Audio>>,
     /// Optional user-provided random data for replay.
-    pub random: Option<ByteIter<'a>>,
+    pub random: Option<RandomBytes>,
     /// System random number generator.
     thread_rng: ThreadRng,
 }
 
-impl<'a> Chip8<'a> {
+impl Chip8 {
     /// Create a new Chip8 using the supplied Config.
-    pub fn new(config: &Config, rand_iterator: Option<&'a mut Iterator<Item=MemoryCell>>) -> Chip8<'a> {
+    pub fn new(config: &Config, random: Option<RandomBytes>) -> Chip8 {
         Chip8 {
             config: *config,
             ram: Vec::from_iter(repeat(0).take(config.ram_bytes)),
@@ -80,7 +81,7 @@ impl<'a> Chip8<'a> {
             keys: Arc::new(RwLock::new([false; 16])),
             buzzer: Arc::new(RwLock::new(false)),
             audio: Arc::new(RwLock::new([0; 16])),
-            random: rand_iterator,
+            random: random,
             thread_rng: thread_rng(),
         }
 
@@ -101,13 +102,13 @@ impl<'a> Chip8<'a> {
 
     fn next_random(&mut self) -> MemoryCell {
         if let Some(ref mut r) = self.random {
-            r.next().unwrap_or(0)
+            r.pop_front().unwrap_or(0)
         } else {
             self.thread_rng.gen()
         }
     }
 
-    pub fn set_random(&mut self, iter: Option<ByteIter<'a>>) {
+    pub fn set_random(&mut self, iter: Option<RandomBytes>) {
         self.random = iter;
     }
 
@@ -123,7 +124,7 @@ impl<'a> Chip8<'a> {
     }
 }
 
-impl<'a> Chip8<'a> {
+impl Chip8 {
     pub fn reset(&mut self) {
         self.ram = Vec::from_iter(repeat(0).take(self.config.ram_bytes));
         self.v = [0; 16];
@@ -164,7 +165,7 @@ impl<'a> Chip8<'a> {
     }
 }
 
-impl<'a> Execute for Chip8<'a> {
+impl Execute for Chip8 {
 
     fn config(&self) -> Config {
         self.config
@@ -269,7 +270,7 @@ impl<'a> Execute for Chip8<'a> {
     }
 }
 
-impl<'a> Default for Chip8<'a> {
+impl Default for Chip8 {
     fn default() -> Self {
         Self::new(&Config::default(), None)
     }

@@ -15,6 +15,8 @@ use instruction::{self, Dest, Instruction, Src};
 
 pub use self::threaded::SimulatorTask;
 
+use state::RandomBytes;
+
 pub trait Simulate {
     /// Fetch the current instruction, advance the PC, and execute the instruction.
     fn step(&mut self) -> Chip8Result<()>;
@@ -32,12 +34,12 @@ pub trait Simulate {
 }
 
 /// Manages the state of a chip8 cpu.
-pub struct Simulator<'a> {
-    core: Chip8<'a>,
+pub struct Simulator {
+    core: Chip8,
     instruction_set: instruction::Set,
 }
 
-impl<'a> Simulate for Simulator<'a> {
+impl Simulate for Simulator {
     /// Loads bytes into RAM starting at the given address.
     fn load_bytes(&mut self, bytes: &[u8], addr: Address) -> Chip8Result<()>  {
         self.core.load_bytes(bytes, addr)
@@ -99,10 +101,10 @@ impl<'a> Simulate for Simulator<'a> {
 
 }
 
-impl<'a> Simulator<'a> {
+impl Simulator {
     /// Returns a new Simulator.
-    pub fn new(config: &Config, rand_iterator: Option<&'a mut Iterator<Item=MemoryCell>>) -> Simulator<'a> {
-        let core = Chip8::new(config, rand_iterator);
+    pub fn new(config: &Config, rand_iterator: Option<RandomBytes>) -> Simulator {
+        let core: Chip8 = Chip8::new(config, rand_iterator);
         let iset = instruction::Set::new(config);
         let mut s = Simulator {
             core: core,
@@ -113,7 +115,7 @@ impl<'a> Simulator<'a> {
         s
     }
 
-    pub fn default() -> Simulator<'a> {
+    pub fn default() -> Simulator {
         Self::new(&Config::default(), None)
     }
 
