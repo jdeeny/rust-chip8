@@ -429,3 +429,48 @@ fn test_skip_key() {
     assert_eq!(s.load(Src::PC).unwrap(), 0x20C);
 
 }
+
+#[test]
+fn test_bcd_font() {
+    // : digits 0 0 0
+    // : main
+    // i := digits
+    // v4 := 123
+    // bcd v4
+    // load v2
+    // v5 := 0
+    // v6 := 0
+    // i := hex v0
+    // sprite v5 v6 5
+    // v5 := 5
+    // i := hex v1
+    // sprite v5 v6 5
+    // v5 := 11
+    // i := hex v2
+    // sprite v5 v6 5
+    // : the_end
+    // jump the_end
+    let prog = [0x12, 0x05, 0x00, 0x00, 0x00, 0xA2, 0x02, 0x64, 0x7B, 0xF4, 0x33, 0xF2, 0x65, 0x65, 0x00, 0x66, 0x00, 0xF0, 0x29, 0xD5, 0x65, 0x65, 0x05, 0xF1, 0x29, 0xD5, 0x65, 0x65, 0x0B, 0xF2, 0x29, 0xD5, 0x65, 0x12, 0x21];
+    let mut s = Simulator::new(&COSMAC_VIP, None);
+    s.load_program(&prog).unwrap();
+    s.step_n(50);
+    let vram = s.vram().unwrap();
+    for line in 0..6 {
+        println!("{:?}", &vram[line*64..(line+1)*64]);
+    }
+    assert_eq!(vram[0 * 64 + 0], 0);
+    assert_eq!(vram[0 * 64 + 1], 0);
+    assert_eq!(vram[0 * 64 + 2], 1);
+    assert_eq!(vram[1 * 64 + 0], 0);
+    assert_eq!(vram[1 * 64 + 1], 1);
+    assert_eq!(vram[1 * 64 + 2], 1);
+    assert_eq!(vram[2 * 64 + 0], 0);
+    assert_eq!(vram[2 * 64 + 1], 0);
+    assert_eq!(vram[2 * 64 + 2], 1);
+    assert_eq!(vram[0 * 64 + 13], 1);
+    assert_eq!(vram[0 * 64 + 14], 1);
+    assert_eq!(vram[1 * 64 + 13], 0);
+    assert_eq!(vram[1 * 64 + 14], 1);
+    assert_eq!(vram[2 * 64 + 13], 1);
+    assert_eq!(vram[2 * 64 + 14], 1);
+}
