@@ -71,8 +71,10 @@ pub trait Execute {
     fn jump(&mut self, addr: Address) -> Chip8Result<()>;
     /// Store a flag in vF.
     fn set_flag(&mut self, state: bool);
-    /// Set a pixel
-    fn set_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<bool>;
+    /// Set a pixel directly.
+    fn set_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<()>;
+    /// Set a pixel by XORing it. Returns true if the pixel was already set.
+    fn xor_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<bool>;
     /// Returns the keyboard state.
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
     // Returns the keyboard.

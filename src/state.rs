@@ -277,13 +277,22 @@ impl Execute for Chip8 {
         Ok(())
     }
 
-    fn set_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<bool> {
+    fn xor_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<bool> {
         let mut vram = self.vram.write().unwrap();
         let x = x % 64;
         let y = y % 32;
         vram[x + y * 64] ^= pixel;
         Ok(vram[x + y * 64] != pixel)
     }
+
+    fn set_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<()> {
+        let mut vram = self.vram.write().unwrap();
+        let x = x % 64;
+        let y = y % 32;
+        vram[x + y * 64] = pixel;
+        Ok(())
+    }
+
 
 
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()> {

@@ -102,7 +102,7 @@ fn test_add() {
 }
 
 #[test]
-fn test_sprite() {
+fn test_sprite_clear() {
     // Octo equivalent:
     // : main
     //   i := the_sprite
@@ -112,9 +112,11 @@ fn test_sprite() {
     //   v0 := 0
     //   v1 := 0
     //   sprite v0 v1 4
+    //   clear
     // : the_sprite 0x50 0xA0 0x50 0xA0
-    let prog = [0xA2, 0x0E, 0x60, 0x3E, 0x61, 0x1E, 0xD0, 0x14, 0x60, 0x00, 0x61, 0x00, 0xD0,
-                0x14, 0x50, 0xA0, 0x50, 0xA0];
+    let prog = [0xA2, 0x10, 0x60, 0x3E, 0x61, 0x1E, 0xD0, 0x14, 0x60, 0x00, 0x61, 0x00, 0xD0,
+                0x14, 0x00, 0xE0, 0x50, 0xA0, 0x50, 0xA0];
+
     let mut s = Simulator::new(&COSMAC_VIP, None);
     s.load_program(&prog).unwrap();
 
@@ -137,8 +139,12 @@ fn test_sprite() {
     assert_eq!(vram[2 * 64 + 2], 0);
     assert_eq!(vram[31 * 64 + 62], 1);
     assert_eq!(vram[31 * 64 + 63], 0);
-
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
+    s.step().unwrap();
+    let vram = s.vram().unwrap();
+    assert_eq!(vram[1 * 64 + 2], 0);
+    assert_eq!(vram[2 * 64 + 1], 0);
+    assert_eq!(vram[31 * 64 + 62], 0);
 }
 
 #[test]

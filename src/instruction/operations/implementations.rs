@@ -252,6 +252,11 @@ pub fn wait_key(exec: &mut Execute, dest: Dest, key: Src) -> Chip8Result<()> {
 }
 
 pub fn clear_screen(exec: &mut Execute) -> Chip8Result<()> {
+    for x in 0..64 {
+        for y in 0..32 {
+            try!(exec.set_pixel(x, y, 0));
+        }
+    }
     Ok(())
 }
 
@@ -267,7 +272,7 @@ pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
     for y in y..n + y {
         let data = try!(exec.load(Src::Address12(addr)));
         for bit in 0..8 {
-            flag |= try!(exec.set_pixel(x + (7 - bit), y, ((data >> bit) & 1) as Pixel));
+            flag |= try!(exec.xor_pixel(x + (7 - bit), y, ((data >> bit) & 1) as Pixel));
         }
         addr += 1;
     }
