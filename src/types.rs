@@ -32,11 +32,17 @@ pub type Vram = Vec<Pixel>;
 /// A set of errors that could be returned.
 #[derive(Debug)]
 pub enum Chip8Error {
+    /// Attempt to access outside bounds -- TODO split into more specific errors
     OutOfBoundsAt(usize),
+    /// Attempt to access outside bounds with unknown location -- TODO is this ever needed?
     OutOfBounds,
+    /// Attempt to pop an address from an empty stack.
     PopEmptyStack,
+    /// Attempt to execute an instruciton wtih an invalid type of operand
     InvalidOperand,
+    /// A failure occured while trying to read from a channel.
     ChannelRxFailure,
+    /// A failure occured while trying to write to a channel.
     ChannelTxFailure,
 }
 /// The result type used throughout the library.

@@ -11,16 +11,16 @@ fn test_jump() {
     let mut s = Simulator::new(&config, None);
 
     let prog = [0x60, 0x55, 0x12, 0x00];    //LD V0, 0x55; Jump 0x200
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
     assert_eq!(s.load(Src::Address12(config.addr_program)).unwrap(), 0x60);
     assert_eq!(s.load(Src::Address12(config.addr_program + 1)).unwrap(),
                0x55);
     // s.jump(config.addr_program as Address).unwrap();
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x202);
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x200);
 }
 
@@ -43,23 +43,23 @@ fn test_fetch_equality_or() {
                 0x82, 0x01, 0x93, 0x10, 0x6A, 0x01, 0x53, 0x10, 0x6B, 0x01, 0x93, 0x20, 0x6C,
                 0x01, 0x53, 0x20, 0x6D, 0x01];
     let mut s = Simulator::new(&COSMAC_VIP, None);
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x205);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0xFF);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::I).unwrap(), 0x202);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0xAA);
     assert_eq!(s.load(Src::Register(2)).unwrap(), 0xA9);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0xFF);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(2)).unwrap(), 0xFD);
-    s.step_n(6);
+    s.step_n(6).unwrap();
     assert_eq!(s.load(Src::Register(0xA)).unwrap(), 1);
     assert_eq!(s.load(Src::Register(0xB)).unwrap(), 0);
     assert_eq!(s.load(Src::Register(0xC)).unwrap(), 0);
@@ -72,16 +72,16 @@ fn test_jump_threaded() {
     let mut s = SimulatorTask::spawn(config);
 
     let prog = [0x60, 0x55, 0x12, 0x00];    //LD V0, 0x55; Jump 0x200
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
     assert_eq!(s.load(Src::Address12(config.addr_program)).unwrap(), 0x60);
     assert_eq!(s.load(Src::Address12(config.addr_program + 1)).unwrap(),
                0x55);
     // s.jump(config.addr_program as Address).unwrap();
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x202);
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x200);
 }
 
@@ -91,12 +91,12 @@ fn test_add() {
     let mut s = SimulatorTask::spawn(config);
 
     let prog = [0x64, 0x32, 0x67, 0xC8, 0x84, 0x74, 0x84, 0x74];    //v4 := 50, v7 := 200, v4 += v7, v4 += v7
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(3);
+    s.step_n(3).unwrap();
     assert_eq!(s.load(Src::Register(4)).unwrap(), 250);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(4)).unwrap(), 0xC2);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
 }
@@ -116,9 +116,9 @@ fn test_sprite() {
     let prog = [0xA2, 0x0E, 0x60, 0x3E, 0x61, 0x1E, 0xD0, 0x14, 0x60, 0x00, 0x61, 0x00, 0xD0,
                 0x14, 0x50, 0xA0, 0x50, 0xA0];
     let mut s = Simulator::new(&COSMAC_VIP, None);
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(4);
+    s.step_n(4).unwrap();
     let vram = s.vram().unwrap();
     assert_eq!(vram[0 * 64 + 0], 0);
     assert_eq!(vram[0 * 64 + 1], 1);
@@ -127,7 +127,7 @@ fn test_sprite() {
     assert_eq!(vram[31 * 64 + 63], 0);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
 
-    s.step_n(3);
+    s.step_n(3).unwrap();
     let vram = s.vram().unwrap();
     assert_eq!(vram[0 * 64 + 0], 0);
     assert_eq!(vram[0 * 64 + 1], 0);
@@ -158,25 +158,25 @@ fn test_sub() {
     // vB =- vA
     let prog = [0x60, 0x20, 0x61, 0x10, 0x80, 0x15, 0x80, 0x15, 0x80, 0x15, 0x6A, 0x20, 0x6B,
                 0x40, 0x8A, 0xB7, 0x8B, 0xA7];
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(3);
+    s.step_n(3).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x10);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0x10);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x00);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0x10);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0xF0);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0x10);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
-    s.step_n(3);
+    s.step_n(3).unwrap();
     assert_eq!(s.load(Src::Register(0xA)).unwrap(), 0x20);
     assert_eq!(s.load(Src::Register(0xB)).unwrap(), 0x40);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 1);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0xA)).unwrap(), 0x20);
     assert_eq!(s.load(Src::Register(0xB)).unwrap(), 0xE0);
     assert_eq!(s.load(Src::Register(0xF)).unwrap(), 0);
@@ -221,37 +221,37 @@ fn test_stash_fetch() {
     config.isa_xochip = true;
     let mut s = Simulator::new(&config, None);
 
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(10);
+    s.step_n(10).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0);
     assert_eq!(s.load(Src::Register(2)).unwrap(), 0x1E);
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0x28);
     assert_eq!(s.load(Src::I).unwrap(), 0x237);
-    s.step_n(2);
+    s.step_n(2).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 1);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 2);
     assert_eq!(s.load(Src::Register(2)).unwrap(), 0x1E);
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0x28);
     assert_eq!(s.load(Src::I).unwrap(), 0x234);
-    s.step_n(2);
+    s.step_n(2).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 1);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 2);
     assert_eq!(s.load(Src::Register(2)).unwrap(), 5);
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0x28);
     assert_eq!(s.load(Src::I).unwrap(), 0x235);
-    s.step_n(9);
+    s.step_n(9).unwrap();
     assert_eq!(s.load(Src::Register(0xA)).unwrap(), 0x42);
     assert_eq!(s.load(Src::Register(0xB)).unwrap(), 0x4D);
     assert_eq!(s.load(Src::Register(0xC)).unwrap(), 0x58);
     assert_eq!(s.load(Src::I).unwrap(), 0x232);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0xA)).unwrap(), 0x42);
     assert_eq!(s.load(Src::Register(0xB)).unwrap(), 0x42);
     assert_eq!(s.load(Src::Register(0xC)).unwrap(), 0x58);
     assert_eq!(s.load(Src::I).unwrap(), 0x232);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0xA)).unwrap(), 0x42);
     assert_eq!(s.load(Src::Register(0xB)).unwrap(), 0x42);
     assert_eq!(s.load(Src::Register(0xC)).unwrap(), 0x58);
@@ -273,16 +273,16 @@ fn test_and_xor() {
     let prog = [0x60, 0x55, 0x61, 0xAA, 0x62, 0x00, 0x82, 0x02, 0x81, 0x02, 0x61, 0xAA, 0x80,
                 0x13, 0x80, 0x03];
     let mut s = Simulator::new(&COSMAC_VIP, None);
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(5);
+    s.step_n(5).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0x00);
     assert_eq!(s.load(Src::Register(2)).unwrap(), 0x00);
-    s.step_n(2);
+    s.step_n(2).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0xFF);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0xAA);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x00);
 }
 
@@ -314,19 +314,19 @@ fn test_call_return_jump_jumpv0() {
                 0x18, 0x22, 0x0E, 0x83, 0x3E, 0x00, 0xEE, 0x80, 0x36, 0x00, 0xEE, 0x6A, 0x0A,
                 0x6A, 0x14, 0x6A, 0x1E, 0x6A, 0x28, 0x12, 0x0E];
     let mut s = Simulator::new(&COSMAC_VIP, None);
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(6);
+    s.step_n(6).unwrap();
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0x4);
     assert_eq!(s.load(Src::PC).unwrap(), 0x212);
-    s.step_n(3);
+    s.step_n(3).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 2);
     assert_eq!(s.load(Src::PC).unwrap(), 0x216);
-    s.step_n(2);
+    s.step_n(2).unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x21A);
-    s.step_n(3);
+    s.step_n(3).unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x220);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x20E);
 }
 
@@ -352,15 +352,15 @@ fn test_random_threadrng() {
                 0x04, 0x63, 0x00, 0xC1, 0xFF, 0x83, 0x11, 0x72, 0x01, 0x32, 0x00, 0x12, 0x10,
                 0x83, 0x03];
     let mut s = Simulator::new(&COSMAC_VIP, None);
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(1281);
+    s.step_n(1281).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x55);
     assert_eq!(s.load(Src::PC).unwrap(), 0x20E);
-    s.step_n(1280);
+    s.step_n(1280).unwrap();
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0xFF);
     assert_eq!(s.load(Src::PC).unwrap(), 0x21A);
-    s.step();
+    s.step().unwrap();
     assert_eq!(s.load(Src::Register(3)).unwrap(), 0xAA);
 }
 
@@ -384,9 +384,9 @@ fn test_random_provided() {
     random_values.push_back(0x23);
     random_values.push_back(0xFF);
     let mut s = Simulator::new(&COSMAC_VIP, Some(random_values));
-    s.load_program(&prog);
+    s.load_program(&prog).unwrap();
 
-    s.step_n(5);
+    s.step_n(5).unwrap();
     assert_eq!(s.load(Src::Register(0)).unwrap(), 0x50);
     assert_eq!(s.load(Src::Register(1)).unwrap(), 0x0A);
     assert_eq!(s.load(Src::Register(2)).unwrap(), 0x23);
