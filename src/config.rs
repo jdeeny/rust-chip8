@@ -73,19 +73,19 @@ mod presets {
     pub const COSMAC_VIP: Config = Config {
         ram_bytes: 2048,
         stack_size: 12,
-        vram_size: 64*32,
+        vram_size: 64 * 32,
         addr_program: 0x0200,
         addr_font: 0x0000,
         addr_font_big: 0x0050,
-        font_small: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
-        font_big: &FONT_4X5_SMOOTH,//&FONT_4X5_CHIP8,
+        font_small: &FONT_4X5_SMOOTH, // &FONT_4X5_CHIP8,
+        font_big: &FONT_4X5_SMOOTH, // &FONT_4X5_CHIP8,
         quirk_shift: false,
         isa_chip8: true,
         isa_superchip: false,
         isa_xochip: false,
     };
 
-    pub const COSMAC_VIP_UPGRADED: Config = Config { ram_bytes: 4096, .. DEFAULT };
+    pub const COSMAC_VIP_UPGRADED: Config = Config { ram_bytes: 4096, ..DEFAULT };
     /// Configuration of a stock TELMAC 1800
     ///
     /// Reference: https://en.wikipedia.org/wiki/Telmac_1800

@@ -16,9 +16,11 @@ pub fn add(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()
 pub fn sub(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()> {
     let mut l = try!(exec.load(lhs));
     let r = try!(exec.load(rhs));
-    //set vF if NOT borrow
+    // set vF if NOT borrow
     exec.set_flag(l >= r);
-    if r > l { l += 256; }
+    if r > l {
+        l += 256;
+    }
     let total = (l - r) & 0xFF;
     exec.store(dest, total)
 }
@@ -34,13 +36,17 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
     let first_reg = match first {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        _ => { return Err(Chip8Error::InvalidOperand) },
+        _ => {
+            return Err(Chip8Error::InvalidOperand);
+        },
     };
 
     let last_reg = match last {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        _ => { return Err(Chip8Error::InvalidOperand) },
+        _ => {
+            return Err(Chip8Error::InvalidOperand);
+        },
     };
 
     let flag = try!(exec.load(flag));
@@ -66,13 +72,17 @@ pub fn fetch(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
     let first_reg = match first {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        _ => { return Err(Chip8Error::InvalidOperand) },
+        _ => {
+            return Err(Chip8Error::InvalidOperand);
+        },
     };
 
     let last_reg = match last {
         Src::Register(r) => r,
         Src::Const(n) => n,
-        _ => { return Err(Chip8Error::InvalidOperand) },
+        _ => {
+            return Err(Chip8Error::InvalidOperand);
+        },
     };
 
     let flag = try!(exec.load(flag));
@@ -201,26 +211,34 @@ pub fn bcd(exec: &mut Execute, src: Src) -> Chip8Result<()> {
 pub fn skip_eq(exec: &mut Execute, lhs: Src, rhs: Src) -> Chip8Result<()> {
     let l = try!(exec.load(lhs));
     let r = try!(exec.load(rhs));
-    if l == r { exec.advance_pc(); }
+    if l == r {
+        exec.advance_pc();
+    }
     Ok(())
 }
 
 pub fn skip_not_eq(exec: &mut Execute, lhs: Src, rhs: Src) -> Chip8Result<()> {
     let l = try!(exec.load(lhs));
     let r = try!(exec.load(rhs));
-    if l != r { exec.advance_pc(); }
+    if l != r {
+        exec.advance_pc();
+    }
     Ok(())
 }
 
 pub fn skip_key_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
     let key_state = false;
-    if key_state { exec.advance_pc(); }
+    if key_state {
+        exec.advance_pc();
+    }
     Ok(())
 }
 
 pub fn skip_key_not_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
     let key_state = false;
-    if !key_state { exec.advance_pc(); }
+    if !key_state {
+        exec.advance_pc();
+    }
     Ok(())
 }
 
@@ -242,10 +260,10 @@ pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
 
     let mut flag = false;
 
-    for y in y..n+y {
+    for y in y..n + y {
         let data = try!(exec.load(Src::Address12(addr)));
         for bit in 0..8 {
-            flag |= try!(exec.set_pixel(x+(7-bit), y, ((data >> bit) & 1) as Pixel));
+            flag |= try!(exec.set_pixel(x + (7 - bit), y, ((data >> bit) & 1) as Pixel));
         }
         addr += 1;
     }

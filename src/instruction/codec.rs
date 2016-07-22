@@ -1,6 +1,6 @@
 use types::*;
 use config::Config;
-use instruction::{self, Coding, Pattern, Definition};
+use instruction::{self, Coding, Definition, Pattern};
 
 #[derive(Copy,Clone)]
 pub struct Encoder {

@@ -4,7 +4,7 @@
 
 use std::boxed::FnBox;
 use types::*;
-use instruction::{Dest, Src, DestKind, SrcKind };
+use instruction::{Dest, DestKind, Src, SrcKind};
 
 mod implementations;
 
@@ -12,8 +12,8 @@ mod implementations;
 pub enum OperationKind {
     NoOp,
     Load(DestKind, SrcKind),
-    Stash(SrcKind, SrcKind, SrcKind), //third argument is a flag, 0 = do not increment I, 1 increment I
-    Fetch(SrcKind, SrcKind, SrcKind), //third argument is a flag, 0 = do not increment I, 1 increment I
+    Stash(SrcKind, SrcKind, SrcKind), /* third argument is a flag, 0 = do not increment I, 1 increment I */
+    Fetch(SrcKind, SrcKind, SrcKind), /* third argument is a flag, 0 = do not increment I, 1 increment I */
     Jump(SrcKind),
     JumpV0(SrcKind),
     Call(SrcKind),
@@ -32,7 +32,7 @@ pub enum OperationKind {
     Rand(DestKind, SrcKind, SrcKind),
     Cls,
     Sprite(SrcKind, SrcKind, SrcKind),
-    Font(SrcKind, SrcKind),     // Glyph number, font number - 0 is small font, 1 is big font
+    Font(SrcKind, SrcKind), // Glyph number, font number - 0 is small font, 1 is big font
     Bcd(SrcKind),
     WaitKey(DestKind, SrcKind),
 }
@@ -80,8 +80,12 @@ impl Operation {
             Operation::NoOp => OperationKind::NoOp,
             Operation::Load(d, s) => OperationKind::Load(d.kind(), s.kind()),
 
-            Operation::Stash(first, last, flag) => OperationKind::Stash(first.kind(), last.kind(), flag.kind()),
-            Operation::Fetch(first, last, flag) => OperationKind::Fetch(first.kind(), last.kind(), flag.kind()),
+            Operation::Stash(first, last, flag) => OperationKind::Stash(first.kind(),
+                                                                        last.kind(),
+                                                                        flag.kind()),
+            Operation::Fetch(first, last, flag) => OperationKind::Fetch(first.kind(),
+                                                                        last.kind(),
+                                                                        flag.kind()),
 
             Operation::Jump(d) => OperationKind::Jump(d.kind()),
             Operation::JumpV0(d) => OperationKind::JumpV0(d.kind()),
@@ -118,31 +122,81 @@ impl Operation {
     /// Execute the operation on exec.
     pub fn execute(&self, exec: &mut Execute) -> Chip8Result<()> {
         match *self {
-            Operation::NoOp                     => { Ok(()) },
-            Operation::Load(dest, src)          => { implementations::load(exec, dest, src) },
-            Operation::Add(dest, lhs, rhs)      => { implementations::add(exec, dest, lhs, rhs) },
-            Operation::Sub(dest, lhs, rhs)      => { implementations::sub(exec, dest, lhs, rhs) },
-            Operation::Jump(addr)               => { implementations::jump(exec, addr) },
-            Operation::JumpV0(addr)             => { implementations::jump_v0(exec, addr) },
-            Operation::Call(addr)               => { implementations::call(exec, addr) },
-            Operation::Ret                      => { implementations::ret(exec) },
-            Operation::Or(dest, lhs, rhs)       => { implementations::or(exec, dest, lhs, rhs) },
-            Operation::And(dest, lhs, rhs)      => { implementations::and(exec, dest, lhs, rhs) },
-            Operation::Xor(dest, lhs, rhs)      => { implementations::xor(exec, dest, lhs, rhs) },
-            Operation::Shr(dest, src)           => { implementations::shr(exec, dest, src) },
-            Operation::Shl(dest, src)           => { implementations::shl(exec, dest, src) },
-            Operation::Font(glyph, font)        => { implementations::font(exec, glyph, font) },
-            Operation::Bcd(value)               => { implementations::bcd(exec, value) },
-            Operation::SkipEq(lhs, rhs)         => { implementations::skip_eq(exec, lhs, rhs) },
-            Operation::SkipNotEq(lhs, rhs)      => { implementations::skip_not_eq(exec, lhs, rhs) },
-            Operation::SkipKey(key)             => { implementations::skip_key_pressed(exec, key) },
-            Operation::SkipNotKey(key)          => { implementations::skip_key_not_pressed(exec, key) },
-            Operation::WaitKey(dest, key)       => { implementations::wait_key(exec, dest, key) },
-            Operation::Cls                      => { implementations::clear_screen(exec) },
-            Operation::Stash(first, last, flag) => { implementations::stash(exec, first, last, flag) },
-            Operation::Fetch(first, last, flag) => { implementations::fetch(exec, first, last, flag) },
-            Operation::Rand(dest, src, mask)    => { implementations::random(exec, dest, src, mask) },
-            Operation::Sprite(x, y, n)          => { implementations::sprite(exec, x, y, n) },
+            Operation::NoOp => {
+                Ok(())
+            },
+            Operation::Load(dest, src) => {
+                implementations::load(exec, dest, src)
+            },
+            Operation::Add(dest, lhs, rhs) => {
+                implementations::add(exec, dest, lhs, rhs)
+            },
+            Operation::Sub(dest, lhs, rhs) => {
+                implementations::sub(exec, dest, lhs, rhs)
+            },
+            Operation::Jump(addr) => {
+                implementations::jump(exec, addr)
+            },
+            Operation::JumpV0(addr) => {
+                implementations::jump_v0(exec, addr)
+            },
+            Operation::Call(addr) => {
+                implementations::call(exec, addr)
+            },
+            Operation::Ret => {
+                implementations::ret(exec)
+            },
+            Operation::Or(dest, lhs, rhs) => {
+                implementations::or(exec, dest, lhs, rhs)
+            },
+            Operation::And(dest, lhs, rhs) => {
+                implementations::and(exec, dest, lhs, rhs)
+            },
+            Operation::Xor(dest, lhs, rhs) => {
+                implementations::xor(exec, dest, lhs, rhs)
+            },
+            Operation::Shr(dest, src) => {
+                implementations::shr(exec, dest, src)
+            },
+            Operation::Shl(dest, src) => {
+                implementations::shl(exec, dest, src)
+            },
+            Operation::Font(glyph, font) => {
+                implementations::font(exec, glyph, font)
+            },
+            Operation::Bcd(value) => {
+                implementations::bcd(exec, value)
+            },
+            Operation::SkipEq(lhs, rhs) => {
+                implementations::skip_eq(exec, lhs, rhs)
+            },
+            Operation::SkipNotEq(lhs, rhs) => {
+                implementations::skip_not_eq(exec, lhs, rhs)
+            },
+            Operation::SkipKey(key) => {
+                implementations::skip_key_pressed(exec, key)
+            },
+            Operation::SkipNotKey(key) => {
+                implementations::skip_key_not_pressed(exec, key)
+            },
+            Operation::WaitKey(dest, key) => {
+                implementations::wait_key(exec, dest, key)
+            },
+            Operation::Cls => {
+                implementations::clear_screen(exec)
+            },
+            Operation::Stash(first, last, flag) => {
+                implementations::stash(exec, first, last, flag)
+            },
+            Operation::Fetch(first, last, flag) => {
+                implementations::fetch(exec, first, last, flag)
+            },
+            Operation::Rand(dest, src, mask) => {
+                implementations::random(exec, dest, src, mask)
+            },
+            Operation::Sprite(x, y, n) => {
+                implementations::sprite(exec, x, y, n)
+            },
         }
     }
 }

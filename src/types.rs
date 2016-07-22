@@ -1,7 +1,7 @@
 //! Defines the data types used to describe the Chip8 and associated peripherals.
 
 
-use std::sync::{RwLockWriteGuard, RwLockReadGuard};
+use std::sync::{RwLockReadGuard, RwLockWriteGuard};
 use config::Config;
 use instruction::{Dest, Src};
 

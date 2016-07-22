@@ -5,7 +5,7 @@ mod tests;
 mod threaded;
 
 use std::fmt;
-use std::sync::{Arc, RwLock, RwLockWriteGuard, RwLockReadGuard};
+use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 use rand::{Rng, ThreadRng, thread_rng};
 
 use types::*;
@@ -41,7 +41,7 @@ pub struct Simulator {
 
 impl Simulate for Simulator {
     /// Loads bytes into RAM starting at the given address.
-    fn load_bytes(&mut self, bytes: &[u8], addr: Address) -> Chip8Result<()>  {
+    fn load_bytes(&mut self, bytes: &[u8], addr: Address) -> Chip8Result<()> {
         self.core.load_bytes(bytes, addr)
     }
 
@@ -98,7 +98,6 @@ impl Simulate for Simulator {
     fn audio(&self) -> Chip8Result<Audio> {
         self.core.audio()
     }
-
 }
 
 impl Simulator {
@@ -154,6 +153,4 @@ impl Simulator {
     fn audio_lock(&mut self) -> Chip8Result<Arc<RwLock<Audio>>> {
         Ok(self.core.audio_lock())
     }
-
-
 }

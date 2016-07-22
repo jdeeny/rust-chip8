@@ -20,7 +20,6 @@ pub enum DestKind {
     SoundTimer,
     /// Program Counter
     PC,
-
 }
 
 impl DestKind {
@@ -39,7 +38,7 @@ impl DestKind {
             DestKind::DelayTimer => Dest::DelayTimer,
             DestKind::SoundTimer => Dest::SoundTimer,
             DestKind::PC => Dest::PC,
-            //DestKind::Unused => Dest::Nowhere,
+            // DestKind::Unused => Dest::Nowhere,
         }
     }
 }
@@ -78,5 +77,4 @@ impl Dest {
             Dest::PC => DestKind::PC,
         }
     }
-
 }

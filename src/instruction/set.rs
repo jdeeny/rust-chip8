@@ -14,8 +14,8 @@ use std::fmt;
 
 use types::*;
 use config::Config;
-use instruction::{Definition, Instruction, instruction_sets };
-use instruction::matching::{InstructionMatcher, CodewordMatcher};
+use instruction::{Definition, Instruction, instruction_sets};
+use instruction::matching::{CodewordMatcher, InstructionMatcher};
 
 /// A Chip8 instruction set based on a particular configuration. Translates between machine code
 /// and `Instruction`s.
@@ -26,8 +26,8 @@ use instruction::matching::{InstructionMatcher, CodewordMatcher};
 /// A 16-bit codeword can be decoded into a generic `Instruction`, which can then be processed
 /// by application logic, e.g. a disassembler. An `Instruction` can be encoded into a 16-bit
 /// codeword. The `Instruction` is created by application logic, e.g. an assembler.
-//#[derive(Debug)]
-pub struct Set{
+// #[derive(Debug)]
+pub struct Set {
     table: Vec<DefMatcher>,
 }
 
@@ -41,12 +41,18 @@ struct DefMatcher {
 
 impl Set {
     /// Creates a new  Set using the given configuration.
-    pub fn new(config: &Config) ->  Set {
+    pub fn new(config: &Config) -> Set {
         let mut set = Set { table: Vec::new() };
 
-        if config.isa_chip8 {set.append(instruction_sets::CHIP8); }
-        if config.isa_superchip { set.append(instruction_sets::SUPERCHIP); }
-        if config.isa_xochip { set.append(instruction_sets::XOCHIP); }
+        if config.isa_chip8 {
+            set.append(instruction_sets::CHIP8);
+        }
+        if config.isa_superchip {
+            set.append(instruction_sets::SUPERCHIP);
+        }
+        if config.isa_xochip {
+            set.append(instruction_sets::XOCHIP);
+        }
 
         set
     }
@@ -77,7 +83,7 @@ impl Set {
         for i in &self.table {
             if i.code_matcher.is_match(codeword) {
                 println!("decoded {:X}", codeword);
-                return Some(Instruction::new(i.definition.specify(codeword)))
+                return Some(Instruction::new(i.definition.specify(codeword)));
             }
         }
         println!("failed to decode {:X}", codeword);
@@ -94,14 +100,13 @@ impl Set {
         match count {
             0 => false,
             1 => true,
-            _ => panic!("should never match more than once")
+            _ => panic!("should never match more than once"),
 
         }
     }
 
-/*    /// Returns the configuration that was used to create this ` Set`
-    pub fn config(&self) -> Config {
-        self.config
-    }*/
-
+    //    /// Returns the configuration that was used to create this ` Set`
+    // pub fn config(&self) -> Config {
+    // self.config
+    // }
 }

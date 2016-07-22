@@ -1,9 +1,9 @@
 //! Defines the state of the Chip8 virtual machine.
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 use std::panic;
-use std::iter::{Iterator, FromIterator, repeat};
+use std::iter::{FromIterator, Iterator, repeat};
 use std::collections::VecDeque;
-use rand::{Rng, thread_rng, ThreadRng};
+use rand::{Rng, ThreadRng, thread_rng};
 pub use types::*;
 use config::Config;
 use instruction::{Dest, Src};
@@ -11,23 +11,23 @@ use instruction::{Dest, Src};
 
 pub type RandomBytes = VecDeque<u8>;
 
-/*#[derive(Debug, Clone)]
-pub struct Locked<T>(pub Arc<RwLock<T>>);
-
-impl<T> Locked<T> {
-    pub fn new(t: T) -> Locked<T> {
-        Locked(Arc::new(RwLock::new(t)))
-    }
-    pub fn try_read(&self) -> RwLockReadGuard<T> {
-        self.0.try_read().unwrap()
-    }
-    pub fn try_write(&mut self) -> RwLockWriteGuard<T> {
-        self.0.try_write().unwrap()s
-    }
-    pub fn clone_lock(&mut self) -> Arc<RwLock<T>> {
-        self.0.clone()
-    }
-}*/
+// #[derive(Debug, Clone)]
+// pub struct Locked<T>(pub Arc<RwLock<T>>);
+//
+// impl<T> Locked<T> {
+// pub fn new(t: T) -> Locked<T> {
+// Locked(Arc::new(RwLock::new(t)))
+// }
+// pub fn try_read(&self) -> RwLockReadGuard<T> {
+// self.0.try_read().unwrap()
+// }
+// pub fn try_write(&mut self) -> RwLockWriteGuard<T> {
+// self.0.try_write().unwrap()s
+// }
+// pub fn clone_lock(&mut self) -> Arc<RwLock<T>> {
+// self.0.clone()
+// }
+// }
 
 /// A struct that contains a Chip8 `Config` and the machine state.
 ///
@@ -77,7 +77,8 @@ impl Chip8 {
             dt: 0,
             pc: 0,
             stack: Vec::with_capacity(config.stack_size),
-            vram: Arc::new(RwLock::new(Vec::from_iter(repeat(Pixel::default()).take(config.vram_size)))),
+            vram: Arc::new(RwLock::new(Vec::from_iter(repeat(Pixel::default())
+                .take(config.vram_size)))),
             keys: Arc::new(RwLock::new([false; 16])),
             buzzer: Arc::new(RwLock::new(false)),
             audio: Arc::new(RwLock::new([0; 16])),
@@ -114,7 +115,9 @@ impl Chip8 {
 
     pub fn load_bytes(&mut self, bytes: &[u8], address: Address) -> Chip8Result<()> {
         let last_byte = address as usize + bytes.len();
-        if last_byte > self.config.ram_bytes { return Err(Chip8Error::OutOfBoundsAt(address as usize)); }
+        if last_byte > self.config.ram_bytes {
+            return Err(Chip8Error::OutOfBoundsAt(address as usize));
+        }
         let mut i = address as usize;
         for b in bytes {
             self.ram[i] = *b;
@@ -133,13 +136,13 @@ impl Chip8 {
         self.dt = 0;
         self.pc = 0;
         self.stack = Vec::with_capacity(self.config.stack_size);
-        *self.vram.try_write().unwrap() = Vec::from_iter(repeat(Pixel::default()).take(self.config.vram_size));
+        *self.vram.try_write().unwrap() = Vec::from_iter(repeat(Pixel::default())
+            .take(self.config.vram_size));
         *self.keys.try_write().unwrap() = [false; 16];
         *self.buzzer.try_write().unwrap() = false;
         *self.audio.try_write().unwrap() = [0; 16];
     }
     pub fn step(&mut self) -> Chip8Result<()> {
-
         Ok(())
     }
     pub fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
@@ -166,27 +169,35 @@ impl Chip8 {
 }
 
 impl Execute for Chip8 {
-
     fn config(&self) -> Config {
         self.config
     }
 
     fn load(&mut self, src: Src) -> Chip8Result<usize> {
         print!("load src: {:?} ", src);
-        let x =
-        match src {
-            Src::Const(n)       => Ok(n),
-            Src::Register(r)    => self.v.get(r).map(|reg| *reg as usize).ok_or(Chip8Error::OutOfBoundsAt(r)),
-            Src::Address12(a)   => self.ram.get(a).map(|cell| *cell as usize).ok_or(Chip8Error::OutOfBoundsAt(a)),
-            Src::I              => Ok(self.i as usize),
-            Src::IndirectI      => self.ram.get(self.i as usize).and_then(|addr| self.ram.get(*addr as usize)).map(|v| *v as usize).ok_or(Chip8Error::OutOfBounds),
+        let x = match src {
+            Src::Const(n) => Ok(n),
+            Src::Register(r) => self.v
+                .get(r)
+                .map(|reg| *reg as usize)
+                .ok_or(Chip8Error::OutOfBoundsAt(r)),
+            Src::Address12(a) => self.ram
+                .get(a)
+                .map(|cell| *cell as usize)
+                .ok_or(Chip8Error::OutOfBoundsAt(a)),
+            Src::I => Ok(self.i as usize),
+            Src::IndirectI => self.ram
+                .get(self.i as usize)
+                .and_then(|addr| self.ram.get(*addr as usize))
+                .map(|v| *v as usize)
+                .ok_or(Chip8Error::OutOfBounds),
             Src::Literal12(n12) => Ok(n12),
-            Src::Literal8(n8)   => Ok(n8),
-            Src::Literal4(n4)   => Ok(n4),
-            Src::SoundTimer     => Ok(self.st as usize),
-            Src::DelayTimer     => Ok(self.dt as usize),
-            Src::Random         => Ok(self.next_random() as usize),
-            Src::PC             => Ok(self.pc as usize),
+            Src::Literal8(n8) => Ok(n8),
+            Src::Literal4(n4) => Ok(n4),
+            Src::SoundTimer => Ok(self.st as usize),
+            Src::DelayTimer => Ok(self.dt as usize),
+            Src::Random => Ok(self.next_random() as usize),
+            Src::PC => Ok(self.pc as usize),
         };
         println!("= {:?}", x);
         x
@@ -195,18 +206,47 @@ impl Execute for Chip8 {
     fn store(&mut self, dest: Dest, data: usize) -> Chip8Result<()> {
         println!("store {:?} = {:?} ", dest, data);
         match dest {
-            Dest::Register(r) => self.v.get_mut(r).map(|reg| {*reg = data as Register8 & 0xFF; () }).ok_or(Chip8Error::OutOfBoundsAt(r)),
-            Dest::Address12(a) => self.ram.get_mut(a).map(|cell| {*cell = data as MemoryCell; () }).ok_or(Chip8Error::OutOfBoundsAt(a)),
-            Dest::I => { self.i = (data & 0xFFFF) as Register16; Ok(()) },
-            Dest::IndirectI => self.load(Src::I).and_then(|addr| self.store(Dest::Address12(addr), data)),
-            Dest::SoundTimer => { self.st = data as Timer; Ok(()) },
-            Dest::DelayTimer => { self.dt = data as Timer; Ok(())},
-            Dest::PC => { self.pc = data as Address; Ok(()) },
+            Dest::Register(r) => self.v
+                .get_mut(r)
+                .map(|reg| {
+                    *reg = data as Register8 & 0xFF;
+                    ()
+                })
+                .ok_or(Chip8Error::OutOfBoundsAt(r)),
+            Dest::Address12(a) => self.ram
+                .get_mut(a)
+                .map(|cell| {
+                    *cell = data as MemoryCell;
+                    ()
+                })
+                .ok_or(Chip8Error::OutOfBoundsAt(a)),
+            Dest::I => {
+                self.i = (data & 0xFFFF) as Register16;
+                Ok(())
+            },
+            Dest::IndirectI => self.load(Src::I)
+                .and_then(|addr| self.store(Dest::Address12(addr), data)),
+            Dest::SoundTimer => {
+                self.st = data as Timer;
+                Ok(())
+            },
+            Dest::DelayTimer => {
+                self.dt = data as Timer;
+                Ok(())
+            },
+            Dest::PC => {
+                self.pc = data as Address;
+                Ok(())
+            },
         }
     }
 
     fn set_flag(&mut self, flag: bool) {
-        self.v[0xF] = if flag { 1 } else { 0 };
+        self.v[0xF] = if flag {
+            1
+        } else {
+            0
+        };
     }
 
     fn stack_pop(&mut self) -> Option<Address> {

@@ -9,204 +9,200 @@ pub const CODE_BIG: usize = 1;
 pub type Font4x5 = [MemoryCell; 5 * 16];
 
 /// I believe this is the 'official' chip8 font.
-pub const FONT_4X5_CHIP8: Font4x5 = [
-    // 0
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    // 1
-    draw_u8!( __X_ ),
-    draw_u8!( _XX_ ),
-    draw_u8!( __X_ ),
-    draw_u8!( __X_ ),
-    draw_u8!( _XXX ),
-    // 2
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    // 3
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    // 4
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    // 5
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    // 6
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    // 7
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( __X_ ),
-    draw_u8!( _X__ ),
-    draw_u8!( _X__ ),
-    // 8
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    // 9
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    // A
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    // B
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( XXX_ ),
-    // C
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( X___ ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    // D
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( XXX_ ),
-    // E
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    // F
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( X___ ),
-];
+pub const FONT_4X5_CHIP8: Font4x5 = [// 0
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(X__X),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     // 1
+                                     draw_u8!(__X_),
+                                     draw_u8!(_XX_),
+                                     draw_u8!(__X_),
+                                     draw_u8!(__X_),
+                                     draw_u8!(_XXX),
+                                     // 2
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     // 3
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(XXXX),
+                                     // 4
+                                     draw_u8!(X__X),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(___X),
+                                     // 5
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(XXXX),
+                                     // 6
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     // 7
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(__X_),
+                                     draw_u8!(_X__),
+                                     draw_u8!(_X__),
+                                     // 8
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     // 9
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(___X),
+                                     draw_u8!(XXXX),
+                                     // A
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X__X),
+                                     draw_u8!(X__X),
+                                     // B
+                                     draw_u8!(XXX_),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXX_),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXX_),
+                                     // C
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(X___),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     // D
+                                     draw_u8!(XXX_),
+                                     draw_u8!(X__X),
+                                     draw_u8!(X__X),
+                                     draw_u8!(X__X),
+                                     draw_u8!(XXX_),
+                                     // E
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     // F
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(XXXX),
+                                     draw_u8!(X___),
+                                     draw_u8!(X___)];
 
 /// Attempt at creating a rounded 4x5 font. Mostly to test that different fonts can be used.
-pub const FONT_4X5_SMOOTH: Font4x5 = [
-    // 0
-    draw_u8!( _XX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( _XX_ ),
-    // 1
-    draw_u8!( ___X ),
-    draw_u8!( __XX ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    // 2
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    // 3
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( _XXX ),
-    draw_u8!( ___X ),
-    draw_u8!( XXXX ),
-    // 4
-    draw_u8!( X___ ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    // 5
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXX_ ),
-    draw_u8!( ___X ),
-    draw_u8!( XXX_ ),
-    // 6
-    draw_u8!( __X_ ),
-    draw_u8!( _X__ ),
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( _XX_ ),
-    // 7
-    draw_u8!( _XXX ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    draw_u8!( ___X ),
-    // 8
-    draw_u8!( _XX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( _XX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( _XX_ ),
-    // 9
-    draw_u8!( _XX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( _XXX ),
-    draw_u8!( __X_ ),
-    draw_u8!( _X__ ),
-    // A
-    draw_u8!( _XX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( XXXX ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    // B
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( XXX_ ),
-    // C
-    draw_u8!( _XXX ),
-    draw_u8!( X___ ),
-    draw_u8!( X___ ),
-    draw_u8!( X___ ),
-    draw_u8!( _XXX ),
-    // D
-    draw_u8!( XXX_ ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( X__X ),
-    draw_u8!( XXX_ ),
-    // E
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXX_ ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    // F
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( XXXX ),
-    draw_u8!( X___ ),
-    draw_u8!( X___ ),
-];
+pub const FONT_4X5_SMOOTH: Font4x5 = [// 0
+                                      draw_u8!(_XX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(X__X),
+                                      draw_u8!(X__X),
+                                      draw_u8!(_XX_),
+                                      // 1
+                                      draw_u8!(___X),
+                                      draw_u8!(__XX),
+                                      draw_u8!(___X),
+                                      draw_u8!(___X),
+                                      draw_u8!(___X),
+                                      // 2
+                                      draw_u8!(XXXX),
+                                      draw_u8!(___X),
+                                      draw_u8!(XXXX),
+                                      draw_u8!(X___),
+                                      draw_u8!(XXXX),
+                                      // 3
+                                      draw_u8!(XXXX),
+                                      draw_u8!(___X),
+                                      draw_u8!(_XXX),
+                                      draw_u8!(___X),
+                                      draw_u8!(XXXX),
+                                      // 4
+                                      draw_u8!(X___),
+                                      draw_u8!(X__X),
+                                      draw_u8!(XXXX),
+                                      draw_u8!(___X),
+                                      draw_u8!(___X),
+                                      // 5
+                                      draw_u8!(XXXX),
+                                      draw_u8!(X___),
+                                      draw_u8!(XXX_),
+                                      draw_u8!(___X),
+                                      draw_u8!(XXX_),
+                                      // 6
+                                      draw_u8!(__X_),
+                                      draw_u8!(_X__),
+                                      draw_u8!(XXX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(_XX_),
+                                      // 7
+                                      draw_u8!(_XXX),
+                                      draw_u8!(___X),
+                                      draw_u8!(___X),
+                                      draw_u8!(___X),
+                                      draw_u8!(___X),
+                                      // 8
+                                      draw_u8!(_XX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(_XX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(_XX_),
+                                      // 9
+                                      draw_u8!(_XX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(_XXX),
+                                      draw_u8!(__X_),
+                                      draw_u8!(_X__),
+                                      // A
+                                      draw_u8!(_XX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(XXXX),
+                                      draw_u8!(X__X),
+                                      draw_u8!(X__X),
+                                      // B
+                                      draw_u8!(XXX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(XXX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(XXX_),
+                                      // C
+                                      draw_u8!(_XXX),
+                                      draw_u8!(X___),
+                                      draw_u8!(X___),
+                                      draw_u8!(X___),
+                                      draw_u8!(_XXX),
+                                      // D
+                                      draw_u8!(XXX_),
+                                      draw_u8!(X__X),
+                                      draw_u8!(X__X),
+                                      draw_u8!(X__X),
+                                      draw_u8!(XXX_),
+                                      // E
+                                      draw_u8!(XXXX),
+                                      draw_u8!(X___),
+                                      draw_u8!(XXX_),
+                                      draw_u8!(X___),
+                                      draw_u8!(XXXX),
+                                      // F
+                                      draw_u8!(XXXX),
+                                      draw_u8!(X___),
+                                      draw_u8!(XXXX),
+                                      draw_u8!(X___),
+                                      draw_u8!(X___)];
 
 #[cfg(test)]
 mod tests {
@@ -237,7 +233,7 @@ mod tests {
 
     #[test]
     fn test_draw() {
-        assert_eq!(draw_u8!( X___ ), 0x80);
-        assert_eq!(draw_u8!( ____ ), 0x00);
+        assert_eq!(draw_u8!(X___), 0x80);
+        assert_eq!(draw_u8!(____), 0x00);
     }
 }

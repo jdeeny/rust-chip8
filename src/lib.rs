@@ -38,7 +38,7 @@
 //! for control of execution and inspection of machine state.
 
 
-#![feature(inclusive_range_syntax, fnbox, plugin)]
+#![feature(inclusive_range_syntax, fnbox, plugin, custom_attribute)]
 #![feature(question_mark)]
 #![plugin(drawbytes)]
 
@@ -59,7 +59,7 @@
 #![cfg_attr(feature = "lints", allow(doc_markdown))]
 
 
-//#![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
+// #![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
 
 #![allow(unused_imports, unused_variables, unused_mut)]
 
@@ -76,4 +76,4 @@ mod types;
 pub use config::Config;
 pub use types::*;
 pub use state::Chip8;
-pub use simulator::{Simulator, SimulatorTask, Simulate};
+pub use simulator::{Simulate, Simulator, SimulatorTask};

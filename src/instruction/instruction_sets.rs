@@ -1,4 +1,6 @@
-use instruction::{Definition, SrcKind, DestKind};
+#![allow(unused_attributes)]
+
+use instruction::{Definition, DestKind, SrcKind};
 use instruction::Coding::*;
 use instruction::OperationKind::*;
 use fonts;
@@ -18,10 +20,11 @@ use fonts;
 // Already added:
 //   Original Chip8, SuperChip, XOChip
 
-const A1:usize = 1;
-const A2:usize = 2;
-const A3:usize = 4;
+const A1: usize = 1;
+const A2: usize = 2;
+const A3: usize = 4;
 
+#[rustfmt_skip]
 pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0),   C(0x0),   C(0x0)], op: NoOp },
     Definition { pattern: [C(0x0), C(0x0),   C(0xE),   C(0x0)], op: Cls },
@@ -60,6 +63,7 @@ pub const CHIP8: &'static [Definition] = &[
     Definition { pattern: [C(0xF), A(A2),    C(0x6),   C(0x5)], op: Fetch(SrcKind::Const(0), SrcKind::Register, SrcKind::Const(1)) },
 ];
 
+#[rustfmt_skip]
 pub const SUPERCHIP: &'static [Definition] = &[
     Definition { pattern: [C(0x0), C(0x0),   C(0xC),   A(A1)],  op: NoOp /*ScrollDown(SrcKind::Literal4)*/ },
     Definition { pattern: [C(0x0), C(0x0),   C(0xF),   C(0xB)], op: NoOp /*ScrollRight*/ },
@@ -72,6 +76,7 @@ pub const SUPERCHIP: &'static [Definition] = &[
     Definition { pattern: [C(0xF), A(A1),    C(0x8),   C(0x5)], op: NoOp /*LoadFlags(SrcKind::Register)*/},
 ];
 
+#[rustfmt_skip]
 pub const XOCHIP: &'static [Definition] = &[
     Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x2)], op: Stash(SrcKind::Register, SrcKind::Register, SrcKind::Const(0)) },
     Definition { pattern: [C(0x5), A(A1),   A(A2),     C(0x3)], op: Fetch(SrcKind::Register, SrcKind::Register, SrcKind::Const(0)) },

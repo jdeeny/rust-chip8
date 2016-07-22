@@ -1,6 +1,6 @@
 use types::*;
-use instruction::{Instruction,Pattern, Coding, Definition, SrcKind, DestKind};
-use instruction::{OperationKind, Operation};
+use instruction::{Coding, Definition, DestKind, Instruction, Pattern, SrcKind};
+use instruction::{Operation, OperationKind};
 
 
 
@@ -31,7 +31,6 @@ impl CodewordMatcher {
     pub fn is_match(&self, codeword: Codeword) -> bool {
         (codeword & self.mask) == (self.code & self.mask)
     }
-
 }
 
 /// Matches an instruction
@@ -42,9 +41,7 @@ pub struct InstructionMatcher {
 
 impl InstructionMatcher {
     pub fn new(definition: &Definition) -> InstructionMatcher {
-        InstructionMatcher {
-            op_kind: definition.op,
-        }
+        InstructionMatcher { op_kind: definition.op }
     }
 
     #[allow(dead_code)]
