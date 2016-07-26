@@ -7,7 +7,7 @@ use rand::{Rng, ThreadRng, thread_rng};
 pub use types::*;
 use config::Config;
 use instruction::{Dest, Src};
-
+use std::fmt;
 
 pub type RandomBytes = VecDeque<u8>;
 
@@ -88,19 +88,6 @@ impl Chip8 {
 
     }
 
-    pub fn vram_clone(&self) -> Arc<RwLock<Vram>> {
-        self.vram.clone()
-    }
-    pub fn keys_clone(&self) -> Arc<RwLock<Keyboard>> {
-        self.keys.clone()
-    }
-    pub fn buzzer_clone(&self) -> Arc<RwLock<Buzzer>> {
-        self.buzzer.clone()
-    }
-    pub fn audio_clone(&self) -> Arc<RwLock<Audio>> {
-        self.audio.clone()
-    }
-
     fn next_random(&mut self) -> MemoryCell {
         if let Some(ref mut r) = self.random {
             r.pop_front().unwrap_or(0)
@@ -109,10 +96,12 @@ impl Chip8 {
         }
     }
 
+    /// Sets the values of the next 'random' numbers.
     pub fn set_random(&mut self, iter: Option<RandomBytes>) {
         self.random = iter;
     }
 
+    /// Load a byte array into ram at the given address.
     pub fn load_bytes(&mut self, bytes: &[u8], address: Address) -> Chip8Result<()> {
         let last_byte = address as usize + bytes.len();
         if last_byte > self.config.ram_bytes {
@@ -125,10 +114,15 @@ impl Chip8 {
         }
         Ok(())
     }
+
+    fn screen_idx(&self, x: usize, y: usize) -> usize {
+        (x % 64) + (y % 32) * 64
+    }
 }
 
 impl Chip8 {
-    pub fn reset(&mut self) {
+    /// Reset the machine to power-on state.
+    pub fn reset(&mut self) -> Chip8Result<()> {
         self.ram = Vec::from_iter(repeat(0).take(self.config.ram_bytes));
         self.v = [0; 16];
         self.i = 0;
@@ -136,33 +130,41 @@ impl Chip8 {
         self.dt = 0;
         self.pc = 0;
         self.stack = Vec::with_capacity(self.config.stack_size);
-        *self.vram.try_write().unwrap() = Vec::from_iter(repeat(Pixel::default())
-            .take(self.config.vram_size));
-        *self.keys.try_write().unwrap() = [false; 16];
-        *self.buzzer.try_write().unwrap() = false;
-        *self.audio.try_write().unwrap() = [0; 16];
+        *try!(self.vram.try_write().map_err(|_| Chip8Error::MutexError)) =
+            Vec::from_iter(repeat(Pixel::default()).take(self.config.vram_size));
+        *try!(self.keys.try_write().map_err(|_| Chip8Error::MutexError)) = [false; 16];
+        *try!(self.buzzer.try_write().map_err(|_| Chip8Error::MutexError)) = false;
+        *try!(self.audio.try_write().map_err(|_| Chip8Error::MutexError)) = [0; 16];
+        Ok(())
     }
+    /// Execute one instruction.
     pub fn step(&mut self) -> Chip8Result<()> {
         Ok(())
     }
+    /// Execute several instructions.
     pub fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
         for _ in 0..number_of_steps {
             try!(self.step());
         }
         Ok(())
     }
+
+    /// Returns a copy of the lock for the keyboard.
     pub fn keyboard_lock(&mut self) -> Arc<RwLock<Keyboard>> {
         self.keys.clone()
     }
 
+    /// Returns a copy of the lock for the vram.
     pub fn vram_lock(&mut self) -> Arc<RwLock<Vram>> {
         self.vram.clone()
     }
 
+    /// Returns a copy of the lock for the buzzer.
     pub fn buzzer_lock(&mut self) -> Arc<RwLock<Buzzer>> {
         self.buzzer.clone()
     }
 
+    /// Returns a copy of the lock for the audio.
     pub fn audio_lock(&mut self) -> Arc<RwLock<Audio>> {
         self.audio.clone()
     }
@@ -180,17 +182,17 @@ impl Execute for Chip8 {
             Src::Register(r) => self.v
                 .get(r)
                 .map(|reg| *reg as usize)
-                .ok_or(Chip8Error::OutOfBoundsAt(r)),
+                .ok_or_else(|| Chip8Error::OutOfBoundsAt(r)),
             Src::Address12(a) => self.ram
                 .get(a)
                 .map(|cell| *cell as usize)
-                .ok_or(Chip8Error::OutOfBoundsAt(a)),
+                .ok_or_else(|| Chip8Error::OutOfBoundsAt(a)),
             Src::I => Ok(self.i as usize),
             Src::IndirectI => self.ram
                 .get(self.i as usize)
                 .and_then(|addr| self.ram.get(*addr as usize))
                 .map(|v| *v as usize)
-                .ok_or(Chip8Error::OutOfBounds),
+                .ok_or_else(|| Chip8Error::OutOfBounds),
             Src::Literal12(n12) => Ok(n12),
             Src::Literal8(n8) => Ok(n8),
             Src::Literal4(n4) => Ok(n4),
@@ -212,14 +214,14 @@ impl Execute for Chip8 {
                     *reg = data as Register8 & 0xFF;
                     ()
                 })
-                .ok_or(Chip8Error::OutOfBoundsAt(r)),
+                .ok_or_else(|| Chip8Error::OutOfBoundsAt(r)),
             Dest::Address12(a) => self.ram
                 .get_mut(a)
                 .map(|cell| {
                     *cell = data as MemoryCell;
                     ()
                 })
-                .ok_or(Chip8Error::OutOfBoundsAt(a)),
+                .ok_or_else(|| Chip8Error::OutOfBoundsAt(a)),
             Dest::I => {
                 self.i = (data & 0xFFFF) as Register16;
                 Ok(())
@@ -278,49 +280,51 @@ impl Execute for Chip8 {
     }
 
     fn xor_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<bool> {
-        let mut vram = self.vram.write().unwrap();
-        let x = x % 64;
-        let y = y % 32;
-        vram[x + y * 64] ^= pixel;
-        Ok(vram[x + y * 64] != pixel)
+        let mut vram = try!(self.vram.write().map_err(|_| Chip8Error::MutexError));
+        let idx = self.screen_idx(x, y);
+        vram[idx] ^= pixel;
+        Ok(vram[idx] != pixel)
     }
 
     fn set_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<()> {
-        let mut vram = self.vram.write().unwrap();
-        let x = x % 64;
-        let y = y % 32;
-        vram[x + y * 64] = pixel;
+        let mut vram = try!(self.vram.write().map_err(|_| Chip8Error::MutexError));
+        let idx = self.screen_idx(x, y);
+        vram[idx] = pixel;
         Ok(())
     }
 
-
-
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()> {
-        let mut k = self.keys.try_write().unwrap();
+        let mut k = try!(self.keys.try_write().map_err(|_| Chip8Error::MutexError));
         *k = *keys;
         Ok(())
 
     }
 
     fn keyboard(&self) -> Chip8Result<Keyboard> {
-        Ok(self.keys.try_read().unwrap().clone())
+        self.keys.try_read().map_err(|_| Chip8Error::MutexError).map(|x| *x)
     }
 
     fn vram(&self) -> Chip8Result<Vram> {
-        Ok(self.vram.try_read().unwrap().clone())
+        self.vram.try_read().map_err(|_| Chip8Error::MutexError).map(|x| x.clone())
     }
 
     fn buzzer(&self) -> Chip8Result<Buzzer> {
-        Ok(*self.buzzer.try_read().unwrap())
+        self.buzzer.try_read().map_err(|_| Chip8Error::MutexError).map(|x| *x)
     }
 
     fn audio(&self) -> Chip8Result<Audio> {
-        Ok(*self.audio.try_read().unwrap())
+        self.audio.try_read().map_err(|_| Chip8Error::MutexError).map(|x| *x)
     }
 }
 
 impl Default for Chip8 {
     fn default() -> Self {
         Self::new(&Config::default(), None)
+    }
+}
+
+impl fmt::Debug for Chip8 {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Chip8 {{}}")
     }
 }

@@ -30,7 +30,7 @@ pub type Audio = [u8; 16];
 pub type Vram = Vec<Pixel>;
 
 /// A set of errors that could be returned.
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Chip8Error {
     /// Attempt to access outside bounds -- TODO split into more specific errors
     OutOfBoundsAt(usize),
@@ -46,6 +46,8 @@ pub enum Chip8Error {
     ChannelTxFailure,
     /// An instruction was not recognized.
     InvalidInstruction(Codeword),
+    /// Mutex error.
+    MutexError,
 }
 /// The result type used throughout the library.
 pub type Chip8Result<T> = Result<T, Chip8Error>;
@@ -79,7 +81,7 @@ pub trait Execute {
     fn xor_pixel(&mut self, x: usize, y: usize, pixel: Pixel) -> Chip8Result<bool>;
     /// Returns the keyboard state.
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
-    // Returns the keyboard.
+    /// Returns the keyboard.
     fn keyboard(&self) -> Chip8Result<Keyboard>;
     /// Returns a reference to video buffer.
     fn vram(&self) -> Chip8Result<Vram>;

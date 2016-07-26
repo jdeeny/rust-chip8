@@ -12,7 +12,7 @@
 //! ```rust
 //! use chip8::{Simulator, Simulate};
 //! use chip8::instruction::Src::Register;
-//! let mut chip8 = Simulator::default();
+//! let mut chip8 = Simulator::default().unwrap();
 //! // A simple program:   LD v6, 25    LD v7, 17    ADD v6, v7
 //! chip8.load_program( &[ 0x66, 0x19,  0x67, 0x11,  0x86, 0x74 ] ).unwrap();
 //! // Execute the three instructions.

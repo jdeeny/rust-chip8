@@ -4,7 +4,7 @@ use std::fmt;
 
 pub mod instruction_sets;
 mod matching;
-mod codec;
+//mod codec;
 mod definition;
 mod operations;
 mod operands;

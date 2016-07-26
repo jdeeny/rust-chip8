@@ -17,19 +17,31 @@ pub use self::threaded::SimulatorTask;
 
 use state::RandomBytes;
 
+/// An object that can simulate a chip8 machine.
 pub trait Simulate {
     /// Fetch the current instruction, advance the PC, and execute the instruction.
     fn step(&mut self) -> Chip8Result<()>;
+    /// Execute multiple instructions.
     fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()>;
+    /// Advance the sound and delay timers.
     fn timer_tick(&mut self) -> Chip8Result<()>;
+    /// Load bytes into ram.
     fn load_bytes(&mut self, bytes: &[u8], addr: Address) -> Chip8Result<()>;
+    /// Load a program into ram and the configured base address.
     fn load_program(&mut self, bytes: &[u8]) -> Chip8Result<()>;
+    /// Load a value from a Src.
     fn load(&mut self, src: Src) -> Chip8Result<usize>;
+    /// Store a value into a Dest.
     fn store(&mut self, dest: Dest, value: usize) -> Chip8Result<()>;
+    /// Set the keyboard state.
     fn set_keyboard(&mut self, keys: &Keyboard) -> Chip8Result<()>;
+    /// Read the keyboard state.
     fn keyboard(&self) -> Chip8Result<Keyboard>;
+    /// Read the Vram state.
     fn vram(&self) -> Chip8Result<Vram>;
+    /// Read the buzzer state.
     fn buzzer(&self) -> Chip8Result<Buzzer>;
+    /// Read the audio state.
     fn audio(&self) -> Chip8Result<Audio>;
 }
 
@@ -102,25 +114,28 @@ impl Simulate for Simulator {
 
 impl Simulator {
     /// Returns a new Simulator.
-    pub fn new(config: &Config, rand_iterator: Option<RandomBytes>) -> Simulator {
+    pub fn new(config: &Config, rand_iterator: Option<RandomBytes>) -> Chip8Result<Simulator> {
         let core: Chip8 = Chip8::new(config, rand_iterator);
         let iset = instruction::Set::new(config);
         let mut s = Simulator {
             core: core,
             instruction_set: iset,
         };
-        s.load_bytes(config.font_small, config.addr_font as Address).unwrap();
-        s.core.store(Dest::PC, config.addr_program).unwrap();
-        s
+        try!(s.load_bytes(config.font_small, config.addr_font as Address));
+        try!(s.core.store(Dest::PC, config.addr_program));
+        Ok(s)
     }
 
-    pub fn default() -> Simulator {
+    /// Returns a default simulator, using the default configuration.
+    pub fn default() -> Chip8Result<Simulator> {
         Self::new(&Config::default(), None)
     }
 
     /// Decodes an instruction. TODO: Move to ::instruction
     pub fn decode_instruction(&self, codeword: Codeword) -> Chip8Result<Instruction> {
-        self.instruction_set.decode(codeword).ok_or(Chip8Error::InvalidInstruction(codeword))
+        self.instruction_set
+            .decode(codeword)
+            .ok_or_else(|| Chip8Error::InvalidInstruction(codeword))
     }
 
     /// Decodes the instruction stored in RAM at the given address.
@@ -141,15 +156,19 @@ impl Simulator {
         (hi << 8) | lo
     }
 
+    /// Returns a copy of the lock for the keyboard.
     fn keyboard_lock(&mut self) -> Chip8Result<Arc<RwLock<Keyboard>>> {
         Ok(self.core.keyboard_lock())
     }
+    /// Returns a copy of the lock for the vram.
     fn vram_lock(&mut self) -> Chip8Result<Arc<RwLock<Vram>>> {
         Ok(self.core.vram_lock())
     }
+    /// Returns a copy of the lock for the buzzer.
     fn buzzer_lock(&mut self) -> Chip8Result<Arc<RwLock<Buzzer>>> {
         Ok(self.core.buzzer_lock())
     }
+    /// Returns a copy of the lock for the audio.
     fn audio_lock(&mut self) -> Chip8Result<Arc<RwLock<Audio>>> {
         Ok(self.core.audio_lock())
     }

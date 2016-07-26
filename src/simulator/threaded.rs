@@ -24,32 +24,32 @@ enum Command {
 struct Manager {
     rx_chan: Receiver<Command>,
     sim: Simulator,
-    keyboard_lock: Arc<RwLock<Keyboard>>,
-    vram_lock: Arc<RwLock<Vram>>,
-    buzzer_lock: Arc<RwLock<Buzzer>>,
-    audio_lock: Arc<RwLock<Audio>>,
+//    keyboard_lock: Arc<RwLock<Keyboard>>,
+//    vram_lock: Arc<RwLock<Vram>>,
+//    buzzer_lock: Arc<RwLock<Buzzer>>,
+//    audio_lock: Arc<RwLock<Audio>>,
 }
 
 impl Manager {
-    pub fn new(config: Config, rx_chan: Receiver<Command>) -> Manager {
-        let mut simulator = Simulator::new(&config, None);
-        let keyboard_lock = simulator.keyboard_lock().unwrap();
-        let vram_lock = simulator.vram_lock().unwrap();
-        let buzzer_lock = simulator.buzzer_lock().unwrap();
-        let audio_lock = simulator.audio_lock().unwrap();
+    pub fn new(config: Config, rx_chan: Receiver<Command>) -> Chip8Result<Manager> {
+        let mut simulator = try!(Simulator::new(&config, None));
+//        let keyboard_lock = try!(simulator.keyboard_lock().map_err(|_| Chip8Error::MutexError));
+//        let vram_lock = try!(simulator.vram_lock().map_err(|_| Chip8Error::MutexError));
+//        let buzzer_lock = try!(simulator.buzzer_lock().map_err(|_| Chip8Error::MutexError));
+//        let audio_lock = try!(simulator.audio_lock().map_err(|_| Chip8Error::MutexError));
 
-        Manager {
+        Ok(Manager {
             rx_chan: rx_chan,
             sim: simulator,
-            keyboard_lock: keyboard_lock,
-            vram_lock: vram_lock,
-            buzzer_lock: buzzer_lock,
-            audio_lock: audio_lock,
-        }
+//            keyboard_lock: keyboard_lock,
+//            vram_lock: vram_lock,
+//            buzzer_lock: buzzer_lock,
+//            audio_lock: audio_lock,
+        })
     }
 
     pub fn run(&mut self) {
-        while true {
+        loop {
             if let Ok(command) = self.rx_chan.recv() {
                 match command {
                     Command::Load(tx_chan, src) => {
@@ -91,6 +91,7 @@ impl Manager {
 }
 
 pub struct SimulatorTask {
+    #[allow(dead_code)]
     child: JoinHandle<()>,
     tx_chan: Sender<Command>,
     keyboard_lock: Arc<RwLock<Keyboard>>,
@@ -104,7 +105,7 @@ impl SimulatorTask {
         let (tx, rx) = channel();
 
         let child = thread::spawn(move || {
-            Manager::new(config, rx).run();
+            Manager::new(config, rx).unwrap().run();
         });
 
         let (tx_locks, rx_locks) = channel();
