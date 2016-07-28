@@ -14,7 +14,7 @@ use std::fmt;
 
 use types::*;
 use config::Config;
-use instruction::{Definition, Instruction, instruction_sets};
+use instruction::{Definition, Operation, instruction_sets};
 use instruction::matching::{CodewordMatcher, InstructionMatcher};
 
 /// A Chip8 instruction set based on a particular configuration. Translates between machine code
@@ -74,16 +74,21 @@ impl Set {
 
     /// Encodes a given chip8 instruction into a 16-bit codeword.
     #[allow(unused_variables)]
-    pub fn encode(&self, inst: Instruction) -> Codeword {
-        unimplemented!()
+    pub fn encode(&self, op: Operation) -> Option<Codeword> {
+        for i in &self.table {
+            if i.inst_matcher.is_match(&op) {
+                return Some(0)
+            }
+        }
+        None
     }
 
     /// Decodes a 16-bit codeword into an Instruction.
-    pub fn decode(&self, codeword: Codeword) -> Option<Instruction> {
+    pub fn decode(&self, codeword: Codeword) -> Option<Operation> {
         for i in &self.table {
             if i.code_matcher.is_match(codeword) {
                 println!("decoded {:X}", codeword);
-                return Some(Instruction::new(i.definition.specify(codeword)));
+                return Some(i.definition.specify(codeword));
             }
         }
         println!("failed to decode {:X}", codeword);

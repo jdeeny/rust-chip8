@@ -11,7 +11,7 @@ use rand::{Rng, ThreadRng, thread_rng};
 use types::*;
 use Chip8;
 use config::Config;
-use instruction::{self, Dest, Instruction, Src};
+use instruction::{self, Dest, Src, Operation};
 
 pub use self::threaded::SimulatorTask;
 
@@ -132,14 +132,14 @@ impl Simulator {
     }
 
     /// Decodes an instruction. TODO: Move to ::instruction
-    pub fn decode_instruction(&self, codeword: Codeword) -> Chip8Result<Instruction> {
+    pub fn decode_instruction(&self, codeword: Codeword) -> Chip8Result<Operation> {
         self.instruction_set
             .decode(codeword)
             .ok_or_else(|| Chip8Error::InvalidInstruction(codeword))
     }
 
     /// Decodes the instruction stored in RAM at the given address.
-    pub fn decode_at_addr(&self, addr: Address) -> Chip8Result<Instruction> {
+    pub fn decode_at_addr(&self, addr: Address) -> Chip8Result<Operation> {
         let a = addr as usize;
         let hi = (self.core.ram[a] as Codeword) << 8;
         let lo = self.core.ram[a + 1] as Codeword;

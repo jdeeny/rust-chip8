@@ -1,7 +1,7 @@
 //! Generic 'microcode' implementations of the operations.
 
 use types::*;
-use instruction::{Dest, Instruction, Src};
+use instruction::{Dest, Src};
 use fonts;
 use config::Config;
 

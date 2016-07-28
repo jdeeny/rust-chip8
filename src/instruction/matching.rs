@@ -1,5 +1,5 @@
 use types::*;
-use instruction::{Coding, Definition, DestKind, Instruction, Pattern, SrcKind};
+use instruction::{Coding, Definition, DestKind, Pattern, SrcKind};
 use instruction::{Operation, OperationKind};
 
 
