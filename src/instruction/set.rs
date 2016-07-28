@@ -18,14 +18,14 @@ use instruction::{Definition, Operation, instruction_sets};
 use instruction::matching::{CodewordMatcher, InstructionMatcher};
 
 /// A Chip8 instruction set based on a particular configuration. Translates between machine code
-/// and `Instruction`s.
+/// and `Operation`s.
 ///
-/// An ` Set` is created with a particular configuration, which governs the
+/// A `Set` is created with a particular configuration, which governs the
 /// instructions that are included in the ISA.
 ///
-/// A 16-bit codeword can be decoded into a generic `Instruction`, which can then be processed
-/// by application logic, e.g. a disassembler. An `Instruction` can be encoded into a 16-bit
-/// codeword. The `Instruction` is created by application logic, e.g. an assembler.
+/// A 16-bit codeword can be decoded into an `Operation`, which can then be processed
+/// by application logic, e.g. a disassembler. An `Operation` can be encoded into a 16-bit
+/// codeword. In this case, the `Operation` is created by application logic, e.g. an assembler.
 // #[derive(Debug)]
 pub struct Set {
     table: Vec<DefMatcher>,

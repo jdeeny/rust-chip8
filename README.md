@@ -32,15 +32,8 @@ A `Pattern` defines how the operands required by an `Operation` will be defined 
 codeword.
 
 An `instruction::Definition` is a combination of an `Operation` and a `Pattern`.
-These `Definition`s can be combined into an `instruction::Set` that is able to *decode* codewords
-and return `instruction::Instruction`s and *encode* `instruction::Instruction`s into codewords.
-
-`Definition`s and `Instruction`s are very similar, but a key difference sets them apart - a
-`Definition` only stores the *kind* of operands that will be used and the `Instruction` stores
-the specific operands that will be used. When a codeword is decoded, information about the
-operands is extracted based on the pattern in the definition. For example, a generic 'Register'
-operand in a `Definition` could be specified as 'the v6 register' when the Instruction is
-created.
+These `Definition`s can be combined into an `instruction::Set` that is able to
+*decode* codewords into `Operation`s and *encode* `Operation`s into codewords.
 
 ## Simulation
 The state of a CHIP-8 system, including CPU and peripherals, is represented by a `Chip8`.
