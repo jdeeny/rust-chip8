@@ -10,8 +10,6 @@
 //! assert_eq!( word, set.encode(inst) );
 //! ```
 
-use std::fmt;
-
 use types::*;
 use config::Config;
 use instruction::{Definition, Operation, instruction_sets};
@@ -26,11 +24,12 @@ use instruction::matching::{CodewordMatcher, InstructionMatcher};
 /// A 16-bit codeword can be decoded into an `Operation`, which can then be processed
 /// by application logic, e.g. a disassembler. An `Operation` can be encoded into a 16-bit
 /// codeword. In this case, the `Operation` is created by application logic, e.g. an assembler.
-// #[derive(Debug)]
+#[derive(Debug)]
 pub struct Set {
     table: Vec<DefMatcher>,
 }
 
+#[derive(Debug)]
 struct DefMatcher {
     pub definition: Definition,
     pub code_matcher: CodewordMatcher,
@@ -57,17 +56,19 @@ impl Set {
         set
     }
 
+    /// Add a slice of definitions to the set.
     pub fn append(&mut self, set: &[Definition]) {
         for d in set.iter() {
-            self.push(&d);
+            self.push(*d);
         }
     }
 
-    pub fn push(&mut self, definition: &Definition) {
+    /// Add a definition to the set.
+    pub fn push(&mut self, definition: Definition) {
         self.table.push(DefMatcher {
-            definition: *definition,
+            definition: definition,
             code_matcher: CodewordMatcher::new(definition.pattern),
-            inst_matcher: InstructionMatcher::new(definition),
+            inst_matcher: InstructionMatcher::new(&definition),
         });
     }
 
@@ -77,7 +78,7 @@ impl Set {
     pub fn encode(&self, op: Operation) -> Option<Codeword> {
         for i in &self.table {
             if i.inst_matcher.is_match(&op) {
-                return Some(0)
+                return Some(0);
             }
         }
         None
@@ -87,14 +88,13 @@ impl Set {
     pub fn decode(&self, codeword: Codeword) -> Option<Operation> {
         for i in &self.table {
             if i.code_matcher.is_match(codeword) {
-                println!("decoded {:X}", codeword);
                 return Some(i.definition.specify(codeword));
             }
         }
-        println!("failed to decode {:X}", codeword);
         None
     }
 
+    /// Returns true if the codeword is in the set.
     pub fn codeword_exists(&self, codeword: Codeword) -> bool {
         let mut count = 0;
         for dm in &self.table {

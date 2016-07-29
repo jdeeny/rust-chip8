@@ -1,9 +1,9 @@
 use types::*;
-use instruction::{Coding, Definition, DestKind, Pattern, SrcKind};
+use instruction::{Coding, Definition, Pattern};
 use instruction::{Operation, OperationKind};
 
 
-
+#[derive(Debug)]
 pub struct CodewordMatcher {
     code: Codeword,
     mask: Codeword,
@@ -34,7 +34,7 @@ impl CodewordMatcher {
 }
 
 /// Matches an instruction
-#[allow(dead_code)]
+#[derive(Debug)]
 pub struct InstructionMatcher {
     op_kind: OperationKind,
 }

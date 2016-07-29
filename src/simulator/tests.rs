@@ -1,9 +1,9 @@
 use std::collections::VecDeque;
 
+use types::*;
 use simulator::{Simulate, Simulator, SimulatorTask};
 use instruction::Src;
-use config::{COSMAC_VIP, Config};
-use types::*;
+use config::COSMAC_VIP;
 
 #[test]
 fn test_jump() {
@@ -416,15 +416,15 @@ fn test_skip_key() {
     let mut keys: Keyboard = [false; 16];
     keys[5] = true;
     s.load_program(&prog).unwrap();
-    s.set_keyboard(&keys);
+    s.set_keyboard(&keys).unwrap();
     s.step_n(13).unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x202);
     keys[5] = false;
-    s.set_keyboard(&keys);
+    s.set_keyboard(&keys).unwrap();
     s.step_n(13).unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x20A);
     keys[8] = true;
-    s.set_keyboard(&keys);
+    s.set_keyboard(&keys).unwrap();
     s.step_n(2).unwrap();
     assert_eq!(s.load(Src::PC).unwrap(), 0x20C);
 }
@@ -454,7 +454,7 @@ fn test_bcd_font() {
                 0x65, 0x65, 0x0B, 0xF2, 0x29, 0xD5, 0x65, 0x12, 0x21];
     let mut s = Simulator::new(&COSMAC_VIP, None).unwrap();
     s.load_program(&prog).unwrap();
-    s.step_n(50);
+    s.step_n(50).unwrap();
     let vram = s.vram().unwrap();
     for line in 0..6 {
         println!("{:?}", &vram[line * 64..(line + 1) * 64]);

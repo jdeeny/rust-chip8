@@ -61,11 +61,12 @@ pub enum Dest {
     DelayTimer,
     /// The sound timer.
     SoundTimer,
-    // The program counter.
+    /// The program counter.
     PC,
 }
 
 impl Dest {
+    /// Returns the kind of Dest.
     pub fn kind(&self) -> DestKind {
         match *self {
             Dest::Register(_) => DestKind::Register,

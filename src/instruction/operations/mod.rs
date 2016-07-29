@@ -2,13 +2,12 @@
 //!
 //! An `OperationKind` can be converted to an Operation by
 
-use std::boxed::FnBox;
 use types::*;
 use instruction::{Dest, DestKind, Src, SrcKind};
 
 mod implementations;
 
-#[derive(Copy,Clone,Eq,PartialEq)]
+#[derive(Copy,Clone,Eq,PartialEq,Debug)]
 pub enum OperationKind {
     NoOp,
     Load(DestKind, SrcKind),

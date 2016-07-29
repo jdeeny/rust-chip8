@@ -38,7 +38,7 @@
 //! for control of execution and inspection of machine state.
 
 
-#![feature(inclusive_range_syntax, fnbox, plugin, custom_attribute)]
+#![feature(inclusive_range_syntax, plugin, custom_attribute)]
 #![feature(question_mark)]
 #![plugin(drawbytes)]
 
@@ -46,22 +46,23 @@
 #![deny(trivial_casts, trivial_numeric_casts, unsafe_code,
         unused_qualifications)]
 
-#![cfg_attr(feature = "lints", warn(missing_docs))]
+//#![cfg_attr(feature = "lints", warn(missing_docs))]
 #![cfg_attr(feature = "lints", plugin(clippy))]
 #![cfg_attr(feature = "lints", deny(clippy))]
 #![cfg_attr(feature = "lints", deny(if_not_else, invalid_upcast_comparisons, items_after_statements,
                                     mem_forget, mut_mut, mutex_integer, non_ascii_literal,
-                                    nonminimal_bool, shadow_reuse, shadow_same, shadow_unrelated,
+                                    nonminimal_bool, shadow_same,
                                     similar_names, single_match_else, string_add, string_add_assign,
                                     unicode_not_nfc, wrong_pub_self_convention ))]
-#![cfg_attr(feature = "lints", warn(option_unwrap_used, result_unwrap_used, missing_debug_implementations,
-                                    unused_import_braces,missing_copy_implementations))]
+//#![cfg_attr(feature = "lints", warn(option_unwrap_used, result_unwrap_used))]
+//#![cfg_attr(feature = "lints", warn(shadow_unrelated, shadow_reuse))]
+#![cfg_attr(feature = "lints", warn(missing_debug_implementations, unused_import_braces,missing_copy_implementations))]
 #![cfg_attr(feature = "lints", allow(doc_markdown))]
-
-
 // #![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
 
-#![allow(unused_imports, unused_variables, unused_mut)]
+//#![allow(unused_imports, unused_variables, unused_mut)]
+#![warn(print_stdout)]
+
 
 extern crate rand;
 extern crate strfmt;

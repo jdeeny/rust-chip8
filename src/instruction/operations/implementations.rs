@@ -3,7 +3,6 @@
 use types::*;
 use instruction::{Dest, Src};
 use fonts;
-use config::Config;
 
 pub fn add(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()> {
     let l = try!(exec.load(lhs));
@@ -27,7 +26,6 @@ pub fn sub(exec: &mut Execute, dest: Dest, lhs: Src, rhs: Src) -> Chip8Result<()
 
 pub fn load(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
     let data = try!(exec.load(src));
-    println!("{:?}", data);
     exec.store(dest, data)
 }
 
@@ -51,7 +49,6 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
 
     let flag = try!(exec.load(flag));
 
-    println!("stash {:?}-{:?}", first_reg, last_reg);
 
     let i = try!(exec.load(Src::I));
     let mut offset = 0;
@@ -68,7 +65,6 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
 
 // Fetches several bytes, pointed to by I, into v0..
 pub fn fetch(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Result<()> {
-    println!("fetch {:?} {:?}", first, last);
     let first_reg = match first {
         Src::Register(r) => r,
         Src::Const(n) => n,
@@ -87,12 +83,10 @@ pub fn fetch(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
 
     let flag = try!(exec.load(flag));
 
-    println!("fetch {:?}-{:?}", first_reg, last_reg);
     let i = try!(exec.load(Src::I));
     let mut offset = 0;
     for r in first_reg...last_reg {
         let value = try!(exec.load(Src::Address12(i + offset)));
-        println!("val: {:?}", value);
         try!(exec.store(Dest::Register(r), value));
         offset += 1;
     }
@@ -184,12 +178,11 @@ pub fn shl(exec: &mut Execute, dest: Dest, src: Src) -> Chip8Result<()> {
 
 pub fn font(exec: &mut Execute, glyph: Src, font: Src) -> Chip8Result<()> {
     let font_code = try!(exec.load(font));
-    let addr;
-    if font_code == fonts::CODE_SMALL {
-        addr = exec.config().addr_font + try!(exec.load(glyph)) * 5;
+    let addr = if font_code == fonts::CODE_SMALL {
+        exec.config().addr_font + try!(exec.load(glyph)) * 5
     } else {
-        addr = exec.config().addr_font_big + try!(exec.load(glyph)) * 10;
-    }
+        exec.config().addr_font_big + try!(exec.load(glyph)) * 10
+    };
     exec.store(Dest::I, addr)
 }
 
@@ -229,7 +222,6 @@ pub fn skip_not_eq(exec: &mut Execute, lhs: Src, rhs: Src) -> Chip8Result<()> {
 pub fn skip_key_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
     let key = try!(exec.load(key));
     let key_state = try!(exec.keyboard())[key];
-    println!("key {:X}? {:?}", key, key_state);
     if key_state {
         exec.advance_pc();
     }
@@ -239,7 +231,6 @@ pub fn skip_key_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
 pub fn skip_key_not_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
     let key = try!(exec.load(key));
     let key_state = try!(exec.keyboard())[key];
-    println!("key {:X}? {:?}", key, key_state);
     if !key_state {
         exec.advance_pc();
     }
@@ -247,8 +238,9 @@ pub fn skip_key_not_pressed(exec: &mut Execute, key: Src) -> Chip8Result<()> {
 }
 
 /// Halt execution until a key is pressed.
+#[allow(unused_variables)]
 pub fn wait_key(exec: &mut Execute, dest: Dest, key: Src) -> Chip8Result<()> {
-    Ok(())
+    unimplemented!()
 }
 
 pub fn clear_screen(exec: &mut Execute) -> Chip8Result<()> {
@@ -261,8 +253,8 @@ pub fn clear_screen(exec: &mut Execute) -> Chip8Result<()> {
 }
 
 pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
-    let mut x = try!(exec.load(x));
-    let mut y = try!(exec.load(y));
+    let x = try!(exec.load(x));
+    let y = try!(exec.load(y));
     let n = try!(exec.load(n));
 
     let mut addr = try!(exec.load(Src::I));
@@ -283,7 +275,7 @@ pub fn sprite(exec: &mut Execute, x: Src, y: Src, n: Src) -> Chip8Result<()> {
 
 pub fn random(exec: &mut Execute, dest: Dest, src: Src, mask: Src) -> Chip8Result<()> {
     let data = try!(exec.load(src));
-    let mask = try!(exec.load(mask));
-    let result = data & mask;
+    let bitmask = try!(exec.load(mask));
+    let result = data & bitmask;
     exec.store(dest, result)
 }

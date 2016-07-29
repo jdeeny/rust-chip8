@@ -1,7 +1,5 @@
-use std::fmt;
-
 use types::*;
-use instruction::{DestKind, Operation, OperationKind, SrcKind};
+use instruction::{Operation, OperationKind};
 
 /// Type to hold instruction word pattern
 pub type Pattern = [Coding; 4];
@@ -27,7 +25,7 @@ pub enum Coding {
 ///     If more than one nibble is used for the same operand, the leftmost nibble is most significant
 ///     and the rightmost is least significant.
 ///     D indicates dest, S src, and A aux.
-#[derive(Copy,Clone)]
+#[derive(Copy,Clone,Debug)]
 pub struct Definition {
     /// The operation that will be performed when this type of instruction is executed.
     pub op: OperationKind,
@@ -45,7 +43,7 @@ impl Definition {
     pub fn specify(&self, codeword: Codeword) -> Operation {
         let mut data = [0usize; 4];
         let mut w = codeword;
-        for (i, coding) in self.pattern.iter().enumerate() {
+        for (_, coding) in self.pattern.iter().enumerate() {
             let nibble = (w as usize & 0xF000) >> 12;
             w <<= 4;
             match *coding {
@@ -57,17 +55,10 @@ impl Definition {
                         }
                     }
                 },
-                Coding::C(n) => {},
-                Coding::X => {},
+                Coding::C(_) | Coding::X => {},
             }
 
         }
-
-        print!("Codeword: {:X} data: ", codeword);
-        for d in data.iter() {
-            print!("{:X} ", d)
-        }
-        println!("");
 
         match self.op {
             OperationKind::NoOp => Operation::NoOp,

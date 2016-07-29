@@ -91,6 +91,7 @@ pub enum Src {
 }
 
 impl Src {
+    /// Returns the kind of Src.
     pub fn kind(&self) -> SrcKind {
         match *self {
             Src::Const(n) => SrcKind::Const(n),

@@ -1,20 +1,16 @@
 //! Simulates a chip8 cpu and provides a thread-safe interface to control execution and state.
 
+mod threaded;
 #[cfg(test)]
 mod tests;
-mod threaded;
 
-use std::fmt;
-use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
-use rand::{Rng, ThreadRng, thread_rng};
+use std::sync::{Arc, RwLock};
 
 use types::*;
 use Chip8;
 use config::Config;
-use instruction::{self, Dest, Src, Operation};
-
+use instruction::{self, Dest, Operation, Src};
 pub use self::threaded::SimulatorTask;
-
 use state::RandomBytes;
 
 /// An object that can simulate a chip8 machine.
@@ -46,6 +42,7 @@ pub trait Simulate {
 }
 
 /// Manages the state of a chip8 cpu.
+#[derive(Debug)]
 pub struct Simulator {
     core: Chip8,
     instruction_set: instruction::Set,
@@ -82,7 +79,6 @@ impl Simulate for Simulator {
 
     fn step(&mut self) -> Chip8Result<()> {
         let instruction = try!(self.decode_at_addr(self.core.pc()));
-        println!("{:?} @ {:X}", instruction, self.core.pc());
         self.core.advance_pc();
         try!(instruction.execute(&mut self.core));
         Ok(())

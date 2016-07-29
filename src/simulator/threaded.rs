@@ -1,6 +1,7 @@
+use std::fmt;
 use std::thread::{self, JoinHandle};
 use std::sync::mpsc::{Receiver, Sender, channel};
-use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
+use std::sync::{Arc, RwLock};
 
 use types::*;
 use simulator::{Simulate, Simulator};
@@ -20,31 +21,18 @@ enum Command {
     AudioLock(Sender<Chip8Result<Arc<RwLock<Audio>>>>),
 }
 
-
+#[derive(Debug)]
 struct Manager {
     rx_chan: Receiver<Command>,
     sim: Simulator,
-//    keyboard_lock: Arc<RwLock<Keyboard>>,
-//    vram_lock: Arc<RwLock<Vram>>,
-//    buzzer_lock: Arc<RwLock<Buzzer>>,
-//    audio_lock: Arc<RwLock<Audio>>,
 }
 
 impl Manager {
     pub fn new(config: Config, rx_chan: Receiver<Command>) -> Chip8Result<Manager> {
-        let mut simulator = try!(Simulator::new(&config, None));
-//        let keyboard_lock = try!(simulator.keyboard_lock().map_err(|_| Chip8Error::MutexError));
-//        let vram_lock = try!(simulator.vram_lock().map_err(|_| Chip8Error::MutexError));
-//        let buzzer_lock = try!(simulator.buzzer_lock().map_err(|_| Chip8Error::MutexError));
-//        let audio_lock = try!(simulator.audio_lock().map_err(|_| Chip8Error::MutexError));
-
+        let simulator = try!(Simulator::new(&config, None));
         Ok(Manager {
             rx_chan: rx_chan,
             sim: simulator,
-//            keyboard_lock: keyboard_lock,
-//            vram_lock: vram_lock,
-//            buzzer_lock: buzzer_lock,
-//            audio_lock: audio_lock,
         })
     }
 
@@ -90,6 +78,7 @@ impl Manager {
     }
 }
 
+/// Provides a simulator that runs in another thread.
 pub struct SimulatorTask {
     #[allow(dead_code)]
     child: JoinHandle<()>,
@@ -101,6 +90,7 @@ pub struct SimulatorTask {
 }
 
 impl SimulatorTask {
+    /// Create a new simulator thread.
     pub fn spawn(config: Config) -> SimulatorTask {
         let (tx, rx) = channel();
 
@@ -144,7 +134,7 @@ impl Simulate for SimulatorTask {
         try!(rx.recv().map_err(|_| Chip8Error::ChannelRxFailure))
     }
     fn step_n(&mut self, number_of_steps: usize) -> Chip8Result<()> {
-        for i in 0..number_of_steps {
+        for _ in 0..number_of_steps {
             try!(self.step());
         }
         Ok(())
@@ -187,7 +177,7 @@ impl Simulate for SimulatorTask {
     }
     fn keyboard(&self) -> Chip8Result<Keyboard> {
         let keyboard_ref = self.keyboard_lock.read().unwrap();
-        let keyboard = keyboard_ref.clone();
+        let keyboard = *keyboard_ref;
         Ok(keyboard)
     }
     fn vram(&self) -> Chip8Result<Vram> {
@@ -203,21 +193,23 @@ impl Simulate for SimulatorTask {
     }
 }
 
+impl fmt::Debug for SimulatorTask {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "SimulatorTask {{}}")
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use config::COSMAC_VIP;
     use instruction::Src;
-    use simulator::{Simulate, Simulator};
+    use simulator::Simulate;
 
     #[test]
     fn test_simtask() {
         let mut task = SimulatorTask::spawn(COSMAC_VIP);
 
-        let t = task.load(Src::Register(0));
-        println!("{:?}", t);
-        // assert!(false);
-
+        task.load(Src::Register(0)).unwrap();
     }
 }

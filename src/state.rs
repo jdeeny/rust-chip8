@@ -1,6 +1,5 @@
 //! Defines the state of the Chip8 virtual machine.
-use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
-use std::panic;
+use std::sync::{Arc, RwLock};
 use std::iter::{FromIterator, Iterator, repeat};
 use std::collections::VecDeque;
 use rand::{Rng, ThreadRng, thread_rng};
@@ -10,24 +9,6 @@ use instruction::{Dest, Src};
 use std::fmt;
 
 pub type RandomBytes = VecDeque<u8>;
-
-// #[derive(Debug, Clone)]
-// pub struct Locked<T>(pub Arc<RwLock<T>>);
-//
-// impl<T> Locked<T> {
-// pub fn new(t: T) -> Locked<T> {
-// Locked(Arc::new(RwLock::new(t)))
-// }
-// pub fn try_read(&self) -> RwLockReadGuard<T> {
-// self.0.try_read().unwrap()
-// }
-// pub fn try_write(&mut self) -> RwLockWriteGuard<T> {
-// self.0.try_write().unwrap()s
-// }
-// pub fn clone_lock(&mut self) -> Arc<RwLock<T>> {
-// self.0.clone()
-// }
-// }
 
 /// A struct that contains a Chip8 `Config` and the machine state.
 ///
@@ -176,8 +157,7 @@ impl Execute for Chip8 {
     }
 
     fn load(&mut self, src: Src) -> Chip8Result<usize> {
-        print!("load src: {:?} ", src);
-        let x = match src {
+        match src {
             Src::Const(n) => Ok(n),
             Src::Register(r) => self.v
                 .get(r)
@@ -200,13 +180,10 @@ impl Execute for Chip8 {
             Src::DelayTimer => Ok(self.dt as usize),
             Src::Random => Ok(self.next_random() as usize),
             Src::PC => Ok(self.pc as usize),
-        };
-        println!("= {:?}", x);
-        x
+        }
     }
 
     fn store(&mut self, dest: Dest, data: usize) -> Chip8Result<()> {
-        println!("store {:?} = {:?} ", dest, data);
         match dest {
             Dest::Register(r) => self.v
                 .get_mut(r)
@@ -269,12 +246,10 @@ impl Execute for Chip8 {
 
     fn jump(&mut self, addr: Address) -> Chip8Result<()> {
         let address = addr as usize;
-        println!("addr: {:?}", addr);
         if address > self.config.ram_bytes - 1 {
             return Err(Chip8Error::OutOfBoundsAt(address));
         }
         self.pc = addr;
-        println!("pc: {:?}", self.pc);
 
         Ok(())
     }
