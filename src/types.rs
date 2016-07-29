@@ -27,7 +27,7 @@ pub type Audio = [u8; 16];
 /// Vram
 pub type Vram = Vec<Pixel>;
 
-/// A set of errors that could be returned.
+/// Errors that could be returned.
 #[derive(Debug, Copy, Clone)]
 pub enum Chip8Error {
     /// Attempt to access outside bounds -- TODO split into more specific errors
