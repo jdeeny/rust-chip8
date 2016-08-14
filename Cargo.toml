@@ -16,7 +16,7 @@ name = "chip8"
 [dependencies]
 rand = "^0.3.14"
 strfmt = "^0.1.5"
-clippy = {version = "0.0.79", optional = true}
+clippy = {version = "0.0.81", optional = true}
 drawbytes = { git = "https://github.com/jdeeny/drawbytes.git", version="^0.1.0"}
 
 [features]
