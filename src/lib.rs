@@ -61,7 +61,7 @@
 // #![cfg_attr(feature = "lints", cast_possible_truncation, cast_possible_wrap, cast_sign_loss))]
 
 //#![allow(unused_imports, unused_variables, unused_mut)]
-#![warn(print_stdout)]
+#![cfg_attr(feature = "lints", warn(print_stdout))]
 
 
 extern crate rand;
