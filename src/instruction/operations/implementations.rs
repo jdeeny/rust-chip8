@@ -52,7 +52,7 @@ pub fn stash(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
 
     let i = try!(exec.load(Src::I));
     let mut offset = 0;
-    for r in first_reg...last_reg {
+    for r in first_reg..=last_reg {
         let value = try!(exec.load(Src::Register(r)));
         try!(exec.store(Dest::Address12(i + offset), value));
         offset += 1;
@@ -85,7 +85,7 @@ pub fn fetch(exec: &mut Execute, first: Src, last: Src, flag: Src) -> Chip8Resul
 
     let i = try!(exec.load(Src::I));
     let mut offset = 0;
-    for r in first_reg...last_reg {
+    for r in first_reg..=last_reg {
         let value = try!(exec.load(Src::Address12(i + offset)));
         try!(exec.store(Dest::Register(r), value));
         offset += 1;

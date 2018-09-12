@@ -38,8 +38,7 @@
 //! for control of execution and inspection of machine state.
 
 
-#![feature(inclusive_range_syntax, plugin, custom_attribute)]
-#![feature(question_mark)]
+#![feature(plugin, custom_attribute)]
 #![plugin(drawbytes)]
 
 // enable errors for some additional lints
